@@ -1,6 +1,8 @@
 # hacky-hours-docs
 
-A community framework for building apps with LLMs — the Hacky Hours way — created by [Empathetech](https://www.empathetech.org).
+A community framework for building apps with LLMs — the Hacky Hours way — created by [Empathetech](https://www.empathetech.org). 🛠️🤗
+
+**For anyone who has an idea and wants to build it** — whether you've shipped a dozen products or you're writing your first line of code. No prior experience required. Just bring the idea.
 
 This repo is two things at once:
 
@@ -11,9 +13,11 @@ This repo is two things at once:
 
 ## The Core Idea
 
-You are the C-suite of your product. Claude and other LLMs are a highly capable implementation team — but they need alignment, not just instructions. This framework gives you the artifacts to provide that alignment: who you are, what you're building, how it should work, and what values it should uphold.
+You drive the product. Claude helps you build it — but it needs your direction, not just your instructions. This framework gives you the artifacts to provide that direction: who you're building for, what you're making, how it should work, and what values it should uphold.
 
-The goal is not to vibe-code blindly, and not to be paralyzed by fear. It's to build with confidence, ownership, and growing expertise.
+The goal isn't to vibe-code blindly, and it isn't to get paralyzed trying to plan everything perfectly. It's to build with confidence, ownership, and growing expertise — one level at a time.
+
+Imperfect documents are fine. Honest documents are what matter.
 
 ---
 

@@ -7,6 +7,26 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.8.0] — 2026-03-20
+
+Tone pass aligned with Empathetech values, and ACCESSIBILITY.md as a first-class design artifact.
+
+### Added
+
+- **`02-design/ACCESSIBILITY.md`** — new design document template covering WCAG standards, perceivable/operable/understandable/robust criteria, testing plan, and known exceptions. Scaffolded by default and listed as a first-class citizen in the Level 2 design table.
+
+### Changed
+
+- **Tone** — language across CLAUDE.md, README.md, and the command file updated to reflect Empathetech's warm, peer-equal, anti-gatekeeping voice:
+  - "C-suite / implementation team" framing replaced with "driver / collaborator"
+  - README opener now welcomes anyone — "no experience required"
+  - "Done when" criteria softened to be honest rather than clinical
+  - Fresh project greeting updated to feel inviting, not procedural
+  - "Framework not a rulebook" framing added to the command intro
+  - Emoji added where they add warmth without distraction 🛠️🤗🎉✅
+
+---
+
 ## [0.7.0] — 2026-03-20
 
 Document lifecycle, iteration cycle, and GitHub sync support.
