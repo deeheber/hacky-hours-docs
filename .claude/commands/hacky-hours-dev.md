@@ -7,13 +7,15 @@ You are now running the Hacky Hours framework assistant. Your job is to guide th
 Handle the argument ($ARGUMENTS) first, before doing anything else:
 
 - "help"                    → print the help message below, then stop
-- "version"                 → print "Hacky Hours command v0.6.0", then stop
+- "version"                 → print "Hacky Hours command v0.7.0", then stop
 - "status"                  → survey the project (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
 - "design" or "2"           → skip to Level 2 guidance
 - "roadmap" or "3"          → skip to Level 3 guidance
 - "build" or "4"            → skip to Level 4 guidance
+- "iterate"                 → skip to Iterate guidance below
+- "sync"                    → skip to Sync guidance below
 - "dry-run"                 → begin with Step 1 below, but in dry-run mode: never create or modify any files; wherever you would write a file, display its contents in a code block with a note "↳ would write to <path>" instead
 - (no argument)             → print the help message below, then stop
 
@@ -24,7 +26,7 @@ Handle the argument ($ARGUMENTS) first, before doing anything else:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v0.6.0
+Hacky Hours framework assistant — v0.7.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -39,6 +41,8 @@ Arguments:
   design      Jump to Level 2 — Design
   roadmap     Jump to Level 3 — Roadmap
   build       Jump to Level 4 — Build
+  iterate     Start an iteration cycle — triage bugs/ideas, amend docs, update backlog
+  sync        Push backlog items to GitHub Issues and publish a release
   status      Report which framework level this project is at
   checklist   Show the pre-merge checklist for Level 4 tasks
   version     Print the installed command version
@@ -129,14 +133,27 @@ If the user asks to scaffold a fresh project, create the following structure:
   PRODUCT_OVERVIEW.md
 02-design/
   README.md
+  decisions/          ← Architecture Decision Records go here
 03-roadmap/
   ROADMAP.md
 04-build/
   BACKLOG.md
   CHANGELOG.md
+archive/              ← cold storage; never delete, move here instead
+.claudeignore         ← tells Claude which files to skip for context
 ```
 
 For each file, create it with a brief header comment explaining its purpose and one placeholder section. Do not copy the full templates — just enough structure to orient the user. Tell them they can see complete templates at https://github.com/empathetech/hacky-hours-docs.
+
+Create `.claudeignore` with these default contents:
+
+```
+archive/
+CHANGELOG.md
+01-ideate/IDEATION.md
+```
+
+**BACKLOG.md is a queue, not a ledger.** Items are added during planning and removed when their PR is merged. An empty BACKLOG means the milestone is complete. Completed work belongs in CHANGELOG.md, not BACKLOG.md.
 
 ---
 
@@ -181,6 +198,8 @@ Start by asking which documents this project actually needs. Not every project n
 For each document, work through it section by section using questions. Generate Mermaid diagrams proactively — ERDs for data models, flowcharts for user journeys, architecture diagrams for system design.
 
 After each document, ask: "Does anything here contradict or require updating another document we've already completed?"
+
+**When a design decision changes during iteration:** do not rewrite the original document in place. Instead, write an Architecture Decision Record (ADR) in `02-design/decisions/` named by date and topic (e.g., `2026-03-20-switch-to-postgres.md`). Update only the affected sections of the original doc, and add a note pointing to the ADR. This preserves the reasoning behind the original decision while keeping the doc accurate.
 
 **Done when:** The design documents collectively answer how the product works well enough to brief an engineer.
 
@@ -227,7 +246,92 @@ The task cycle:
 - [ ] Error messages don't expose internal system state
 - [ ] Change has been manually tested against the relevant user journey
 
+**Milestone housekeeping (run when BACKLOG.md is empty):**
+- Append milestone entry to CHANGELOG.md; move entries older than 3 releases to `archive/changelog/`
+- Move the completed roadmap milestone section to `archive/roadmap/`
+- Update any design docs that changed; write ADRs for significant decisions
+- Move `IDEATION.md` to `archive/` if not already done
+- Review `.claudeignore` — anything newly cold that should be excluded?
+- Tag the release
+
 **Done when:** All milestone tasks are merged, the product behaves as described in the milestone outcome, CHANGELOG.md is updated, and a tagged release has been cut.
+
+---
+
+### Iterate — Run an Iteration Cycle
+
+**Purpose:** Capture bugs, ideas, and improvements after a release, amend the docs that need updating, and queue the work.
+
+The shape of iteration is the same as the initial build cycle — capture → synthesize → prioritize → build — but the inputs are *amendments* to existing documents, not blank pages.
+
+**Step 1: Capture**
+
+Ask the user to brain-dump freely: bugs they've seen, feedback they've received, ideas for improvements. Write everything into `ITERATION.md` (create it at the repo root if it doesn't exist). No filtering yet — just capture.
+
+Prompt with:
+- "What's broken or annoying that you've noticed since the last release?"
+- "What did users ask for that you didn't have time to build?"
+- "What would you change about the design now that you've seen it work in practice?"
+
+**Step 2: Synthesize — identify downstream amendments**
+
+Read `ITERATION.md` alongside the existing design docs. For each item, ask:
+- Does this change how the product works? → Flag the relevant design doc for amendment
+- Does this introduce a new design decision? → Note that an ADR will be needed
+- Is this purely an implementation fix with no design impact? → Goes straight to backlog
+
+Surface the amendment list to the user and confirm before making any changes.
+
+**Step 3: Prioritize — triage into BACKLOG**
+
+Categorize each item:
+- **Hotfix** — broken in production, needs immediate attention
+- **Next milestone** — important enough to be in the next planned release
+- **Backlog** — valid but not urgent; add to BACKLOG.md without a milestone assignment
+
+Add items to BACKLOG.md. Remove any items that have already been completed but not yet cleared.
+
+**Step 4: Amend design docs**
+
+For each flagged design doc, work through the needed changes section by section. Write ADRs in `02-design/decisions/` for any significant decisions. Update the affected sections of the original doc.
+
+**Step 5: Build**
+
+Proceed with the Level 4 build cycle using the updated backlog.
+
+**Done when:** ITERATION.md has been fully triaged, design docs reflect current reality, and the new items are in BACKLOG.md. Move `ITERATION.md` to `archive/` when complete.
+
+---
+
+### Sync — Push to GitHub
+
+**Purpose:** Promote the current BACKLOG and CHANGELOG to GitHub Issues and Releases.
+
+Always confirm before taking any action. This writes to a shared system.
+
+**Offer the following options:**
+
+1. **Push BACKLOG to Issues** — create a GitHub Issue for each item in BACKLOG.md that doesn't already have one. Ask the user what milestone to assign them to.
+
+   ```bash
+   gh issue create --title "<item title>" --body "<item description>" --milestone "<milestone name>"
+   ```
+
+2. **Create a milestone** — if no milestone exists for the current planned release, offer to create one.
+
+   ```bash
+   gh api repos/:owner/:repo/milestones --method POST --field title="<version>" --field due_on="<date>"
+   ```
+
+3. **Publish a release** — take the latest entry from CHANGELOG.md and publish it as a GitHub Release on the current tag.
+
+   ```bash
+   gh release create <tag> --title "<version>" --notes "<changelog entry>"
+   ```
+
+Check that `gh` is installed and authenticated before attempting any of these. If not, tell the user to run `gh auth login` first.
+
+**Never run any of these without explicit confirmation from the user.**
 
 ---
 

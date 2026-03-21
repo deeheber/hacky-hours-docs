@@ -7,6 +7,28 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.7.0] — 2026-03-20
+
+Document lifecycle, iteration cycle, and GitHub sync support.
+
+### Added
+
+- **`/hacky-hours iterate`** — runs an iteration cycle: free-write bugs/ideas into `ITERATION.md`, identify which design docs need amending, triage items into BACKLOG, write ADRs for significant decisions, then proceed with Level 4 build
+- **`/hacky-hours sync`** — pushes BACKLOG items to GitHub Issues, creates milestones, and publishes CHANGELOG entries as GitHub Releases via `gh` CLI (always confirms before acting)
+- **`archive/` folder** — added to scaffold as cold storage for completed milestones, old CHANGELOG entries, superseded design decisions, and IDEATION.md after Level 1
+- **`.claudeignore`** — added to scaffold with sensible defaults to keep LLM context lean as the project grows
+- **`02-design/decisions/`** — added to scaffold for Architecture Decision Records
+- **`runbooks/document-hygiene.md`** — new runbook covering hot/warm/cold doc tiers, per-document lifecycle, ADR pattern, archive conventions, and a milestone housekeeping checklist
+
+### Changed
+
+- **Scaffold** — expanded to include `archive/`, `.claudeignore`, and `02-design/decisions/`
+- **BACKLOG.md** — formalized as a strict queue: items are removed when merged, not marked done. An empty BACKLOG signals milestone complete.
+- **Level 2 guidance** — added ADR pattern: when a design decision changes during iteration, write a new ADR rather than rewriting the original document in place
+- **Level 4 guidance** — added milestone housekeeping checklist: CHANGELOG trimming, roadmap archival, design doc amendments, `.claudeignore` review
+
+---
+
 ## [0.6.0] — 2026-03-20
 
 Command UX improvements: proper autocomplete description, safer default behavior, and a dry-run mode for testing without writing files.
