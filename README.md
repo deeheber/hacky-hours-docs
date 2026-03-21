@@ -93,6 +93,8 @@ Work through these levels in order. Each level's `README.md` explains what "done
 | [`runbooks/costs.md`](./runbooks/costs.md) | What this will cost you |
 | [`runbooks/FAQ.md`](./runbooks/FAQ.md) | Frequently asked questions |
 | [`runbooks/getting-started/`](./runbooks/getting-started/) | Setup guides for all platforms and skill levels |
+| [`runbooks/document-hygiene.md`](./runbooks/document-hygiene.md) | How to keep docs lean as your project grows (archiving, `.claudeignore`, ADRs) |
+| [`runbooks/github-action-sync.md`](./runbooks/github-action-sync.md) | Auto-sync BACKLOG and CHANGELOG when PRs merge via GitHub Action |
 
 ---
 
@@ -110,7 +112,7 @@ curl -fsSL https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/i
 irm https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.ps1 | iex
 ```
 
-Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions (updating, uninstalling).
+Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`iterate`, `sync`, `dry-run`, `--root`, and more).
 
 ---
 

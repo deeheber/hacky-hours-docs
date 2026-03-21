@@ -18,7 +18,7 @@ Level 1 has two documents:
 3. **Draft `PRODUCT_OVERVIEW.md`** — work with Claude to answer the five W questions using your ideation as the source.
 4. **Review and refine** — read it back to yourself. Does it sound like the product you want to build?
 
-> **You are the decision-maker.** Claude will offer structure and ask questions, but every answer in `PRODUCT_OVERVIEW.md` should come from you.
+> **You drive this.** Claude will offer structure and ask questions, but every answer in `PRODUCT_OVERVIEW.md` should come from you. There are no wrong answers here — just honest ones.
 
 ---
 

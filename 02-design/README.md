@@ -14,9 +14,11 @@ Design documents define how your product works — in detail, and from multiple 
 | [`DATA_MODEL.md`](./DATA_MODEL.md) | Your product stores, retrieves, or transforms data of any kind |
 | [`USER_JOURNEYS.md`](./USER_JOURNEYS.md) | You need to map out how users move through key flows in your product |
 | [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) | Your product has a UI and you want consistent visual design and language |
+| [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) | Your product has a UI — build accessibly from day one, not as an afterthought (almost always) ♿ |
 | [`MARKET_FIT.md`](./MARKET_FIT.md) | You want to validate who your users are and why they'd choose your product |
 | [`BUSINESS_LOGIC.md`](./BUSINESS_LOGIC.md) | Your product has rules, calculations, or domain-specific behavior that needs to be explicit |
 | [`SECURITY_PRIVACY.md`](./SECURITY_PRIVACY.md) | Your product handles user data, authentication, payments, or anything sensitive (almost always) |
+| [`decisions/`](./decisions/) | Record significant design changes over time without overwriting original documents |
 | [`diagrams/`](./diagrams/) | You want visual representations of any of the above |
 
 ---
@@ -33,9 +35,9 @@ Design documents define how your product works — in detail, and from multiple 
 ## Done Enough to Move On?
 
 You're ready for Level 3 when:
-- The documents you created collectively explain how the product works at a level sufficient to brief an engineer
+- A new collaborator could read these docs and understand how the product is meant to work — they don't need to be complete, they need to be honest
 - There are no major open questions about how core features function
-- `SECURITY_PRIVACY.md` exists in some form, even if minimal
+- `SECURITY_PRIVACY.md` and `ACCESSIBILITY.md` exist in some form, even if minimal
 
 ---
 
@@ -47,6 +49,8 @@ When helping a user at Level 2:
 - When a document reveals a gap or contradiction in `PRODUCT_OVERVIEW.md`, surface it clearly
 - Generate Mermaid diagrams proactively for data models, user journeys, and architecture — visuals help non-technical stakeholders validate understanding
 - `SECURITY_PRIVACY.md` should be created for almost every project that handles user data; prompt the user if they're skipping it
+- `ACCESSIBILITY.md` should be created for almost every project with a UI; it's the most commonly skipped document and the most costly to fix later
+- When design decisions change during iteration, write a short Architecture Decision Record (ADR) in `decisions/` rather than rewriting the original document — this preserves the reasoning behind original decisions
 
 ---
 
