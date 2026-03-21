@@ -1,6 +1,6 @@
 # Document Hygiene
 
-As a project grows, its documentation can become a liability — bloated files slow down LLM context loading, contradict each other, and obscure what's actually true right now. This runbook describes how to keep the framework documents lean, accurate, and useful over time.
+As a project grows, its documentation can become a liability — bloated files make it harder for Claude to give accurate, focused answers, documents start contradicting each other, and it becomes unclear what's actually true right now. This runbook describes how to keep the framework documents lean, accurate, and useful over time.
 
 ---
 
@@ -43,12 +43,12 @@ CHANGELOG.md is a **ledger**. Completed work lands here with a version tag and d
 - Keep only the **last 3 releases** in the file — move older entries to `archive/changelog/`
 - GitHub Releases holds the canonical history; the file is a quick human reference
 
-### Design docs — amend with ADRs
+### Design docs — amend with decision records
 
 Design documents (ARCHITECTURE.md, DATA_MODEL.md, etc.) describe **how the product works today**. When a design decision changes:
 
 - Do **not** rewrite the original document in place — this loses the reasoning behind the original decision
-- Instead, write a small Architecture Decision Record (ADR) in `02-design/decisions/`
+- Instead, write a small **Architecture Decision Record (ADR)** — a short note recording what changed and why — in `02-design/decisions/`
 - Name it by date and topic: `2026-03-20-switch-to-postgres.md`
 - Keep the original doc accurate by updating only the affected sections, with a note: `See decisions/2026-03-20-switch-to-postgres.md`
 
@@ -100,7 +100,13 @@ archive/
 
 ## .claudeignore
 
-The `.claudeignore` file tells Claude which paths to skip when building context. The scaffold creates a default one — adjust it as your project evolves.
+The `.claudeignore` file is a convention — not a natively enforced feature. To make it work, add a line to your `CLAUDE.md`:
+
+```markdown
+When building context, skip any files or folders listed in `.claudeignore`.
+```
+
+With that instruction in place, Claude will respect the file. The scaffold creates a default `.claudeignore` — adjust it as your project evolves.
 
 Default contents:
 

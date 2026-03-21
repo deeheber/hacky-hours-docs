@@ -32,7 +32,7 @@ That's it. The script downloads the command file directly from GitHub and places
 2. Start a Claude Code session: `claude`
 3. Type `/hacky-hours` and press Enter
 
-Claude should respond by surveying the project and offering options.
+Claude should print the help message listing all available arguments.
 
 ---
 
@@ -40,11 +40,18 @@ Claude should respond by surveying the project and offering options.
 
 | Command | What it does |
 |---------|-------------|
-| `/hacky-hours` | Auto-detects your project's state and presents options |
-| `/hacky-hours ideate` | Jump directly to Level 1 — Ideation |
-| `/hacky-hours design` | Jump directly to Level 2 — Design |
-| `/hacky-hours roadmap` | Jump directly to Level 3 — Roadmap |
-| `/hacky-hours build` | Jump directly to Level 4 — Build |
+| `/hacky-hours` | Show this help message |
+| `/hacky-hours ideate` | Jump to Level 1 — Ideation |
+| `/hacky-hours design` | Jump to Level 2 — Design |
+| `/hacky-hours roadmap` | Jump to Level 3 — Roadmap |
+| `/hacky-hours build` | Jump to Level 4 — Build |
+| `/hacky-hours iterate` | Start an iteration cycle after a release |
+| `/hacky-hours sync` | Push backlog to GitHub Issues, publish a release |
+| `/hacky-hours dry-run` | Run the full workflow without writing any files |
+| `/hacky-hours status` | Report which framework level this project is at |
+| `/hacky-hours checklist` | Show the pre-merge checklist |
+| `/hacky-hours version` | Print the installed version |
+| `/hacky-hours help` | Same as running with no argument |
 
 ---
 

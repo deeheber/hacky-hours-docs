@@ -1,0 +1,147 @@
+# hacky-hours-sync.yml
+#
+# GitHub Action: auto-sync BACKLOG.md and CHANGELOG.md when a PR is merged.
+#
+# SETUP:
+#   1. Copy this file to .github/workflows/hacky-hours-sync.yml in your project repo
+#   2. Add your Anthropic API key to GitHub Secrets: Settings → Secrets → ANTHROPIC_API_KEY
+#   3. Optionally adjust the `branches` list and `CHANGELOG_PATH` / `BACKLOG_PATH` env vars
+#
+# WHAT IT DOES:
+#   When a PR is merged to main, calls Claude API to:
+#   - Remove the matching item from BACKLOG.md
+#   - Add the completed item to CHANGELOG.md under the current version
+#   - Commit the updated docs back to main
+#
+# LIMITATIONS:
+#   - Matching is fuzzy (Claude uses PR title + branch name to find the BACKLOG item)
+#   - Does not close GitHub Issues — Claude Code handles that in-session
+#   - Requires ANTHROPIC_API_KEY secret
+
+name: Hacky Hours Sync
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  sync-docs:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    env:
+      BACKLOG_PATH: 04-build/BACKLOG.md
+      CHANGELOG_PATH: 04-build/CHANGELOG.md
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Anthropic SDK
+        run: pip install anthropic
+
+      - name: Sync docs via Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          BACKLOG_PATH: ${{ env.BACKLOG_PATH }}
+          CHANGELOG_PATH: ${{ env.CHANGELOG_PATH }}
+        run: python - <<'EOF'
+import os
+import anthropic
+
+pr_title = os.environ["PR_TITLE"]
+pr_body = os.environ.get("PR_BODY", "")
+pr_branch = os.environ["PR_BRANCH"]
+backlog_path = os.environ["BACKLOG_PATH"]
+changelog_path = os.environ["CHANGELOG_PATH"]
+
+with open(backlog_path) as f:
+    backlog = f.read()
+
+with open(changelog_path) as f:
+    changelog = f.read()
+
+client = anthropic.Anthropic()
+
+prompt = f"""A pull request was just merged. Update the project documentation.
+
+PR title: {pr_title}
+PR branch: {pr_branch}
+PR description: {pr_body}
+
+Current BACKLOG.md:
+<backlog>
+{backlog}
+</backlog>
+
+Current CHANGELOG.md:
+<changelog>
+{changelog}
+</changelog>
+
+Instructions:
+1. Find the BACKLOG item that best matches this PR (use title and branch name as signals).
+2. Remove that item from BACKLOG.md. If no clear match exists, leave BACKLOG.md unchanged.
+3. Add a one-line entry for this PR to the most recent version section in CHANGELOG.md.
+   Format: `- <PR title> (#<PR number if mentioned in branch/title, otherwise omit>)`
+   If no version section exists yet, add one: `## [Unreleased]`
+4. Return ONLY the updated file contents in this exact format — no commentary:
+
+BACKLOG:
+<updated backlog content>
+
+CHANGELOG:
+<updated changelog content>
+"""
+
+message = client.messages.create(
+    model="claude-opus-4-6",
+    max_tokens=4096,
+    messages=[{"role": "user", "content": prompt}]
+)
+
+response = message.content[0].text
+
+# Parse the response
+backlog_marker = "BACKLOG:\n"
+changelog_marker = "\nCHANGELOG:\n"
+
+backlog_start = response.find(backlog_marker)
+changelog_start = response.find(changelog_marker)
+
+if backlog_start != -1 and changelog_start != -1:
+    new_backlog = response[backlog_start + len(backlog_marker):changelog_start].strip()
+    new_changelog = response[changelog_start + len(changelog_marker):].strip()
+
+    with open(backlog_path, "w") as f:
+        f.write(new_backlog + "\n")
+
+    with open(changelog_path, "w") as f:
+        f.write(new_changelog + "\n")
+
+    print("Docs updated successfully.")
+else:
+    print("Could not parse Claude response. Skipping file update.")
+    print("Response was:", response)
+EOF
+
+      - name: Commit updated docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${{ env.BACKLOG_PATH }} ${{ env.CHANGELOG_PATH }}
+          git diff --staged --quiet || git commit -m "docs: sync backlog and changelog after merge of '${{ github.event.pull_request.title }}' [skip ci]"
+          git push

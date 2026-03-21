@@ -7,6 +7,23 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.9.0] — 2026-03-20
+
+Dogfooding support, sync upgrades, project state machine, and GitHub Action template.
+
+### Added
+
+- **`--root <path>` flag** — all commands now accept `--root <path>` to scaffold and operate in a subdirectory instead of the project root (e.g. `/hacky-hours ideate --root meta/` for dogfooding the framework within its own repo)
+- **Generated project `CLAUDE.md`** — scaffolded alongside the level folders; contains state machine instructions so Claude automatically checks GitHub Issues at session start, removes completed items from BACKLOG.md, adds them to CHANGELOG.md, closes linked issues, and prompts the release process when the milestone is done
+- **GitHub Action template** — `runbooks/templates/hacky-hours-sync.yml`: a copy-paste workflow that calls the Claude API on PR merge to remove the completed item from BACKLOG.md and add it to CHANGELOG.md automatically
+- **`runbooks/github-action-sync.md`** — setup guide for the Action template, including cost, matching logic, and troubleshooting
+
+### Changed
+
+- **`sync` guidance** — upgraded with deduplication (checks for existing issues before creating), issue URL back-linking (records GitHub URL into BACKLOG.md after creation), pre-flight `gh auth status` check, and a post-sync summary
+
+---
+
 ## [0.8.0] — 2026-03-20
 
 Tone pass aligned with Empathetech values, and ACCESSIBILITY.md as a first-class design artifact.

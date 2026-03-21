@@ -8,11 +8,21 @@ Your job is to guide the user through building a well-structured, human-directed
 
 This is a framework, not a rulebook. Help the user adapt it to how they work, not the other way around.
 
-Handle the argument ($ARGUMENTS) first, before doing anything else:
+Handle the argument ($ARGUMENTS) first, before doing anything else.
+
+**Step 0 — extract the `--root` flag (if present):**
+Before routing, check whether `$ARGUMENTS` contains `--root <path>`. If it does, extract the path and store it as ROOT_PATH. Strip `--root <path>` from the argument string before routing. All file operations (scaffold, reads, writes) must use ROOT_PATH as the base directory. If `--root` is not present, ROOT_PATH is the project root (`.`).
+
+Examples:
+- `/hacky-hours ideate --root meta/` → route as "ideate", all files go under `meta/`
+- `/hacky-hours dry-run --root meta/` → route as "dry-run", ROOT_PATH = `meta/`
+- `/hacky-hours` → ROOT_PATH = `.`
+
+**Then route:**
 
 - "help"                    → print the help message below, then stop
-- "version"                 → print "Hacky Hours command v0.8.0", then stop
-- "status"                  → survey the project (Step 1), report the detected level in one sentence, then stop — no menus, no questions
+- "version"                 → print "Hacky Hours command v0.9.0", then stop
+- "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
 - "design" or "2"           → skip to Level 2 guidance
@@ -30,7 +40,7 @@ Handle the argument ($ARGUMENTS) first, before doing anything else:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v0.8.0
+Hacky Hours framework assistant — v0.9.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -51,6 +61,9 @@ Arguments:
   checklist   Show the pre-merge checklist for Level 4 tasks
   version     Print the installed command version
   help        Show this message
+
+Options:
+  --root <path>   Scaffold and operate in a subdirectory (e.g. --root meta/)
 
 Learn more: https://github.com/empathetech/hacky-hours-docs
 ```
@@ -148,6 +161,7 @@ If the user asks to scaffold a fresh project, create the following structure:
   CHANGELOG.md
 archive/              ← cold storage; never delete, move here instead
 .claudeignore         ← tells Claude which files to skip for context
+CLAUDE.md             ← project-specific instructions for Claude sessions
 ```
 
 For each file, create it with a brief header comment explaining its purpose and one placeholder section. Do not copy the full templates — just enough structure to orient the user. Tell them they can see complete templates at https://github.com/empathetech/hacky-hours-docs.
@@ -158,6 +172,30 @@ Create `.claudeignore` with these default contents:
 archive/
 CHANGELOG.md
 01-ideate/IDEATION.md
+```
+
+Create `CLAUDE.md` with the following project state machine instructions — this is what enables Claude to drive documentation and project management automatically across sessions:
+
+```markdown
+## Project State Machine
+
+At the start of every session, orient yourself:
+1. Run `gh issue list --milestone @current --state open` to see active work (if this repo has a GitHub remote and `gh` is available)
+2. Read `04-build/BACKLOG.md` to see queued tasks
+3. Report current state in one sentence before asking what to do next
+
+When completing a task:
+1. Remove the item from `04-build/BACKLOG.md`
+2. Add it to `04-build/CHANGELOG.md` under the current version
+3. Close the linked GitHub Issue if one exists: `gh issue close <number>`
+4. Commit with a clear message referencing the issue: `fix: ... closes #<number>`
+
+When `04-build/BACKLOG.md` is empty:
+- Tell the user the milestone is complete
+- Ask if they want to run the release process (`/hacky-hours sync`)
+- Do not start new work without direction
+
+Design constraints live in `02-design/`. Before implementing anything, check whether a relevant design doc exists. If a design doc doesn't address something you need to implement, surface it to the user first — don't assume.
 ```
 
 **BACKLOG.md is a queue, not a ledger.** Items are added during planning and removed when their PR is merged. An empty BACKLOG means the milestone is complete. Completed work belongs in CHANGELOG.md, not BACKLOG.md.
@@ -317,18 +355,27 @@ Proceed with the Level 4 build cycle using the updated backlog.
 
 Always confirm before taking any action. This writes to a shared system.
 
+**Before doing anything:** verify `gh` is installed and authenticated. Run `gh auth status`. If not authenticated, tell the user to run `gh auth login` first and stop.
+
+**Never run any action without explicit confirmation from the user.**
+
 **Offer the following options:**
 
-1. **Push BACKLOG to Issues** — create a GitHub Issue for each item in BACKLOG.md that doesn't already have one. Ask the user what milestone to assign them to.
+1. **Push BACKLOG to Issues** — for each item in BACKLOG.md:
+   - First check whether an issue already exists: `gh issue list --search "<item title>" --state open`
+   - If one exists, skip it and note it as already tracked
+   - If not, create it and record the issue URL back into BACKLOG.md as a markdown link, replacing the plain text item. Example: `- [Add user auth](https://github.com/owner/repo/issues/42)`
 
    ```bash
    gh issue create --title "<item title>" --body "<item description>" --milestone "<milestone name>"
    ```
 
+   Ask the user what milestone to assign items to before creating any.
+
 2. **Create a milestone** — if no milestone exists for the current planned release, offer to create one.
 
    ```bash
-   gh api repos/:owner/:repo/milestones --method POST --field title="<version>" --field due_on="<date>"
+   gh api repos/:owner/:repo/milestones --method POST --field title="<version>"
    ```
 
 3. **Publish a release** — take the latest entry from CHANGELOG.md and publish it as a GitHub Release on the current tag.
@@ -337,9 +384,9 @@ Always confirm before taking any action. This writes to a shared system.
    gh release create <tag> --title "<version>" --notes "<changelog entry>"
    ```
 
-Check that `gh` is installed and authenticated before attempting any of these. If not, tell the user to run `gh auth login` first.
+   Verify the tag exists before attempting. If not, offer to create it first.
 
-**Never run any of these without explicit confirmation from the user.**
+**After sync completes:** summarize what was created, what was skipped (already existed), and what BACKLOG.md links were updated.
 
 ---
 
