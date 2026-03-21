@@ -9,6 +9,12 @@ You don't need to be a security expert to fill this out. You need to think clear
 ---
 
 > **Claude Guidance:** This document should be revisited before every implementation task in Level 4. When helping the user fill it out, ask: "What's the most sensitive thing your product stores?" and "What would happen if an attacker got into your database?" Keep the language approachable — no jargon. Flag any gaps (e.g., "you mentioned email addresses but haven't addressed how they're stored") and recommend minimizing data collection where possible. Reference OWASP Top 10 in plain language when relevant. Do not skip this document even for "small" projects — a small project with real users has real responsibilities.
+>
+> **Data minimization is a security strategy, not just a privacy preference.** Less data stored = smaller breach impact. Push back on collecting data "just in case." Every field in the data model should have a clear reason to exist.
+>
+> **For authentication:** strongly prefer OAuth providers (Google, GitHub) or magic links over passwords the product manages itself. Custom password auth is one of the most common sources of security failures and is almost never necessary for new projects. Flag this clearly if the user is leaning toward custom auth.
+>
+> **For dependency review:** check `LICENSING.md` alongside this document — GPL/AGPL license conflicts can become compliance issues, not just licensing ones.
 
 ---
 
@@ -51,6 +57,19 @@ You don't need to be a security expert to fill this out. You need to think clear
 | Cross-site scripting (XSS) | |
 | Exposed secrets in code or logs | |
 
+## Dependency Security and License Hygiene
+
+*Third-party code introduces both security and licensing risk. Review both.*
+
+- **Known vulnerabilities:** Are any dependencies flagged in vulnerability databases (e.g., via `npm audit`, `pip-audit`, or GitHub Dependabot)?
+- **Maintenance status:** Are key dependencies actively maintained? Unmaintained libraries are a long-term security risk.
+- **License compatibility:** Do any dependencies carry GPL or AGPL licenses that conflict with your product's license? Cross-reference with `LICENSING.md`.
+- **Third-party API terms:** Do the terms of service for any external APIs restrict commercial use, data portability, or resale?
+
+| Dependency | Known CVEs | Actively maintained? | License | Conflicts? |
+|------------|-----------|---------------------|---------|-----------|
+| | | | | |
+
 ## Compliance Considerations
 
 *Any legal or regulatory requirements that apply — GDPR, CCPA, HIPAA, COPPA, etc. Note what applies and the key obligations.*
@@ -73,4 +92,5 @@ You don't need to be a security expert to fill this out. You need to think clear
 - [Design README](./README.md)
 - [DATA_MODEL.md](./DATA_MODEL.md)
 - [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md)
+- [LICENSING.md](./LICENSING.md)
 - [build/BACKLOG.md](../04-build/BACKLOG.md)

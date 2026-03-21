@@ -7,6 +7,38 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.0.0] — 2026-03-20
+
+Safety-first design philosophy, licensing as a first-class artifact, and `hacky-hours/` subfolder as the default scaffold location.
+
+### Added
+
+- **`02-design/LICENSING.md`** — new design document template covering product license choice (MIT, Apache, GPL, proprietary, etc.), third-party dependency license compatibility, business model implications, and a pre-build checklist. Scaffolded by default alongside `ACCESSIBILITY.md`.
+- **`/hacky-hours audit`** — new read-only release readiness command: (1) secrets and sensitive file scan with heuristic pattern matching, (2) framework doc readiness checks, (3) git status translated into plain language, (4) numbered next-steps to-do list ordered by severity. Never modifies any files. The recommended step before `/hacky-hours sync`.
+- **`/hacky-hours adopt`** — new command for bringing an existing codebase into the framework. Reads README, package manifests, directory structure, schema files, auth files, env var references, git log, and TODO comments to infer artifact stubs for PRODUCT_OVERVIEW, ARCHITECTURE, SECURITY_PRIVACY, and BACKLOG. Asks clarifying questions for what can't be inferred. Always confirms before writing. Hands off to `iterate` as the natural next step.
+- **`/hacky-hours migrate`** — new command that moves existing root-level framework artifacts into the `hacky-hours/` subfolder using `git mv` (preserving history). Updates `.claudeignore`, `CLAUDE.md`, and flags any `hacky-hours-sync.yml` GitHub Action path changes needed. Shows exactly what it will do before doing anything. Commits framework files only — not `git add -A`.
+- **Constraints & Values section in `PRODUCT_OVERVIEW.md`** — captures licensing intent, privacy stance, infrastructure preference, and accessibility commitment at Level 1, seeding Level 2 design decisions before any code is written.
+- **Safety-first design philosophy** — documented in `CLAUDE.md` and embedded throughout Level 2 guidance: free before paid, less infrastructure before more, privacy-preserving before data-rich, accessible by default, fewer dependencies before more. Claude leads with the simplest safe option and explains tradeoffs before suggesting complexity.
+- **Licensing questions at Level 1** — the Level 1 → Level 2 transition now explicitly includes licensing intent questions so that dependency choices in Level 2 are made with license compatibility in mind.
+- **Context-reading preambles on every level command** — each level command (`ideate`, `design`, `roadmap`, `build`) now explicitly states which prior artifacts to read before starting. Claude won't ask users to repeat what's already written.
+
+### Changed
+
+- **Default scaffold location** — framework artifacts now default to `hacky-hours/` subfolder instead of the project root. Pass `--root .` to operate at the root as before. The survey step falls back to the root automatically for existing projects and suggests running `migrate`.
+- **No-arg behavior** — `/hacky-hours` (no argument) now runs the full guided session (survey + orient + act) instead of printing the help message. Use `help` for the help message. This makes the no-arg path the natural "just run this and it'll figure out where you are" on-ramp for new users.
+- **Help message** reorganized into logical groups: Getting started, Navigate the framework, Release workflow, Utilities. Clearer description of each command's purpose.
+- **`/hacky-hours sync`** — redesigned. Now does one thing: publish a GitHub Release from the latest CHANGELOG entry. BACKLOG→Issues and milestone creation removed — these created maintenance burden without meaningful value for the core audience. Sync now: checks `gh` auth, confirms the tag, previews exactly what will be published, and publishes on explicit confirmation.
+- **Milestone-complete flow** — when BACKLOG.md empties, now suggests `audit` before `sync` so users catch issues before publishing.
+- **Generated project `CLAUDE.md`** — paths updated to `hacky-hours/` prefix; now also suggests `audit` before `sync` on milestone completion.
+- **`.claudeignore` defaults** updated to use `hacky-hours/` prefixes.
+- **`ARCHITECTURE.md` Claude Guidance** — strengthened with explicit safety-first defaults: managed/hosted before self-hosted, fewer external services, established open-source libraries, cost and data residency implications flagged.
+- **`SECURITY_PRIVACY.md`** — added Dependency Security and License Hygiene section; Claude Guidance updated to recommend OAuth/magic links over custom auth, and to cross-reference `LICENSING.md`.
+- **`ACCESSIBILITY.md` Claude Guidance** — added "start simple, stay semantic" principle and note on accessible-first UI library selection.
+- **`02-design/README.md`** — added `LICENSING.md` row; Claude Guidance updated to read Constraints & Values section first and apply safety-first defaults throughout.
+- **Version** bumped to v1.0.0.
+
+---
+
 ## [0.9.0] — 2026-03-20
 
 Dogfooding support, sync upgrades, project state machine, and GitHub Action template.

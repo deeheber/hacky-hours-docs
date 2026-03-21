@@ -52,12 +52,14 @@ Add this to your project's `CLAUDE.md`:
 ```markdown
 ## Hacky Hours Framework
 
-This project uses the Hacky Hours documentation framework, located at `docs/hacky-hours/`.
+This project uses the Hacky Hours documentation framework.
+Framework artifacts live at `hacky-hours/` (default) or wherever you placed them.
 
 Before starting work:
-- For new features: read `docs/hacky-hours/build/README.md` and this project's `build/BACKLOG.md`
-- For design decisions: read the relevant doc in `docs/hacky-hours/design/` and this project's corresponding design doc
-- For security concerns: read `docs/hacky-hours/design/SECURITY_PRIVACY.md` before any implementation that touches user data
+- For new features: read `hacky-hours/04-build/BACKLOG.md`
+- For design decisions: read the relevant doc in `hacky-hours/02-design/`
+- For security concerns: read `hacky-hours/02-design/SECURITY_PRIVACY.md` before any implementation that touches user data
+- For licensing: read `hacky-hours/02-design/LICENSING.md` before adding any dependency or external service
 ```
 
 ---
@@ -75,7 +77,8 @@ This project follows the Hacky Hours four-level documentation framework.
 The framework reference lives at: `/path/to/hacky-hours-docs/` (adjust to your local path)
 
 When helping with design decisions, read the relevant template from the framework before making suggestions.
-When helping with implementation, read `design/SECURITY_PRIVACY.md` in both the framework and this project before proceeding.
+When helping with implementation, read `hacky-hours/02-design/SECURITY_PRIVACY.md` before proceeding.
+When adding any dependency, read `hacky-hours/02-design/LICENSING.md` to check compatibility.
 ```
 
 This approach requires the framework to be available at a consistent path on every machine where you work.

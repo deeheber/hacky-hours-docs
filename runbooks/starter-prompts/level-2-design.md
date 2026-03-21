@@ -21,8 +21,11 @@ I'm now at Level 2 — Design. The available design documents are:
 - MARKET_FIT.md (who the users are and why they'd choose this)
 - BUSINESS_LOGIC.md (rules and calculations the product enforces)
 - SECURITY_PRIVACY.md (how user data is handled and protected)
+- LICENSING.md (what license my product uses and what dependencies I can use)
 
 Based on my product overview, which of these documents does my project actually need for the MVP? Which are optional? Please explain your reasoning for each.
+
+For LICENSING.md specifically: I'd like to understand my options in plain language before we get too deep into architecture — the license choice affects which dependencies and services I can use.
 ```
 
 ---

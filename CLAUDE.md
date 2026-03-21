@@ -14,28 +14,41 @@ Never make large assumptions about what the user wants to build or how. Ask clar
 
 When a user is new or uncertain, slow down and teach. When a user is more experienced, reduce scaffolding and move faster. Match your level of explanation to the signals the user gives you about their background. This framework is for everyone — from first-time builders to seasoned engineers — so never assume prior knowledge.
 
+## Safety-First Design Philosophy
+
+This framework is built for everyone — including people who don't yet understand the full consequences of what they're building. When making recommendations, always default to the safest, simplest, least-risky option and explain the tradeoffs before suggesting alternatives. Specifically:
+
+- **Free before paid** — recommend free/open-source tools, libraries, and platforms before commercial ones. Flag costs clearly when paid options are relevant.
+- **Less infrastructure before more** — prefer a simple hosted solution over a self-managed one, a single service over a microservices architecture, a managed database over one the user has to operate.
+- **Privacy-preserving before data-rich** — recommend collecting the minimum data needed. Flag data collection, storage, and third-party sharing as explicit decisions, not defaults.
+- **Reduce attack surface** — when two approaches accomplish the same goal, prefer the one with fewer credentials to manage, fewer external dependencies, and fewer moving parts.
+- **Accessible by default** — WCAG 2.1 AA is the right starting point for any UI. Don't wait for the user to ask. Simple, semantic HTML before complex UI frameworks.
+- **Licensing hygiene from the start** — ask about license intent early. Flag dependency license conflicts before they become architectural problems.
+
+Users can always choose a more complex or paid option — and sometimes they should. But they should make that choice with clear awareness of the tradeoffs, not because it was the default recommendation.
+
 ## Four-Level System
 
 This repo organizes work into four levels. Always orient the user to which level they're at and what the next step is.
 
-### Level 1 — Ideation (`ideate/`)
+### Level 1 — Ideation (`hacky-hours/01-ideate/`)
 Help the user brain-dump freely into `IDEATION.md`. Ask open-ended questions to draw out their vision. When there's enough to work with, help synthesize it into `PRODUCT_OVERVIEW.md` using the 5Ws: who (target audience), what (product form and function), where (platform), when (timeline), why (value and motivation).
 
 **Done when:** `PRODUCT_OVERVIEW.md` clearly answers all five W questions at a level that a new team member could understand the product's purpose.
 
-### Level 2 — Design (`design/`)
+### Level 2 — Design (`hacky-hours/02-design/`)
 Start by reading `PRODUCT_OVERVIEW.md` and helping the user decide which design documents their specific project needs — not all projects need all documents. Ask questions like: "Does your product store user data?" before assuming a `DATA_MODEL.md` is needed.
 
 For each document created, generate Mermaid diagrams where applicable (ERDs for data models, flowcharts for user journeys, architecture diagrams for system design).
 
 **Done when:** The design documents collectively answer how the product works at a level sufficient to hand off to an engineer.
 
-### Level 3 — Roadmap (`roadmap/`)
+### Level 3 — Roadmap (`hacky-hours/03-roadmap/`)
 Read all Level 2 documents and help the user categorize features into MVP, V1, and V2. Push back on scope creep. An MVP should be the minimum that proves the core value proposition, nothing more.
 
 **Done when:** Every planned feature has been assigned to a release tier, with clear rationale for why it belongs there.
 
-### Level 4 — Build (`build/`)
+### Level 4 — Build (`hacky-hours/04-build/`)
 Translate roadmap items into discrete tasks in `BACKLOG.md`, each tied to a branch name and semantic version. Before any task is marked complete, verify it meets the criteria established in `design/SECURITY_PRIVACY.md` and other relevant design documents. Update `CHANGELOG.md` on milestone completion.
 
 **Done when:** The current milestone's tasks are complete, tested against design constraints, and released as a tagged version.
@@ -54,13 +67,14 @@ To reference this framework from a different project's Claude Code session, add 
 ```markdown
 ## Hacky Hours Framework
 
-This project uses the Hacky Hours documentation framework. The framework lives at:
-`docs/hacky-hours/` (git submodule) or the path where you cloned/copied it.
+This project uses the Hacky Hours documentation framework. Framework artifacts live at:
+`hacky-hours/` (default scaffold location) or wherever you placed them.
 
 Before starting work, read the relevant level documents:
-- For new features: read `docs/hacky-hours/build/README.md` and this project's `build/BACKLOG.md`
-- For design decisions: read the relevant file in `docs/hacky-hours/design/` and this project's corresponding design doc
-- For security/privacy concerns: always read `design/SECURITY_PRIVACY.md` before implementation
+- For new features: read `hacky-hours/04-build/README.md` and `hacky-hours/04-build/BACKLOG.md`
+- For design decisions: read the relevant file in `hacky-hours/02-design/`
+- For security/privacy concerns: always read `hacky-hours/02-design/SECURITY_PRIVACY.md` before implementation
+- For licensing questions: read `hacky-hours/02-design/LICENSING.md` before adding any dependency
 ```
 
 See `runbooks/using-this-repo/import-as-resource.md` for full setup instructions.

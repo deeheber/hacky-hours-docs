@@ -135,9 +135,12 @@ When helping the user fill in this document:
 
 - Ask about the product's platform first (web, mobile, desktop, API) — accessibility requirements differ significantly
 - If the product has a UI, `WCAG 2.1 AA` is the right default unless there's a specific reason to go higher or lower
+- **Start simple, stay semantic:** the most effective accessibility improvements are also the simplest — use native HTML elements (`<button>`, `<nav>`, `<label>`) instead of styled divs, add alt text, ensure keyboard focus is visible. These cost almost nothing and cover the majority of use cases. Only reach for ARIA when native elements aren't sufficient.
+- **Accessible-by-default tech choices:** when recommending UI frameworks or component libraries, prefer ones with strong built-in accessibility (e.g., Radix UI, Headless UI, React Aria) over ones that require extensive manual remediation. Flag accessibility track records when comparing options.
 - Push gently on the testing plan — automated tools catch ~30% of issues. Keyboard and screen reader testing are essential and often skipped
 - If the user isn't sure where to start, suggest beginning with the three most commonly missed items: color contrast, keyboard navigation, and alt text
 - Frame accessibility as a quality bar, not a compliance checkbox — and as a values statement. Empathetech builds for everyone. This document is where that commitment becomes concrete.
+- **Don't defer:** accessibility is significantly harder to retrofit than to build in. If a user says "we'll add accessibility later," flag that this is one of the most common and costly mistakes in product development.
 
 ---
 

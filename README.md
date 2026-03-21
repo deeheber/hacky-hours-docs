@@ -19,6 +19,8 @@ The goal isn't to vibe-code blindly, and it isn't to get paralyzed trying to pla
 
 Imperfect documents are fine. Honest documents are what matter.
 
+**This framework defaults to the safest, simplest path.** When Claude makes recommendations, it leads with free tools, minimal infrastructure, privacy-preserving defaults, and accessible design — and explains the tradeoffs before suggesting anything more complex. You can always choose a more powerful option, but you'll make that choice knowingly.
+
 ---
 
 ## How It Works
@@ -112,7 +114,9 @@ curl -fsSL https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/i
 irm https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.ps1 | iex
 ```
 
-Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`iterate`, `sync`, `dry-run`, `--root`, and more).
+Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`iterate`, `sync`, `migrate`, `dry-run`, `--root`, and more).
+
+> **Upgrading from v0.x?** Framework artifacts now default to a `hacky-hours/` subfolder. Run `/hacky-hours migrate` to move existing artifacts there — the command will show you exactly what it plans to do before touching anything.
 
 ---
 

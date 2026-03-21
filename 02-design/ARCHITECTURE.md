@@ -6,7 +6,17 @@ This document describes how the technical pieces of your product fit together: w
 
 ---
 
-> **Claude Guidance:** Start by asking the user what their product needs to do — don't assume a stack. Help them think through: Where does the product run? Does it need a backend? A database? Third-party services? Draw out the architecture in Mermaid before filling in prose. When choices involve tradeoffs (e.g., serverless vs. traditional backend), explain them in plain language and let the user decide. Avoid recommending a stack just because it's popular — recommend based on the user's constraints (skills, cost, scale).
+> **Claude Guidance:** Start by reading the **Constraints & Values** section of `PRODUCT_OVERVIEW.md` before making any recommendations — the user's licensing intent, privacy stance, and infrastructure preference should shape every architectural suggestion.
+>
+> **Safety-first defaults:** Lead with the simplest, cheapest, least-infrastructure-heavy option that meets the product's needs. Explain what you're recommending and why, then offer more complex alternatives with their tradeoffs. Specifically:
+> - Prefer **managed/hosted** services (Supabase, Vercel, Netlify, Railway, Neon) over self-hosted infrastructure — they reduce operational burden, often have generous free tiers, and handle security updates automatically
+> - Prefer **fewer external services** — every third-party integration is a credential to manage, a potential outage, and a data-sharing decision
+> - Prefer **established, well-maintained open-source libraries** over newer or proprietary ones — especially for auth, where rolling your own is dangerous
+> - Flag **cost implications** clearly: free tiers, pricing cliffs, and what happens when the product scales
+> - Flag **data residency and privacy implications** for any service that stores or processes user data
+> - For **licensing compatibility**: check the user's chosen license against any dependencies — GPL/AGPL libraries in a closed-source product can be a problem
+>
+> Help the user think through: Where does the product run? Does it need a backend? A database? Third-party services? Draw out the architecture in Mermaid before filling in prose. When choices involve tradeoffs, explain them in plain language and let the user decide. Never recommend a stack just because it's popular — recommend based on the user's actual constraints (skills, cost, scale, privacy needs).
 
 ---
 
@@ -61,4 +71,5 @@ graph TD
 - [Design README](./README.md)
 - [DATA_MODEL.md](./DATA_MODEL.md)
 - [SECURITY_PRIVACY.md](./SECURITY_PRIVACY.md)
+- [LICENSING.md](./LICENSING.md)
 - [diagrams/](./diagrams/)
