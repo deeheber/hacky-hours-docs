@@ -94,14 +94,19 @@ Work through these levels in order. Each level's `README.md` explains what "done
 
 ## Use as a Claude Code Command
 
-Install `/hacky-hours` as a global Claude Code slash command so it works in **any repo you open** — not just this one.
+Install `/hacky-hours` as a global Claude Code slash command so it works in **any repo you open** — no cloning required.
 
+**macOS / Linux:**
 ```bash
-mkdir -p ~/.claude/commands
-cp /path/to/hacky-hours-docs/.claude/commands/hacky-hours.md ~/.claude/commands/hacky-hours.md
+curl -fsSL https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.sh | bash
 ```
 
-Then type `/hacky-hours` in any Claude Code session to launch the guided framework workflow. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions (Windows, updating, uninstalling).
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.ps1 | iex
+```
+
+Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions (updating, uninstalling).
 
 ---
 
