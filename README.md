@@ -1,6 +1,6 @@
 # hacky-hours-docs
 
-A community framework for building apps with LLMs — the Hacky Hour way — created by [Empathetech](https://www.empathetech.org).
+A community framework for building apps with LLMs — the Hacky Hours way — created by [Empathetech](https://www.empathetech.org).
 
 This repo is two things at once:
 

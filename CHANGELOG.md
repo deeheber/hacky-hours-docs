@@ -7,6 +7,27 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.0] — 2026-03-20
+
+Command UX improvements: proper autocomplete description, safer default behavior, and a dry-run mode for testing without writing files.
+
+### Added
+
+- **`/hacky-hours dry-run`** — runs the full interactive workflow without creating or modifying any files; file contents are shown in code blocks with a `↳ would write to <path>` note instead
+- **YAML frontmatter `description` field** — replaces the `<!-- version: x.x.x -->` comment; autocomplete now shows a human-readable description instead of the version string
+
+### Changed
+
+- **No-argument behavior** — running `/hacky-hours` with no argument now prints the help message instead of immediately starting the workflow, preventing accidental framework invocation
+- **Help message** — added a one-paragraph description of what Hacky Hours is, so the help output is useful to someone who hasn't seen the framework before
+- **"Fresh project" greeting** — expanded to introduce the framework to users encountering it for the first time in a new project
+
+### Fixed
+
+- **README.md** — corrected "Hacky Hour" to "Hacky Hours"
+
+---
+
 ## [0.5.0] — 2026-03-20
 
 Quality-of-life improvements to the slash command: new utility arguments, version tracking, and a dev/release naming distinction.
