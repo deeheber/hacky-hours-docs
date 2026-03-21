@@ -6,6 +6,9 @@ Plain-language definitions for every term used in this framework. When you hit a
 
 ## A
 
+**ARIA (Accessible Rich Internet Applications)**
+A set of HTML attributes that help screen readers understand interactive elements on a webpage. For example, `aria-label` describes a button's purpose when the visual label alone isn't clear enough.
+
 **API (Application Programming Interface)**
 A way for two pieces of software to talk to each other. When your app "calls an API," it's sending a request to another service (like a payment processor or weather data provider) and getting back a response. You don't need to know how the other service works — just what to ask and what you'll get back.
 
@@ -28,9 +31,18 @@ A parallel version of your project where you can make changes without affecting 
 **Bug**
 An error in the code that causes the product to behave in an unintended way.
 
+**Backend**
+The part of an app that users don't see — the server, the database, and the logic that processes requests. Runs on a server, not in the browser.
+
 ---
 
 ## C
+
+**CCPA (California Consumer Privacy Act)**
+A California law giving residents the right to know what personal data is collected about them and to request its deletion. Relevant if your product has California users.
+
+**Copyleft**
+A licensing approach (used by GPL and AGPL) that requires anyone who modifies and distributes the code to also share their modifications under the same license. The opposite of "permissive" licenses like MIT, which don't have this requirement.
 
 **CLI (Command-Line Interface)**
 A text-based way to interact with software — you type commands instead of clicking buttons. Claude Code is a CLI tool. The terminal is where you run CLI tools.
@@ -71,6 +83,9 @@ A visual diagram showing what data your app stores and how different types of da
 
 ## F
 
+**Frontmatter**
+Metadata at the top of a Markdown file, enclosed between `---` lines. Used by tools to store structured information (like a title or description) separate from the document's content. Written in YAML format.
+
 **Fork**
 Creating a personal copy of someone else's GitHub repository under your own account. Your fork is independent — changes you make don't affect the original. This is how you get your own copy of `hacky-hours-docs`.
 
@@ -90,9 +105,18 @@ A website that hosts git repositories and adds collaboration tools (pull request
 **GitHub Desktop**
 A free app that gives you a visual interface for git operations — no terminal required.
 
+**GDPR (General Data Protection Regulation)**
+A European Union law governing how personal data is collected, stored, and processed. Applies to any product that serves EU users, regardless of where the company is based. Requires explicit consent and gives users the right to access, correct, and delete their data.
+
+**GPL (General Public License)**
+An open-source license that requires anyone who distributes modified versions of the code to also release their source code under the same license. See also: copyleft. AGPL (Affero GPL) extends this to software accessed over a network.
+
 ---
 
 ## H
+
+**HIPAA (Health Insurance Portability and Accountability Act)**
+A US law that governs how health information is stored and shared. If your product handles medical records, health data, or patient information, HIPAA compliance is required.
 
 **Hosting**
 Putting your app on a server so it's accessible on the internet. Services like Vercel and Netlify handle this for you — you push code to GitHub, and they deploy it automatically.
@@ -100,6 +124,9 @@ Putting your app on a server so it's accessible on the internet. Services like V
 ---
 
 ## M
+
+**MCP (Model Context Protocol)**
+A standard for connecting AI tools to external data sources and services. Think of it as a universal adapter that lets different AI applications (Claude Code, Cursor, etc.) plug into the same tools.
 
 **Magic Link**
 A login method where the system emails you a one-time link that logs you in when clicked — no password needed. Simpler and often more secure than traditional passwords for low-risk applications.
@@ -118,6 +145,19 @@ A plain-text diagramming syntax that GitHub renders as visual diagrams. Used in 
 
 **MVP (Minimum Viable Product)**
 The smallest version of your product that proves your core idea. Deliberately incomplete — just enough to test whether people find value in it.
+
+**NVDA (NonVisual Desktop Access)**
+A free, open-source screen reader for Windows. Screen readers convert on-screen text to speech or Braille output, allowing visually impaired users to navigate software. Other common screen readers: VoiceOver (macOS/iOS), TalkBack (Android).
+
+---
+
+## O
+
+**OAuth**
+A standard that lets users log into your app using an existing account (like Google or GitHub) instead of creating a new username and password. Safer and simpler than building your own login system.
+
+**OWASP Top 10**
+A widely-referenced list of the ten most critical web application security risks, published by the Open Web Application Security Project. Includes things like injection attacks, broken authentication, and exposed sensitive data. Used as a baseline for security reviews.
 
 ---
 
@@ -152,6 +192,15 @@ A folder for your project that git tracks. Contains all your files, plus the ful
 **RSVP**
 In the context of this framework's example project, a user's response to an event. In general use: confirming attendance.
 
+**Screen Reader**
+Software that reads aloud what's displayed on screen, enabling visually impaired users to navigate and interact with applications. Common screen readers: VoiceOver (macOS/iOS), NVDA (Windows), TalkBack (Android).
+
+**Submodule**
+A git feature that lets you include one repository inside another. The inner repo stays independent — it has its own history and can be updated separately. Used when you want to reference shared code or templates without copying them.
+
+**Symlink (Symbolic Link)**
+A shortcut file that points to another file or folder. When you open the symlink, you're actually opening the file it points to. Used to avoid duplicating files that need to exist in multiple locations.
+
 ---
 
 ## S
@@ -161,6 +210,9 @@ A version numbering system: `MAJOR.MINOR.PATCH` (e.g., `1.2.3`). Patch = bug fix
 
 **SSH**
 A secure way to authenticate with remote servers (including GitHub) from the terminal. An alternative to HTTPS for pushing/pulling code.
+
+**Tag (git)**
+A named marker attached to a specific commit, typically used to mark release versions (e.g., `v1.0.0`). Unlike branches, tags don't move — they permanently mark a point in history. GitHub uses tags to create Releases.
 
 ---
 
@@ -173,11 +225,28 @@ A text-based interface for giving your computer instructions. Also called: comma
 
 ## V
 
+**VoiceOver**
+Apple's built-in screen reader for macOS and iOS. Reads aloud on-screen elements so visually impaired users can navigate applications. See also: NVDA (Windows), TalkBack (Android).
+
 **Version Control**
 The practice of tracking changes to files over time so you can see what changed, when, and why — and revert if needed. Git is the most common version control system.
 
 **VS Code (Visual Studio Code)**
 A free, widely-used code and text editor made by Microsoft. Used in this framework for editing Markdown files and running the terminal.
+
+---
+
+## W
+
+**WCAG (Web Content Accessibility Guidelines)**
+International standards for making web content accessible to people with disabilities. The most common target is WCAG 2.1 AA — a practical middle ground that covers most accessibility needs. AAA is stricter but often impractical for all content. Published by the W3C (World Wide Web Consortium).
+
+---
+
+## Y
+
+**YAML (YAML Ain't Markup Language)**
+A human-readable data format used for configuration files. Uses indentation instead of brackets. You'll see it in frontmatter (the `---` blocks at the top of Markdown files) and in GitHub Actions workflow files.
 
 ---
 

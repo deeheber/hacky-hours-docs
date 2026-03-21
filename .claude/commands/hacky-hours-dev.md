@@ -25,7 +25,7 @@ Examples:
 
 - "help"                    → print the help message below, then stop
 - "help <command>"          → print help for that specific command (see Subcommand Help below), then stop
-- "version"                 → print "Hacky Hours command v1.2.0", then stop
+- "version"                 → print "Hacky Hours command v1.3.0", then stop
 - "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
@@ -47,7 +47,7 @@ Examples:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v1.2.0
+Hacky Hours framework assistant — v1.3.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -747,6 +747,7 @@ Check under ROOT_PATH:
 
 - Is `04-build/BACKLOG.md` empty? If not, list the remaining tasks — you can't ship if the milestone isn't done
 - Does `04-build/CHANGELOG.md` have an entry for the version you're about to release? (Look for a version header like `## [x.y.z]`)
+- **Version string check:** If `.claude/commands/` contains a command prompt file, extract the version from its help message or routing table and compare it to the latest CHANGELOG version. If they don't match, flag it as a warning: "Command prompt says vX.Y.Z but CHANGELOG says vA.B.C — bump the version strings before tagging."
 - Is there a `LICENSE` file in the repo root? If `02-design/LICENSING.md` exists and has a chosen license but no `LICENSE` file is present, flag it
 - Do `SECURITY_PRIVACY.md` and `ACCESSIBILITY.md` exist and contain filled-in content (not just placeholder text)?
 

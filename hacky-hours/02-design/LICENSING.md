@@ -23,4 +23,4 @@ No current revenue model. The project is community-driven and maintained by Empa
 - [x] License file exists at repo root
 - [x] License is stated clearly in README
 - [x] No code dependencies to audit
-- [ ] Contributor License Agreement (CLA) — not currently required; revisit if external contributions grow
+- [x] Contributor License Agreement (CLA) — **not needed.** MIT already grants broad permissions. A CLA would add contributor friction without meaningful benefit for a Markdown-only community project. Revisit only if the project adds a commercial product or considers relicensing.

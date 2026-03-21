@@ -7,6 +7,22 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.0] — 2026-03-21
+
+Accessibility audit, glossary expansion, version bump check, and CLA resolution.
+
+### Added
+
+- **Pre-release version bump check** — the audit flow (Phase 2) now checks whether version strings in the command prompt match the latest CHANGELOG version before tagging. Flags mismatches as warnings.
+- **19 new glossary entries** — ARIA, CCPA, copyleft, frontmatter, GDPR, GPL, HIPAA, MCP, NVDA, OAuth, OWASP Top 10, screen reader, submodule, symlink, tag, VoiceOver, WCAG, YAML, and backend. All terms were found used in runbooks or templates without definition.
+
+### Changed
+
+- **ACCESSIBILITY.md** — updated with audit findings: 21 terms addressed, remaining gaps documented (screen reader navigation, i18n, shell-specific instructions).
+- **LICENSING.md** — CLA checklist item resolved: not needed for a Markdown-only MIT project. Revisit only if commercial product or relicensing is considered.
+
+---
+
 ## [1.2.0] — 2026-03-21
 
 Cross-tool support, CHANGELOG deduplication, and architecture documentation.
