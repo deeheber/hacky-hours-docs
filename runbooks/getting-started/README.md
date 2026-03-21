@@ -2,58 +2,91 @@
 
 Welcome. This folder has everything you need to go from zero to a working Hacky Hours setup.
 
-**Never opened a terminal before?** Start with [`00-what-is-a-terminal.md`](./00-what-is-a-terminal.md) — it's a 5-minute read that makes every other step here much less intimidating.
+**Never opened a terminal before?** Read [`00-what-is-a-terminal.md`](./00-what-is-a-terminal.md) first — it's a 5-minute read that makes every other step here much less intimidating.
 
 ---
 
-## Your Setup Path
+## Choose Your Path
 
-Follow the steps for your operating system in order. Check each one off as you go.
+There are three ways to get set up, depending on how much you want to install on your computer.
 
-### macOS
+---
 
+### Path A: Zero Install (Fastest — recommended for beginners)
+
+Everything runs in your browser. No downloads, no terminal setup on your own computer.
+
+1. [ ] [01-github.md](./01-github.md) — Create a GitHub account
+2. [ ] [08-github-codespaces.md](./08-github-codespaces.md) — Open this repo in a browser-based editor with Claude Code pre-installed
+
+**Time: ~15 minutes.** You'll be editing files and running Claude Code sessions entirely in the browser.
+
+---
+
+### Path B: Local Setup with GitHub Desktop (Recommended for most people)
+
+Install tools on your computer but avoid terminal git commands using the GitHub Desktop app.
+
+**macOS:**
 1. [ ] [01-github.md](./01-github.md) — Create a GitHub account
 2. [ ] [06-macos-setup.md](./06-macos-setup.md) — Install Homebrew, Node.js, git, and VS Code
 3. [ ] [02-claude-code.md](./02-claude-code.md) — Install and authenticate Claude Code
-4. [ ] [04-ide-setup.md](./04-ide-setup.md) — Configure VS Code extensions
-5. [ ] [fork-vs-clone](../using-this-repo/fork-vs-clone.md) — Get your copy of this repo
+4. [ ] [09-github-desktop.md](./09-github-desktop.md) — Install GitHub Desktop for visual git management
+5. [ ] [04-ide-setup.md](./04-ide-setup.md) — Configure VS Code extensions
+6. [ ] [fork-vs-clone.md](../using-this-repo/fork-vs-clone.md) — Get your copy of this repo
 
-### Windows
-
+**Windows:**
 1. [ ] [01-github.md](./01-github.md) — Create a GitHub account
 2. [ ] [05-windows-setup.md](./05-windows-setup.md) — Install Windows Terminal, Node.js, git, and VS Code
 3. [ ] [02-claude-code.md](./02-claude-code.md) — Install and authenticate Claude Code
-4. [ ] [04-ide-setup.md](./04-ide-setup.md) — Configure VS Code extensions
-5. [ ] [fork-vs-clone](../using-this-repo/fork-vs-clone.md) — Get your copy of this repo
+4. [ ] [09-github-desktop.md](./09-github-desktop.md) — Install GitHub Desktop for visual git management
+5. [ ] [04-ide-setup.md](./04-ide-setup.md) — Configure VS Code extensions
+6. [ ] [fork-vs-clone.md](../using-this-repo/fork-vs-clone.md) — Get your copy of this repo
 
-### Linux
-
+**Linux:**
 1. [ ] [01-github.md](./01-github.md) — Create a GitHub account
 2. [ ] [07-linux-setup.md](./07-linux-setup.md) — Install Node.js, git, and VS Code
 3. [ ] [02-claude-code.md](./02-claude-code.md) — Install and authenticate Claude Code
-4. [ ] [04-ide-setup.md](./04-ide-setup.md) — Configure VS Code extensions
-5. [ ] [fork-vs-clone](../using-this-repo/fork-vs-clone.md) — Get your copy of this repo
+4. [ ] [03-git-basics.md](./03-git-basics.md) — Learn the core git commands (GitHub Desktop isn't available on Linux)
+5. [ ] [04-ide-setup.md](./04-ide-setup.md) — Configure VS Code extensions
+6. [ ] [fork-vs-clone.md](../using-this-repo/fork-vs-clone.md) — Get your copy of this repo
+
+**Time: ~45–60 minutes.**
+
+---
+
+### Path C: Full Terminal Setup (For the comfortable or curious)
+
+All tools installed locally, git managed from the terminal.
+
+Follow Path B but replace `09-github-desktop.md` with [`03-git-basics.md`](./03-git-basics.md).
 
 ---
 
 ## How Long Does This Take?
 
-For most people: **30–60 minutes**, depending on your internet speed and whether you run into any hiccups. The troubleshooting sections in each runbook cover the most common issues.
+| Path | Time |
+|------|------|
+| A — Zero Install | ~15 minutes |
+| B — Local + GitHub Desktop | ~45–60 minutes |
+| C — Full Terminal | ~45–60 minutes |
 
 ---
 
 ## You're Ready When...
 
-After completing your path above, you should be able to:
-- Open a terminal and run a command without panicking
-- Open GitHub in a browser and see your forked repo
-- Type `claude` in your terminal and have it respond
-- Open your project folder in VS Code
+- You can open your project files and edit them
+- You can type `claude` and have it respond
+- You can save your changes back to GitHub
 
 Once all of that works, head to [`01-ideate/`](../../01-ideate/) and start building.
+
+Before you start, take a look at the [`example/`](../../example/) folder — it shows a completed Level 1 and Level 2 so you know what you're working toward.
 
 ---
 
 ## Need Help?
 
-If you get stuck, open your forked repo in VS Code, start a Claude Code session with `claude`, and describe exactly what happened and what error you're seeing. Claude can walk you through most setup issues.
+If you get stuck, start a Claude Code session (`claude`) and describe exactly what happened and what error you're seeing. Claude can walk you through most setup issues.
+
+You can also check the [FAQ](../FAQ.md) for common questions.

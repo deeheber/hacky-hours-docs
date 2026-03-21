@@ -17,6 +17,41 @@ The goal is not to vibe-code blindly, and not to be paralyzed by fear. It's to b
 
 ---
 
+## How It Works
+
+```mermaid
+flowchart TD
+    A([Your Idea]) --> L1
+
+    subgraph L1 ["01-ideate — Capture & Synthesize"]
+        B["IDEATION.md\nStream of consciousness notes"] --> C["PRODUCT_OVERVIEW.md\nWho · What · Where · When · Why"]
+    end
+
+    L1 --> L2
+
+    subgraph L2 ["02-design — Define the Product"]
+        D[Architecture] & E[Data Model] & F[User Journeys] & G[Security & Privacy] & H[Style Guide]
+    end
+
+    L2 --> L3
+
+    subgraph L3 ["03-roadmap — Prioritize"]
+        I["ROADMAP.md\nMVP → V1 → V2"]
+    end
+
+    L3 --> L4
+
+    subgraph L4 ["04-build — Build & Ship"]
+        J[BACKLOG.md] --> K[Branches & PRs] --> L[Versioned Releases]
+    end
+
+    L4 --> M([Shipped Product])
+```
+
+Work through these levels in order. Each level's `README.md` explains what "done enough to move on" looks like.
+
+---
+
 ## Four Levels
 
 | Level | Folder | What happens here |
@@ -26,20 +61,34 @@ The goal is not to vibe-code blindly, and not to be paralyzed by fear. It's to b
 | 3 — Roadmap | [`03-roadmap/`](./03-roadmap/) | Prioritize features into MVP / V1 / V2 milestones |
 | 4 — Build | [`04-build/`](./04-build/) | Track tasks, manage releases, maintain a changelog |
 
-Work through these levels in order. Each level's `README.md` explains what "done enough to move on" looks like.
-
 ---
 
 ## Getting Started
 
-**New to all of this?** Start with the runbooks:
-- [Set up your tools](./runbooks/getting-started/) — GitHub, Claude Code, git, IDE, Windows/macOS/Linux
-- [Fork vs clone this repo](./runbooks/using-this-repo/fork-vs-clone.md)
+**New to all of this?** Start here:
+- [Getting started guide](./runbooks/getting-started/README.md) — choose your setup path (zero-install, local, or full terminal)
+- [What is a terminal?](./runbooks/getting-started/00-what-is-a-terminal.md) — if that question even crossed your mind
+- [What will this cost?](./runbooks/costs.md) — a plain-language cost breakdown
+- [FAQ](./runbooks/FAQ.md) — answers to the most common questions
 
-**Ready to build something?** Start at Level 1:
-1. Open [`01-ideate/IDEATION.md`](./01-ideate/IDEATION.md) and start writing down your ideas
-2. When you have enough, work with Claude to synthesize them into [`01-ideate/PRODUCT_OVERVIEW.md`](./01-ideate/PRODUCT_OVERVIEW.md)
-3. Move to Level 2 and let Claude help you decide which design documents your project needs
+**Ready to build something?**
+1. Fork this repo → clone it → open it in VS Code or Codespaces
+2. Open [`01-ideate/IDEATION.md`](./01-ideate/IDEATION.md) and start writing
+3. Use the [starter prompts](./runbooks/starter-prompts/) to kick off each Claude session
+4. Check the [`example/`](./example/) folder to see what completed documents look like
+
+---
+
+## Resources
+
+| Resource | What it is |
+|----------|-----------|
+| [`example/`](./example/) | A completed fictional project (NeighborBoard) showing what filled-in documents look like |
+| [`runbooks/starter-prompts/`](./runbooks/starter-prompts/) | Copy-paste prompts to start Claude sessions at each level |
+| [`GLOSSARY.md`](./GLOSSARY.md) | Plain-language definitions for every technical term |
+| [`runbooks/costs.md`](./runbooks/costs.md) | What this will cost you |
+| [`runbooks/FAQ.md`](./runbooks/FAQ.md) | Frequently asked questions |
+| [`runbooks/getting-started/`](./runbooks/getting-started/) | Setup guides for all platforms and skill levels |
 
 ---
 
