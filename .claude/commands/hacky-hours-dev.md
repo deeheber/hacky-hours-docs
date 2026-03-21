@@ -24,6 +24,7 @@ Examples:
 **Then route:**
 
 - "help"                    → print the help message below, then stop
+- "help <command>"          → print help for that specific command (see Subcommand Help below), then stop
 - "version"                 → print "Hacky Hours command v1.0.1", then stop
 - "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
@@ -67,7 +68,7 @@ Usage: /hacky-hours [argument]
   iterate     Post-release cycle — triage bugs/ideas, amend docs, update backlog
 
 --- Release workflow ---
-  audit       Check release readiness — scans for secrets, flags git status, lists next steps
+  audit       Check release readiness — scans for secrets, flags git status, saves scorecard
   sync        Publish a GitHub Release from your latest CHANGELOG entry
 
 --- Utilities ---
@@ -76,11 +77,164 @@ Usage: /hacky-hours [argument]
   checklist   Show the pre-merge checklist for Level 4 tasks
   version     Print the installed command version
   help        Show this message
+  help <cmd>  Show detailed help for a specific command (e.g. help audit)
 
 Options:
   --root <path>   Operate in a subdirectory instead of hacky-hours/ (e.g. --root . for project root)
 
 Learn more: https://github.com/empathetech/hacky-hours-docs
+```
+
+---
+
+## Subcommand Help
+
+When the user runs `/hacky-hours help <command>`, print the relevant entry below, then stop. If the command isn't recognized, print the full help message instead.
+
+```
+/hacky-hours help ideate
+
+  Level 1 — Ideation: Get your ideas out of your head and into structured form.
+
+  What it does:
+    - Opens or continues IDEATION.md (free-writing space, no rules)
+    - Helps synthesize ideas into PRODUCT_OVERVIEW.md (Who/What/Where/When/Why)
+    - Asks Constraints & Values questions (licensing, privacy, infrastructure)
+
+  Done when: PRODUCT_OVERVIEW.md clearly answers the 5Ws and Constraints & Values.
+  Next step: /hacky-hours design
+
+---
+
+/hacky-hours help design
+
+  Level 2 — Design: Define how your product works in enough detail to build it.
+
+  What it does:
+    - Helps you decide which design docs your project needs
+    - Works through each doc section by section with questions
+    - Generates Mermaid diagrams (ERDs, flowcharts, architecture)
+    - Applies safety-first defaults: free before paid, less data, fewer dependencies
+
+  Available docs: ARCHITECTURE, DATA_MODEL, USER_JOURNEYS, STYLE_GUIDE,
+    ACCESSIBILITY, MARKET_FIT, BUSINESS_LOGIC, SECURITY_PRIVACY, LICENSING
+
+  Done when: A new collaborator could understand how the product works.
+  Next step: /hacky-hours roadmap
+
+---
+
+/hacky-hours help roadmap
+
+  Level 3 — Roadmap: Prioritize features ruthlessly into milestones.
+
+  What it does:
+    - Lists every feature from your design docs
+    - Categorizes each as MVP, V1, or V2+
+    - Pushes back on scope creep — if the MVP feels huge, it's too big
+
+  Done when: Every feature has a home and the MVP is small enough to ship.
+  Next step: /hacky-hours build
+
+---
+
+/hacky-hours help build
+
+  Level 4 — Build: Implement incrementally, aligned to your design decisions.
+
+  What it does:
+    - Picks tasks from BACKLOG.md
+    - Creates branches, implements, verifies against design docs
+    - Runs pre-merge checklist before calling anything done
+    - Updates CHANGELOG.md on milestone completion
+
+  Done when: All milestone tasks are merged and you've cut a tagged release.
+  Related: /hacky-hours checklist, /hacky-hours audit
+
+---
+
+/hacky-hours help iterate
+
+  Post-release iteration: Capture feedback, amend docs, queue next work.
+
+  What it does:
+    1. Capture — brain-dump bugs, feedback, and ideas into ITERATION.md
+    2. Synthesize — identify which design docs need amendments
+    3. Prioritize — triage items as hotfix, next milestone, or backlog
+    4. Amend — update design docs, write ADRs for significant decisions
+    5. Build — proceed with the Level 4 cycle
+
+  Done when: ITERATION.md is triaged, design docs updated, BACKLOG.md populated.
+
+---
+
+/hacky-hours help audit
+
+  Release readiness check — read-only, safe to run anytime.
+
+  What it does:
+    Phase 1: Scan for secrets and sensitive files
+    Phase 2: Check framework doc readiness (BACKLOG, CHANGELOG, LICENSE)
+    Phase 3: Translate git status into plain language
+    Phase 4: Generate ordered next-steps list
+    Phase 5: Optionally save results as a scorecard in audits/
+
+  Never modifies files (except the optional scorecard).
+  Run this before /hacky-hours sync.
+
+---
+
+/hacky-hours help sync
+
+  Publish a GitHub Release from your latest CHANGELOG entry.
+
+  What it does:
+    1. Verify gh CLI is authenticated
+    2. Read latest CHANGELOG entry and confirm
+    3. Create git tag if needed
+    4. Preview the release
+    5. Publish on explicit confirmation
+
+  Requires: gh CLI installed and authenticated
+  Run /hacky-hours audit first.
+
+---
+
+/hacky-hours help adopt
+
+  Bring an existing codebase into the framework.
+
+  What it does:
+    - Reads your codebase (README, package files, schema, auth, env vars, git log)
+    - Infers artifact stubs (PRODUCT_OVERVIEW, ARCHITECTURE, SECURITY_PRIVACY, BACKLOG)
+    - Asks clarifying questions for what can't be inferred
+    - Creates framework files under hacky-hours/ after confirmation
+
+  These are starting points, not finished documents. Review everything.
+  Next step: /hacky-hours iterate
+
+---
+
+/hacky-hours help migrate
+
+  Move root-level framework artifacts into hacky-hours/ subfolder.
+
+  What it does:
+    - Surveys root for 01-ideate/, 02-design/, etc.
+    - Moves them with git mv (preserves history)
+    - Updates .claudeignore and CLAUDE.md paths
+    - Flags any GitHub Action paths that need manual updating
+
+  For upgrading from v0.x to v1.0 layout.
+
+---
+
+/hacky-hours help dry-run
+
+  Guided session without writing any files.
+
+  Same as running /hacky-hours with no arguments, but every file write
+  is displayed as a code block instead of actually created. Safe to explore.
 ```
 
 ---
@@ -178,6 +332,7 @@ hacky-hours/             ← ROOT_PATH (default); all framework artifacts live h
   04-build/
     BACKLOG.md
     CHANGELOG.md
+  audits/                ← persistent audit scorecards (see /hacky-hours audit)
   archive/               ← cold storage; never delete, move here instead
 .claudeignore            ← tells Claude which files to skip for context (at project root)
 CLAUDE.md                ← project-specific instructions for Claude sessions (at project root)
@@ -191,11 +346,12 @@ Create `.claudeignore` with these default contents:
 
 ```
 hacky-hours/archive/
+hacky-hours/audits/
 hacky-hours/04-build/CHANGELOG.md
 hacky-hours/01-ideate/IDEATION.md
 ```
 
-Create `CLAUDE.md` with the following project state machine instructions — this is what enables Claude to drive documentation and project management automatically across sessions:
+Create `CLAUDE.md` with the following project state machine instructions — this is what enables Claude to drive documentation and project management automatically across sessions. **Replace `hacky-hours/` with the actual ROOT_PATH if different from the default:**
 
 ```markdown
 ## Project State Machine
@@ -221,6 +377,8 @@ Design constraints live in `hacky-hours/02-design/`. Before implementing anythin
 
 Before adding any dependency or external service, check `hacky-hours/02-design/LICENSING.md` for compatibility with the project's chosen license.
 ```
+
+Note: if ROOT_PATH is not `hacky-hours/`, substitute the correct path in all references above (e.g., `meta/04-build/BACKLOG.md` if `--root meta/` was used during scaffold).
 
 **BACKLOG.md is a queue, not a ledger.** Items are added during planning and removed when their PR is merged. An empty BACKLOG means the milestone is complete. Completed work belongs in CHANGELOG.md, not BACKLOG.md.
 
@@ -357,6 +515,8 @@ The task cycle:
 
 ### Iterate — Run an Iteration Cycle
 
+**Context to read before starting:** Read `04-build/CHANGELOG.md` to understand what shipped in the last release. Read `04-build/BACKLOG.md` to see if anything is already queued. Skim the Level 2 design docs so you can identify which ones need amendments.
+
 **Purpose:** Capture bugs, ideas, and improvements after a release, amend the docs that need updating, and queue the work.
 
 The shape of iteration is the same as the initial build cycle — capture → synthesize → prioritize → build — but the inputs are *amendments* to existing documents, not blank pages.
@@ -401,6 +561,8 @@ Proceed with the Level 4 build cycle using the updated backlog.
 ---
 
 ### Sync — Publish a GitHub Release
+
+**Context to read before starting:** Read `04-build/CHANGELOG.md` under ROOT_PATH to find the latest version entry. Check `04-build/BACKLOG.md` — if it's not empty, the milestone isn't done and you should suggest running `/hacky-hours audit` first.
 
 **Purpose:** Take the latest CHANGELOG entry and publish it as an official GitHub Release. One outcome: your release is visible on your repo's Releases page with your changelog notes attached.
 
@@ -466,6 +628,8 @@ gh release create <version> --title "<version>" --notes "<full changelog entry>"
 ---
 
 ### Migrate — Move Artifacts to hacky-hours/ Subfolder
+
+**Context to read before starting:** Check the project root for existing framework folders (`01-ideate/`, `02-design/`, etc.) and any `.claudeignore` or `CLAUDE.md` that may reference them. Also check for `.github/workflows/hacky-hours-sync.yml`.
 
 **Purpose:** Move existing framework artifacts from the project root into the `hacky-hours/` subfolder, which is the new default location as of v1.0.0.
 
@@ -539,6 +703,8 @@ Note: the `git mv` steps in Step 2 are already staged. The commit above adds the
 ---
 
 ### Audit — Release Readiness Check
+
+**Context to read before starting:** Read `02-design/LICENSING.md` to know the expected license. Read `04-build/BACKLOG.md` and `04-build/CHANGELOG.md` under ROOT_PATH to assess milestone completion. Do not ask the user for this information — read it yourself.
 
 **Purpose:** A read-only scan of the project that tells the user exactly what needs to happen before they can ship. Never modifies any files. Safe to run at any time.
 
@@ -639,7 +805,57 @@ If everything is clean, say so: "Everything looks good — you're ready to run `
 
 ---
 
+**Phase 5 — Save Scorecard (optional)**
+
+After presenting the Phase 4 report, ask the user: "Would you like to save this audit as a scorecard? It'll be stored in `audits/` so you have a record."
+
+If yes, write a Markdown file to `ROOT_PATH/audits/` named by date: `YYYY-MM-DD-audit.md`. If multiple audits run on the same day, append a counter: `YYYY-MM-DD-audit-2.md`.
+
+The scorecard format:
+
+```markdown
+# Audit Scorecard — YYYY-MM-DD
+
+**Project:** <repo name>
+**Branch:** <current branch>
+**Commit:** <short SHA>
+
+## Secrets Scan
+
+- **Result:** PASS | FAIL | WARNING
+- **Findings:** <list or "None">
+
+## Framework Doc Readiness
+
+- **BACKLOG.md:** Empty (milestone complete) | N tasks remaining
+- **CHANGELOG.md:** Entry exists for vX.Y.Z | No entry found
+- **LICENSE:** Present | Missing
+- **SECURITY_PRIVACY.md:** Filled in | Placeholder only | Missing
+- **ACCESSIBILITY.md:** Filled in | Placeholder only | Missing
+
+## Git Status
+
+- **Uncommitted changes:** N files
+- **Untracked files:** N files
+- **Unpushed commits:** N commits
+- **Branch:** <branch name>
+
+## Next Steps
+
+<copy of the Phase 4 ordered list>
+
+---
+
+*Generated by `/hacky-hours audit` — this is a heuristic check, not a security guarantee.*
+```
+
+Create the `audits/` directory under ROOT_PATH if it doesn't exist. This is the one file the audit command is allowed to write — everything else remains read-only.
+
+---
+
 ### Adopt — Bring an Existing Codebase into the Framework
+
+**Context to read before starting:** Read as much of the existing codebase as possible before asking the user questions. The goal is to infer as much as you can and only ask about what's genuinely ambiguous. Don't ask the user to tell you things you can read.
 
 **Purpose:** Generate a starting set of hacky-hours framework artifacts by reading an existing codebase. For teams or individuals who already have working code and want to use the iterate cycle going forward.
 
@@ -716,13 +932,17 @@ Present a summary of what you're about to create:
 I'll create the following under hacky-hours/:
 
   01-ideate/PRODUCT_OVERVIEW.md  — inferred from README + your answers
+  02-design/README.md            — index of design documents
   02-design/ARCHITECTURE.md      — inferred from directory structure + package files
   02-design/SECURITY_PRIVACY.md  — partial, based on auth files and env vars
   02-design/LICENSING.md         — blank template (needs your input)
   02-design/ACCESSIBILITY.md     — blank template (needs your input)
+  02-design/decisions/           — for Architecture Decision Records
+  03-roadmap/ROADMAP.md          — empty, ready for prioritization
   04-build/BACKLOG.md            — seeded from TODOs + README + your answers
   04-build/CHANGELOG.md          — empty, ready for your first entry
-  archive/
+  audits/                        — for persistent audit scorecards
+  archive/                       — cold storage for completed work
   .claudeignore (at project root)
   CLAUDE.md (at project root)
 
