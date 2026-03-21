@@ -6,5 +6,6 @@ SRC="https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/.claude
 
 mkdir -p "$HOME/.claude/commands"
 curl -fsSL "$SRC" -o "$DEST"
+sed -i '' '/^description:/ s/ (dev)//' "$DEST"
 
 echo "Installed. Type /hacky-hours in any Claude Code session."
