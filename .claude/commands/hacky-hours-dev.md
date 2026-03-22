@@ -25,7 +25,7 @@ Examples:
 
 - "help"                    → print the help message below, then stop
 - "help <command>"          → print help for that specific command (see Subcommand Help below), then stop
-- "version"                 → print "Hacky Hours command v1.3.0", then stop
+- "version"                 → print "Hacky Hours command v1.4.0", then stop
 - "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
@@ -37,6 +37,7 @@ Examples:
 - "audit"                   → skip to Audit guidance below
 - "adopt"                   → skip to Adopt guidance below
 - "migrate"                 → skip to Migrate guidance below
+- "link" (with optional `--sync` flag) → skip to Link guidance below
 - "dry-run"                 → begin with Step 1 below, but in dry-run mode: never create or modify any files; wherever you would write a file, display its contents in a code block with a note "↳ would write to <path>" instead
 - (no argument)             → run the guided session: execute Steps 1, 2, and 3 below
 
@@ -47,7 +48,7 @@ Examples:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v1.3.0
+Hacky Hours framework assistant — v1.4.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -70,6 +71,9 @@ Usage: /hacky-hours [argument]
 --- Release workflow ---
   audit       Check release readiness — scans for secrets, flags git status, saves scorecard
   sync        Publish a GitHub Release from your latest CHANGELOG entry
+
+--- Multi-repo ---
+  link        Connect this repo to a related repo — generates RELATED_REPOS.md in both
 
 --- Utilities ---
   migrate     Move existing root-level artifacts into hacky-hours/ subfolder (v0.x → v1.0)
@@ -235,6 +239,28 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
 
   Same as running /hacky-hours with no arguments, but every file write
   is displayed as a code block instead of actually created. Safe to explore.
+
+---
+
+/hacky-hours help link
+
+  Connect this repo to a related repo — generates RELATED_REPOS.md in both.
+
+  What it does:
+    - Reads the other repo's design docs via the provided local path
+    - Infers this repo's role relative to the other (consumer, sibling, service, etc.)
+    - Asks clarifying questions for what can't be inferred
+    - Confirms before writing anything
+    - Creates or appends to RELATED_REPOS.md in this repo and the other repo
+    - Updates CLAUDE.md in this repo with cross-repo reading instructions
+
+  Usage:
+    /hacky-hours link ../other-repo           Initial link
+    /hacky-hours link --sync ../other-repo    Re-sync — surfaces what changed in the
+                                              other repo since the link was established
+
+  Done when: Both repos have RELATED_REPOS.md and CLAUDE.md cross-repo instructions.
+  Run in: the dependent repo, pointing at the authoritative repo
 ```
 
 ---
@@ -445,6 +471,7 @@ Start by asking which documents this project actually needs. Not every project n
 | BUSINESS_LOGIC.md | The product has rules, calculations, or domain-specific behavior |
 | SECURITY_PRIVACY.md | The product handles user data, auth, or payments (almost always) |
 | LICENSING.md | Almost always — ask early, before dependencies are chosen |
+| RELATED_REPOS.md | The product spans multiple repos (backend + frontend, service + CLI, etc.) |
 
 For each document, work through it section by section using questions. Generate Mermaid diagrams proactively — ERDs for data models, flowcharts for user journeys, architecture diagrams for system design.
 
@@ -964,6 +991,158 @@ After writing, tell the user:
 > "Your framework artifacts are ready. They're a starting point — review them and fill in anything I couldn't infer, especially LICENSING.md, ACCESSIBILITY.md, and the Constraints & Values section of PRODUCT_OVERVIEW.md.
 >
 > When you're ready to work on your next milestone, run `/hacky-hours iterate` to triage what to build next."
+
+---
+
+### Link — Connect Two Related Repos
+
+**Context to read before starting:** Read `04-build/BACKLOG.md` and `01-ideate/PRODUCT_OVERVIEW.md` under ROOT_PATH so you understand what this repo is before reading the other one. Then read the other repo's design docs — at minimum `01-ideate/PRODUCT_OVERVIEW.md` and `02-design/ARCHITECTURE.md`. Do not ask the user to describe either repo; read them yourself first.
+
+**Purpose:** Establish a documented, navigable relationship between two repos so that design decisions in one don't contradict settled decisions in the other. Generates `RELATED_REPOS.md` in both repos and updates `CLAUDE.md` in this repo with instructions for reading across the boundary.
+
+**Parse the argument first.** The argument is either:
+- `link <path>` — initial link; `<path>` is the local path to the other repo (e.g., `../ideation-tracker`)
+- `link --sync <path>` — re-sync mode; same path, but compare rather than generate
+
+If no path is provided, ask the user: "What's the local path to the other repo, relative to this one? (e.g., `../repo-name`)"
+
+**Always confirm before writing anything to either repo.**
+
+---
+
+**Initial Link Flow**
+
+**Step 1: Read both repos**
+
+Read this repo's:
+- `ROOT_PATH/01-ideate/PRODUCT_OVERVIEW.md`
+- `ROOT_PATH/02-design/ARCHITECTURE.md` (if it exists)
+
+Read the other repo's (using the provided path):
+- `<path>/hacky-hours/01-ideate/PRODUCT_OVERVIEW.md` (fall back to `<path>/hacky-hours/01-ideate/IDEATION.md` if no PRODUCT_OVERVIEW)
+- `<path>/hacky-hours/02-design/ARCHITECTURE.md`
+- Any other design docs that exist in `<path>/hacky-hours/02-design/`
+
+Also run in the other repo to get its GitHub URL:
+```bash
+git -C <path> remote get-url origin
+```
+
+**Step 2: Infer the relationship**
+
+From what you've read, determine:
+- Which repo is the **authoritative** one (owns the source of truth — data model, business logic, API contracts, etc.)
+- Which repo is the **dependent** one (consumes or presents what the other defines)
+- What the dependent repo needs to know when making design decisions (the routing table)
+
+Show your inference to the user:
+
+> "Based on what I've read: [other repo] looks like the authoritative repo — it owns [X, Y, Z]. This repo is the dependent — it consumes [the API / the data model / etc.]. Does that sound right, or is the relationship different?"
+
+If the relationship is more equal (two services that share a domain boundary), note that and ask the user to clarify what each owns.
+
+**Step 3: Clarifying questions**
+
+Ask only what you couldn't infer:
+1. "What decisions made in [other repo] are most likely to affect what you build here?"
+2. "Are there any design docs in [other repo] that this repo should treat as constraints — i.e., never contradict without raising it there first?"
+3. "Is there anything this repo owns that [other repo] needs to be aware of?"
+
+**Step 4: Build the routing table**
+
+From the other repo's design docs and the user's answers, construct the Decision Routing Table for this repo: a list of design question types and which doc in the other repo answers them.
+
+Example entries:
+- "What data does this component need?" → `02-design/DATA_MODEL.md` in [other repo]
+- "What does this status value mean?" → `02-design/BUSINESS_LOGIC.md — Enums section` in [other repo]
+- "Can I add this dependency?" → `02-design/LICENSING.md` in [other repo]
+
+Be specific — include section names where the relevant content lives.
+
+**Step 5: Confirm and write**
+
+Show the user a summary of what will be written:
+
+```
+I'll create or update the following:
+
+  This repo:
+    ROOT_PATH/02-design/RELATED_REPOS.md   — new section for [other repo]
+    CLAUDE.md                              — add cross-repo reading instructions
+
+  Other repo (<path>):
+    <path>/hacky-hours/02-design/RELATED_REPOS.md   — new section for this repo
+```
+
+Ask for confirmation, then write both files.
+
+**Writing RELATED_REPOS.md in this repo (dependent):**
+
+Create or append a `## Repo: [other-repo-name]` section to `ROOT_PATH/02-design/RELATED_REPOS.md`. The section must include:
+- GitHub URL (from `git remote get-url origin` in the other repo)
+- Local path (the argument the user provided, expressed relative to this repo's root)
+- Relationship table (this repo's role vs. the other repo's role)
+- Source of truth declaration (which repo wins on conflict)
+- Decision Routing Table (pointing *to* the other repo's docs)
+- Cross-repo coordination protocol
+
+**Writing RELATED_REPOS.md in the other repo (authoritative):**
+
+Create or append a `## Repo: [this-repo-name]` section to `<path>/hacky-hours/02-design/RELATED_REPOS.md`. This is the *reverse perspective* — the routing table points back to *this* repo's docs for anything the authoritative repo needs to understand about the dependent. This section is typically shorter; the authoritative repo usually just needs to know the dependent exists and where to find its design docs.
+
+**Updating CLAUDE.md in this repo:**
+
+Add a `## Related Repositories` section (if not already present):
+
+```markdown
+## Related Repositories
+
+This project has related repositories. Before making design decisions that cross repo boundaries:
+1. Read `hacky-hours/02-design/RELATED_REPOS.md` to understand the relationship and source-of-truth boundaries
+2. Use the local path listed there to read the other repo's design docs directly — always preferred over guessing
+3. If the local clone isn't available, use the GitHub URL as fallback
+```
+
+Do not add this section if it already exists.
+
+---
+
+**Re-sync Flow (`--sync`)**
+
+**Step 1: Read the current state of the other repo**
+
+Using the provided path, read all design docs in `<path>/hacky-hours/02-design/`. Note the last-modified timestamps or any section content that has changed since the link was established.
+
+**Step 2: Read this repo's RELATED_REPOS.md**
+
+Find the `## Repo: [other-repo-name]` section. Extract the Decision Routing Table and relationship description.
+
+**Step 3: Compare and surface discrepancies**
+
+Look for:
+- New design docs in the other repo that aren't referenced in the routing table
+- Sections in the routing table that point to docs that no longer exist or have been significantly restructured
+- Changes to source-of-truth ownership (e.g., something this repo was responsible for has been moved to the other repo)
+- Any decisions in the other repo's new ADRs (`02-design/decisions/`) that affect this repo
+
+Present findings as a plain-language list:
+
+```
+Changes in [other repo] since this link was established:
+
+[!] BUSINESS_LOGIC.md has a new "Stream Lifecycle" section — update your routing table
+    to reference it for stream state questions.
+
+[!] DATA_MODEL.md — the `jobs` table has 3 new fields. If your UI displays job records,
+    review these before your next implementation task.
+
+[ ] A new design doc exists: STYLE_GUIDE.md — not currently in your routing table.
+    Add it if your repo makes UI decisions.
+
+[ ] No changes detected in ARCHITECTURE.md, LICENSING.md, SECURITY_PRIVACY.md.
+```
+
+Do **not** auto-update RELATED_REPOS.md. Show the findings and let the user decide what to update. If they want to update the routing table, offer to do it section by section.
 
 ---
 

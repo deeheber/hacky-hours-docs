@@ -19,6 +19,7 @@ Design documents define how your product works — in detail, and from multiple 
 | [`BUSINESS_LOGIC.md`](./BUSINESS_LOGIC.md) | Your product has rules, calculations, or domain-specific behavior that needs to be explicit |
 | [`SECURITY_PRIVACY.md`](./SECURITY_PRIVACY.md) | Your product handles user data, authentication, payments, or anything sensitive (almost always) |
 | [`LICENSING.md`](./LICENSING.md) | Almost always — ask early, before any dependencies are chosen |
+| [`RELATED_REPOS.md`](./RELATED_REPOS.md) | Your product spans multiple repos (backend + frontend, service + CLI, shared library, etc.) |
 | [`decisions/`](./decisions/) | Record significant design changes over time without overwriting original documents |
 | [`diagrams/`](./diagrams/) | You want visual representations of any of the above |
 
@@ -54,6 +55,7 @@ When helping a user at Level 2:
 - `LICENSING.md` should be created early — before architecture decisions lock in dependency choices. License compatibility is much easier to reason about before than after
 - **Safety-first throughout:** when recommending tools, services, or approaches, lead with the free/simple/privacy-preserving option. Explain tradeoffs before suggesting complexity. The user can choose a more powerful path — but they should choose it knowingly
 - When design decisions change during iteration, write a short Architecture Decision Record (ADR) in `decisions/` rather than rewriting the original document — this preserves the reasoning behind original decisions
+- If `ARCHITECTURE.md` describes a multi-repo split, prompt the user to create `RELATED_REPOS.md` — or run `/hacky-hours link <path>` from the dependent repo to generate it automatically
 
 ---
 

@@ -7,6 +7,23 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.4.0] — 2026-03-21
+
+Cross-repo linking: connect related repos, generate RELATED_REPOS.md in both, and re-sync when the authoritative repo changes.
+
+### Added
+
+- **`/hacky-hours link`** — new command for connecting two related repos. Run in the dependent repo, pointing at the authoritative repo's local path. Reads both repos' design docs, infers the relationship and source-of-truth boundary, asks clarifying questions, and generates `RELATED_REPOS.md` in both repos plus a `## Related Repositories` section in this repo's `CLAUDE.md`. `--sync` flag re-reads the authoritative repo's current design docs and surfaces what's changed since the link was established — without auto-updating anything.
+- **`RELATED_REPOS.md` template** (`02-design/RELATED_REPOS.md`) — new Level 2 design artifact for documenting cross-repo relationships. Contains: relationship table (role + source-of-truth boundary per repo), Decision Routing Table (design question → doc in other repo), and cross-repo coordination protocol. Single file with one `## Repo:` section per related repo.
+
+### Changed
+
+- **Level 2 guidance** — added `RELATED_REPOS.md` to the "which docs does your project need?" table, prompted when `ARCHITECTURE.md` indicates a multi-repo split. Also added `link` suggestion to the Claude Guidance section of `02-design/README.md`.
+- **Help message** — added `--- Multi-repo ---` section with `link` entry.
+- **Subcommand help** — added `help link` entry documenting both initial link and `--sync` usage.
+
+---
+
 ## [1.3.0] — 2026-03-21
 
 Accessibility audit, glossary expansion, version bump check, and CLA resolution.
