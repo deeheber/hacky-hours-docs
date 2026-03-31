@@ -7,6 +7,29 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.5.0] — 2026-03-30
+
+Non-linear lifecycle: product pivot, doc efficiency optimization, and two-way GitHub Issues sync.
+
+### Added
+
+- **`/hacky-hours optimize`** — new command that evaluates framework documentation efficiency. Scans all docs for token cost (estimated), staleness (last modified vs. last commit reference), density (placeholder vs. real content), and cross-reference usage. Generates actionable recommendations: archive, consolidate, trim, or fill in. Optionally saves results as an optimization report in `audits/`. Also integrated as a lighter check in iterate Step 2 — flags oversized/stale docs during synthesis.
+- **`/hacky-hours pivot`** — new lifecycle path for product re-ideation with full context. Reads all existing artifacts, walks through Level 1 questions with awareness of current state, produces a structured diff of what changed, and cascades changes through Levels 2-4. Includes doc structural refactoring (merge, split, retire) and ADR generation for significant direction changes. Use when the product direction itself needs rethinking, not just refinement.
+- **`/hacky-hours sync --issues`** — two-way reconciliation between BACKLOG.md and GitHub Issues. Push: creates Issues from BACKLOG items without `#<number>` annotations. Pull: surfaces open Issues with `[hacky-hours]` label not in BACKLOG. Diverged items shown side-by-side for human resolution. Last-write-wins conflict model — every change requires explicit confirmation. Creates `[hacky-hours]` label automatically if missing.
+- **ADR: Non-Linear Lifecycle** (`02-design/decisions/2026-03-30-non-linear-lifecycle.md`) — documents the shift from a strictly linear four-level lifecycle to one with backward arcs via `pivot` and self-evaluation via `optimize`.
+- **ADR: Two-Way GitHub Issues Sync** (`02-design/decisions/2026-03-30-issues-two-way-sync.md`) — documents the last-write-wins conflict resolution model, identity linking (`#<number>` in BACKLOG, `[hacky-hours]` label on Issues), and the decision to keep neither source canonical.
+
+### Changed
+
+- **Lifecycle model** — the framework is no longer strictly linear. ARCHITECTURE.md now includes a Mermaid diagram showing the iterate → pivot backward arc and the optimize self-evaluation loop.
+- **ARCHITECTURE.md** — added Lifecycle Model section, GitHub Issues Integration section, updated command prompt size metric.
+- **Iterate guidance (Step 2)** — now includes a lightweight efficiency check that flags oversized/stale docs during synthesis, with a suggestion to run `/hacky-hours optimize` for full analysis.
+- **Sync command** — now has two modes: `sync` (releases, unchanged) and `sync --issues` (issue reconciliation). Routing and help updated accordingly.
+- **Help message** — added `optimize`, `pivot`, and `sync --issues` entries.
+- **Subcommand help** — added `help optimize`, `help pivot`, and `help sync --issues` entries.
+
+---
+
 ## [1.4.0] — 2026-03-21
 
 Cross-repo linking: connect related repos, generate RELATED_REPOS.md in both, and re-sync when the authoritative repo changes.

@@ -25,7 +25,7 @@ Examples:
 
 - "help"                    → print the help message below, then stop
 - "help <command>"          → print help for that specific command (see Subcommand Help below), then stop
-- "version"                 → print "Hacky Hours command v1.4.0", then stop
+- "version"                 → print "Hacky Hours command v1.5.0", then stop
 - "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
@@ -33,10 +33,12 @@ Examples:
 - "roadmap" or "3"          → skip to Level 3 guidance
 - "build" or "4"            → skip to Level 4 guidance
 - "iterate"                 → skip to Iterate guidance below
-- "sync"                    → skip to Sync guidance below
+- "sync" (with optional `--issues` flag) → skip to Sync guidance below
 - "audit"                   → skip to Audit guidance below
 - "adopt"                   → skip to Adopt guidance below
 - "migrate"                 → skip to Migrate guidance below
+- "optimize"                → skip to Optimize guidance below
+- "pivot"                   → skip to Pivot guidance below
 - "link" (with optional `--sync` flag) → skip to Link guidance below
 - "dry-run"                 → begin with Step 1 below, but in dry-run mode: never create or modify any files; wherever you would write a file, display its contents in a code block with a note "↳ would write to <path>" instead
 - (no argument)             → run the guided session: execute Steps 1, 2, and 3 below
@@ -48,7 +50,7 @@ Examples:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v1.4.0
+Hacky Hours framework assistant — v1.5.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -67,10 +69,13 @@ Usage: /hacky-hours [argument]
   roadmap     Jump to Level 3 — Roadmap
   build       Jump to Level 4 — Build
   iterate     Post-release cycle — triage bugs/ideas, amend docs, update backlog
+  optimize    Evaluate framework doc efficiency — token cost, staleness, density
+  pivot       Re-ideate with full context — rethink product direction, cascade changes
 
 --- Release workflow ---
   audit       Check release readiness — scans for secrets, flags git status, saves scorecard
   sync        Publish a GitHub Release from your latest CHANGELOG entry
+  sync --issues  Two-way sync between BACKLOG.md and GitHub Issues
 
 --- Multi-repo ---
   link        Connect this repo to a related repo — generates RELATED_REPOS.md in both
@@ -179,6 +184,7 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
   What it does:
     Phase 1: Scan for secrets and sensitive files
     Phase 2: Check framework doc readiness (BACKLOG, CHANGELOG, LICENSE)
+    Phase 2b: Reconcile GitHub Issues with BACKLOG (if gh CLI available)
     Phase 3: Translate git status into plain language
     Phase 4: Generate ordered next-steps list
     Phase 5: Optionally save results as a scorecard in audits/
@@ -194,6 +200,7 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
 
   What it does:
     1. Verify gh CLI is authenticated
+    1b. Check GitHub Issues ↔ BACKLOG alignment
     2. Read latest CHANGELOG entry and confirm
     3. Create git tag if needed
     4. Preview the release
@@ -201,6 +208,28 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
 
   Requires: gh CLI installed and authenticated
   Run /hacky-hours audit first.
+
+---
+
+/hacky-hours help sync --issues
+
+  Two-way sync between BACKLOG.md and GitHub Issues.
+
+  What it does:
+    1. Verify gh CLI is authenticated
+    2. Push: create GitHub Issues for BACKLOG items that don't have one yet
+    3. Pull: surface open Issues with [hacky-hours] label not in BACKLOG
+    4. Diff: show side-by-side comparison for items that diverged
+    5. Confirm: every change requires explicit human confirmation
+
+  Identity linking:
+    - BACKLOG items get #<number> annotation after Issue is created
+    - GitHub Issues get [hacky-hours] label (created automatically if missing)
+
+  Conflict model: last-write-wins with diff shown to user.
+  Neither BACKLOG nor Issues is canonical — you decide at sync time.
+
+  Requires: gh CLI installed and authenticated
 
 ---
 
@@ -261,6 +290,57 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
 
   Done when: Both repos have RELATED_REPOS.md and CLAUDE.md cross-repo instructions.
   Run in: the dependent repo, pointing at the authoritative repo
+
+---
+
+/hacky-hours help optimize
+
+  Evaluate framework documentation efficiency — token cost, staleness, and density.
+
+  What it does:
+    Phase 1: Measure command prompt size (estimated token count)
+    Phase 2: Scan all framework docs for size, staleness, and density
+    Phase 3: Analyze cross-reference usage (which docs are actually read during builds?)
+    Phase 4: Generate actionable recommendations (archive, consolidate, trim)
+    Phase 5: Optionally save results as an optimization report in audits/
+
+  Metrics:
+    - Token cost: estimated tokens consumed by each doc
+    - Staleness: last modified date vs. last referenced in a git commit
+    - Density: ratio of placeholder/boilerplate text to real content
+    - Cross-reference hits: how often each doc is mentioned in commit messages or other docs
+
+  Also runs as a lighter check within /hacky-hours iterate (Step 2) — flags
+  oversized or stale docs during the synthesis phase.
+
+  Never modifies framework docs. Safe to run anytime.
+  Done when: You know which docs are earning their context cost and which aren't.
+
+---
+
+/hacky-hours help pivot
+
+  Re-ideate with full context — rethink product direction and cascade changes.
+
+  What it does:
+    1. Read — loads all existing framework artifacts as context
+    2. Revisit — walks through Level 1 questions with awareness of current state
+    3. Diff — identifies what changed vs. current PRODUCT_OVERVIEW.md
+    4. Cascade — propagates direction changes through Levels 2, 3, and 4
+    5. Refactor — merges, splits, or retires design docs as needed
+    6. Record — writes ADRs for significant direction changes
+
+  Use pivot (not iterate) when:
+    - The product's core audience, problem, or form factor has changed
+    - You're questioning whether the current design docs reflect what you're actually building
+    - Multiple design docs feel wrong but you can't pinpoint why
+
+  Use iterate when:
+    - The direction is sound but the implementation needs refinement
+    - You're capturing bugs, feedback, and incremental improvements
+
+  Done when: PRODUCT_OVERVIEW.md reflects the new direction and changes have
+  cascaded through design docs, roadmap, and backlog.
 ```
 
 ---
@@ -564,6 +644,8 @@ Read `ITERATION.md` alongside the existing design docs. For each item, ask:
 - Does this introduce a new design decision? → Note that an ADR will be needed
 - Is this purely an implementation fix with no design impact? → Goes straight to backlog
 
+**Quick efficiency check (lightweight optimize):** While reviewing the design docs, flag any that look oversized, stale, or mostly placeholder. For each flagged doc, note it alongside the amendment list. If multiple docs are flagged, suggest running `/hacky-hours optimize` for a full analysis after the iteration cycle completes.
+
 Surface the amendment list to the user and confirm before making any changes.
 
 **Step 3: Prioritize — triage into BACKLOG**
@@ -587,7 +669,13 @@ Proceed with the Level 4 build cycle using the updated backlog.
 
 ---
 
-### Sync — Publish a GitHub Release
+### Sync — Publish a GitHub Release / Sync Issues
+
+**Parse the flag first.** If the argument contains `--issues`, skip to the **Issues Sync Flow** below. Otherwise, run the **Release Flow**.
+
+---
+
+#### Release Flow
 
 **Context to read before starting:** Read `04-build/CHANGELOG.md` under ROOT_PATH to find the latest version entry. Check `04-build/BACKLOG.md` — if it's not empty, the milestone isn't done and you should suggest running `/hacky-hours audit` first.
 
@@ -603,6 +691,17 @@ Run `gh auth status`. If not authenticated or `gh` is not installed:
 - Tell the user to run `gh auth login` and follow the prompts
 - Link them to: https://cli.github.com if `gh` isn't installed
 - Stop until this is resolved
+
+**Step 1b: Check GitHub Issues ↔ BACKLOG alignment**
+
+If `gh` is available and authenticated, run a quick reconciliation before publishing:
+
+1. Run `gh issue list --state open --limit 100 --json number,title` and compare against `04-build/BACKLOG.md`.
+2. If there are open issues that don't appear in BACKLOG, warn: "There are N open GitHub Issues not tracked in BACKLOG.md. These may represent unfinished work. Review before publishing."
+3. If BACKLOG is empty but open issues remain, warn: "BACKLOG is empty but N GitHub Issues are still open. Close them or add them to the backlog before releasing."
+4. If everything is in sync (or BACKLOG and issues are both clear), note: "GitHub Issues and BACKLOG are in sync."
+
+This is advisory — the user can proceed regardless, but they should make an informed decision.
 
 **Step 2: Read the latest CHANGELOG entry**
 
@@ -651,6 +750,109 @@ gh release create <version> --title "<version>" --notes "<full changelog entry>"
 ```
 
 **After publishing:** tell the user where to find their release (GitHub repo → Releases tab) and suggest running `/hacky-hours audit` before starting the next milestone to make sure the repo is in a clean state.
+
+---
+
+#### Issues Sync Flow
+
+**Context to read before starting:** Read `04-build/BACKLOG.md` under ROOT_PATH. This is the local source of work items that will be compared against GitHub Issues.
+
+**Purpose:** Two-way reconciliation between BACKLOG.md and GitHub Issues. Neither source is canonical — the user resolves all conflicts at sync time.
+
+**Always confirm before creating, updating, or closing anything.**
+
+**Step 1: Verify gh is set up**
+
+Run `gh auth status`. If not authenticated or `gh` is not installed, stop and direct the user to set it up (same as Release Flow Step 1).
+
+**Step 2: Ensure the `hacky-hours` label exists**
+
+Check if the label exists:
+
+```bash
+gh label list --search "hacky-hours" --json name
+```
+
+If it doesn't exist, ask the user: "I need to create a `hacky-hours` label in this repo to track synced issues. OK to create it?" If yes:
+
+```bash
+gh label create "hacky-hours" --description "Tracked in hacky-hours BACKLOG.md" --color "0E8A16"
+```
+
+**Step 3: Read both sources**
+
+Read `04-build/BACKLOG.md` and parse each item. Look for `#<number>` annotations — these are items already linked to an Issue.
+
+Fetch open Issues with the `hacky-hours` label:
+
+```bash
+gh issue list --label "hacky-hours" --state open --limit 100 --json number,title,body,updatedAt
+```
+
+Also fetch recently closed Issues with the label (to detect completed work):
+
+```bash
+gh issue list --label "hacky-hours" --state closed --limit 50 --json number,title,body,closedAt
+```
+
+**Step 4: Compare and categorize**
+
+Sort items into four buckets:
+
+1. **Push (BACKLOG → Issues):** Items in BACKLOG without a `#<number>` annotation. These need new GitHub Issues created.
+2. **Pull (Issues → BACKLOG):** Open Issues with `hacky-hours` label that don't appear in BACKLOG (by number). These were created directly in GitHub by collaborators.
+3. **Diverged:** Items that exist in both (linked by `#<number>`) but the text has changed in one or both. Compare BACKLOG item text against Issue title+body.
+4. **Stale:** BACKLOG items linked to Issues that are now closed. These may be done.
+
+**Step 5: Present the diff**
+
+Show the user a clear summary:
+
+```
+BACKLOG ↔ GitHub Issues sync:
+
+Push (BACKLOG → new Issues):
+  [ ] "Add user authentication" — will create Issue with [hacky-hours] label
+  [ ] "Fix mobile layout" — will create Issue with [hacky-hours] label
+
+Pull (Issues → BACKLOG):
+  [ ] #42 "Refactor database queries" — will add to BACKLOG with #42 annotation
+  [ ] #57 "Update API docs" — will add to BACKLOG with #57 annotation
+
+Diverged (text differs):
+  [!] #31 "Setup CI pipeline"
+      BACKLOG says: "Setup CI/CD pipeline with GitHub Actions and deploy previews"
+      Issue says:   "Setup CI pipeline — basic lint + test only for now"
+      → Which version to keep? (backlog / issue / skip)
+
+Stale (Issue closed, still in BACKLOG):
+  [?] #18 "Initial project scaffold" — Issue was closed 2026-03-15
+      → Remove from BACKLOG? (yes / no)
+```
+
+**Step 6: Confirm and execute**
+
+For each bucket, ask for confirmation before acting:
+
+- **Push:** "Create these N Issues? (yes / no / pick individually)"
+  - If yes: create each Issue, add `hacky-hours` label, then update BACKLOG.md with the `#<number>` annotation
+- **Pull:** "Add these N items to BACKLOG? (yes / no / pick individually)"
+  - If yes: append to the appropriate section of BACKLOG.md with `#<number>`
+- **Diverged:** For each item, the user picks: keep BACKLOG version (update Issue), keep Issue version (update BACKLOG), or skip
+- **Stale:** For each item, the user confirms removal from BACKLOG or keeps it
+
+After all actions are complete, show a summary of what changed.
+
+**Step 7: Report**
+
+```
+Sync complete:
+  Created: N new Issues
+  Added to BACKLOG: N items
+  Updated: N diverged items resolved
+  Removed: N stale items cleaned up
+  Skipped: N items (no action taken)
+```
 
 ---
 
@@ -777,6 +979,31 @@ Check under ROOT_PATH:
 - **Version string check:** If `.claude/commands/` contains a command prompt file, extract the version from its help message or routing table and compare it to the latest CHANGELOG version. If they don't match, flag it as a warning: "Command prompt says vX.Y.Z but CHANGELOG says vA.B.C — bump the version strings before tagging."
 - Is there a `LICENSE` file in the repo root? If `02-design/LICENSING.md` exists and has a chosen license but no `LICENSE` file is present, flag it
 - Do `SECURITY_PRIVACY.md` and `ACCESSIBILITY.md` exist and contain filled-in content (not just placeholder text)?
+
+---
+
+**Phase 2b — GitHub Issues ↔ BACKLOG Reconciliation**
+
+If `gh` is available and authenticated (check with `gh auth status`), compare the state of GitHub Issues against `04-build/BACKLOG.md`. This helps catch drift when people work on items outside of Claude Code sessions.
+
+Run `gh issue list --state open --limit 100 --json number,title,labels,milestone` and compare with BACKLOG items. Report:
+
+- **BACKLOG items with no matching GitHub Issue:** These exist in BACKLOG.md but have no corresponding open issue. Users working outside Claude Code (or in their own sessions) won't see these tasks. Flag as: "Consider creating GitHub Issues for these so they're visible to all contributors."
+- **Open GitHub Issues with no matching BACKLOG item:** These exist as open issues but aren't in BACKLOG.md. They may have been added directly in GitHub, or the BACKLOG wasn't updated. Flag as: "These open issues aren't tracked in BACKLOG.md — add them if they're part of the current plan, or close them if they're done/obsolete."
+- **Closed GitHub Issues still in BACKLOG:** Run `gh issue list --state closed --limit 50 --json number,title` and check if any match BACKLOG items. Flag as: "These BACKLOG items have already-closed GitHub Issues — they may be done. Verify and remove from BACKLOG if complete."
+
+Matching is fuzzy: compare issue titles against BACKLOG item text. A BACKLOG item that contains `#<number>` is an explicit link — use that for exact matching first, then fall back to title similarity.
+
+If `gh` is not available or not authenticated, skip this phase with a note: "Skipped GitHub Issues check — `gh` CLI not available or not authenticated. Run `gh auth login` to enable."
+
+In the scorecard (Phase 5), add a section:
+
+```
+## GitHub Issues Sync
+- **BACKLOG-only items:** N items (no matching issue)
+- **Issue-only items:** N items (not in BACKLOG)
+- **Stale BACKLOG items:** N items (issue already closed)
+```
 
 ---
 
@@ -991,6 +1218,246 @@ After writing, tell the user:
 > "Your framework artifacts are ready. They're a starting point — review them and fill in anything I couldn't infer, especially LICENSING.md, ACCESSIBILITY.md, and the Constraints & Values section of PRODUCT_OVERVIEW.md.
 >
 > When you're ready to work on your next milestone, run `/hacky-hours iterate` to triage what to build next."
+
+---
+
+### Pivot — Re-Ideate with Full Context
+
+**Context to read before starting:** Read ALL framework artifacts under ROOT_PATH: `PRODUCT_OVERVIEW.md`, every design doc in `02-design/`, `ROADMAP.md`, `BACKLOG.md`, `CHANGELOG.md`, and any ADRs in `02-design/decisions/`. Also read `ITERATION.md` if it exists. Build a complete mental model of the current product before asking the user anything.
+
+**Purpose:** Go back to the foundational questions — who is this for, what problem does it solve, is the current direction still right — with the full benefit of everything that's been built and learned. This is not iterate (which assumes the direction is sound). This is for when the direction itself needs rethinking.
+
+**When to use pivot vs. iterate:**
+- **Pivot:** "Are we building the right thing?" — the who, what, or why has shifted
+- **Iterate:** "Are we building the thing right?" — the direction is sound, refine the execution
+
+**Always confirm before modifying any files. Pivot can change everything.**
+
+---
+
+**Step 1: Read and summarize current state**
+
+Read all framework artifacts. Present a concise summary to the user:
+
+> "Here's what your docs currently say about this product:
+> - **Who:** [from PRODUCT_OVERVIEW]
+> - **What:** [from PRODUCT_OVERVIEW]
+> - **Why:** [from PRODUCT_OVERVIEW]
+> - **Architecture:** [key points from ARCHITECTURE.md]
+> - **Shipped so far:** [from CHANGELOG — last 2-3 releases]
+> - **Queued next:** [from BACKLOG]"
+
+Then ask: "What's changed? What's making you rethink the direction?"
+
+---
+
+**Step 2: Revisit Level 1 questions**
+
+Walk through the PRODUCT_OVERVIEW 5Ws, but framed as re-evaluation:
+
+- **Who:** "Your current target is [X]. Is that still right, or has the audience shifted?"
+- **What:** "You described this as [X]. Does that still capture what you're building?"
+- **Where:** "You're on [platform]. Any reason to change that?"
+- **When:** "Your original timeline was [X]. How does that look now?"
+- **Why:** "The original motivation was [X]. Is that still the core driver?"
+- **Constraints & Values:** "Your licensing/privacy/infrastructure choices were [X]. Do those still hold?"
+
+For each W, note whether the answer has changed. If unchanged, say so and move on quickly. Focus time on what's actually shifting.
+
+---
+
+**Step 3: Identify the diff**
+
+After revisiting all questions, present the changes as a structured diff:
+
+```
+Product direction diff:
+
+  Who:    [unchanged] / [changed: was X, now Y]
+  What:   [unchanged] / [changed: was X, now Y]
+  Where:  [unchanged]
+  When:   [changed: was X, now Y]
+  Why:    [unchanged]
+  Values: [changed: licensing shifted from X to Y]
+```
+
+Ask: "Does this diff capture the pivot accurately? Anything I'm missing?"
+
+---
+
+**Step 4: Cascade through Level 2**
+
+For each change in the diff, identify which design docs are affected:
+
+| Change | Affected docs | Nature of impact |
+|--------|--------------|------------------|
+| Audience shifted | MARKET_FIT, USER_JOURNEYS, ACCESSIBILITY | May need rewrite |
+| Platform changed | ARCHITECTURE, SECURITY_PRIVACY | Structural change |
+| Licensing changed | LICENSING, ARCHITECTURE (dependency choices) | Constraint change |
+
+For each affected doc, ask: "Does this doc need to be **amended** (update sections), **rewritten** (start the doc over with the new direction), or **retired** (no longer relevant)?"
+
+Also check for docs that should be **created** — a pivot might introduce needs that didn't exist before (e.g., pivoting from CLI to web app now needs STYLE_GUIDE.md and USER_JOURNEYS.md).
+
+And check for docs that should be **consolidated** — if the pivot simplifies the product, two docs might now cover the same thing.
+
+---
+
+**Step 5: Cascade through Levels 3 and 4**
+
+After Level 2 is settled:
+
+- **Roadmap:** Review `ROADMAP.md`. Which milestones still make sense? Which features belong in different tiers now? Rewrite the roadmap with the new direction.
+- **Backlog:** Clear `BACKLOG.md` of items that no longer align. Add new items from the updated roadmap. Note which items survived the pivot unchanged — these are your most stable features.
+
+---
+
+**Step 6: Record the pivot**
+
+Write an ADR in `02-design/decisions/` named `YYYY-MM-DD-pivot-<topic>.md` that captures:
+- What changed and why
+- What was considered but rejected
+- What docs were rewritten, retired, or created
+
+Update `PRODUCT_OVERVIEW.md` with the new answers. Add a note at the top: "Pivoted on YYYY-MM-DD — see [ADR](decisions/YYYY-MM-DD-pivot-<topic>.md) for context."
+
+---
+
+**Step 7: Update supporting files**
+
+- Update `CLAUDE.md` if path references changed (docs retired or created)
+- Update `.claudeignore` if docs were archived
+- Update `RELATED_REPOS.md` if the relationship with other repos changed
+- Archive retired docs to `ROOT_PATH/archive/` — never delete, always archive
+
+**Done when:** PRODUCT_OVERVIEW.md reflects the new direction, all design docs are consistent with it, the roadmap and backlog are updated, and an ADR documents why the pivot happened. ✅
+
+---
+
+### Optimize — Evaluate Framework Doc Efficiency
+
+**Context to read before starting:** Read `.claudeignore` to understand what's already excluded from context. Do not read every framework doc in full yet — the point of this command is to measure them efficiently.
+
+**Purpose:** A read-only analysis of the framework's documentation footprint. Tells the user which docs are earning their context cost and which are dead weight. Never modifies any framework files. Safe to run at any time.
+
+Run all four phases in order. Collect all findings, then present them together at the end as a single report.
+
+---
+
+**Phase 1 — Command Prompt Size**
+
+Measure the slash command prompt file itself:
+
+```bash
+wc -l < .claude/commands/hacky-hours-dev.md 2>/dev/null || wc -l < .claude/commands/hacky-hours.md 2>/dev/null
+```
+
+Estimate token count using the rule of thumb: ~0.75 tokens per word for English Markdown. Count words:
+
+```bash
+wc -w < .claude/commands/hacky-hours-dev.md 2>/dev/null || wc -w < .claude/commands/hacky-hours.md 2>/dev/null
+```
+
+Report: "Command prompt: ~N lines, ~N words, ~N estimated tokens."
+
+For context, note that Claude's context window is 200K tokens. Frame the prompt size as a percentage: "This uses ~X% of a session's context window before any docs are loaded."
+
+---
+
+**Phase 2 — Framework Doc Inventory**
+
+Scan all Markdown files under ROOT_PATH. For each file, collect:
+
+1. **Size:** line count and word count
+2. **Estimated tokens:** words × 0.75
+3. **Last modified:** `git log -1 --format="%ai" -- <file>` (when was this file last changed?)
+4. **Last referenced in a commit:** `git log -1 --format="%ai" --all --grep="<filename without path>" 2>/dev/null` (when was this file last mentioned in a commit message?)
+5. **Density:** scan for placeholder patterns — lines matching `*italicized placeholder text*` or containing only `TBD`, `TODO`, `placeholder`, `needs input`. Report: "N of M lines are placeholder content (X%)"
+
+Present as a table sorted by estimated token cost (largest first):
+
+```
+Framework Doc Inventory (sorted by token cost):
+
+File                          Lines  Tokens  Last Modified  Placeholder%  Status
+────────────────────────────  ─────  ──────  ─────────────  ────────────  ──────
+04-build/CHANGELOG.md          300   ~4500   2026-03-21     0%            active
+02-design/ARCHITECTURE.md      110   ~1650   2026-03-30     5%            active
+02-design/SECURITY_PRIVACY.md   85   ~1275   2026-03-20     12%           review
+02-design/LICENSING.md           40    ~600   2026-03-20     30%           stale?
+...
+
+Total: ~N tokens across N files
+```
+
+**Status classification:**
+- **active** — modified within the last 2 releases or referenced in recent commits
+- **review** — not modified recently but has low placeholder content (may be complete, or may be forgotten)
+- **stale?** — not modified in 3+ releases AND either high placeholder content or no commit references
+
+---
+
+**Phase 3 — Cross-Reference Analysis**
+
+Check how often each framework doc is referenced by other docs or by the command prompt:
+
+1. For each doc filename (e.g., `SECURITY_PRIVACY.md`), grep across all other framework docs and the command prompt for references to it
+2. Count inbound references (other docs pointing to this doc)
+3. Count outbound references (this doc pointing to other docs)
+
+Also check git log for how often each doc appears in commit messages:
+
+```bash
+git log --oneline --all | grep -ci "<filename>" 
+```
+
+Present as a reference map:
+
+```
+Cross-Reference Map:
+
+File                          Inbound  Outbound  Commit Mentions
+────────────────────────────  ───────  ────────  ───────────────
+SECURITY_PRIVACY.md              8        3            12
+ARCHITECTURE.md                  6        5            15
+LICENSING.md                     4        2             3
+ACCESSIBILITY.md                 3        1             5
+```
+
+Docs with zero inbound references and zero commit mentions are candidates for archiving or consolidation.
+
+---
+
+**Phase 4 — Recommendations**
+
+Based on Phases 1–3, generate actionable recommendations. Categorize each as:
+
+- **Archive** — doc is stale, mostly placeholder, and rarely referenced. Move to `archive/`.
+- **Consolidate** — two docs cover overlapping concerns. Merge them and update cross-references.
+- **Trim** — doc is active but oversized relative to its content. Specific sections could be shortened or moved to an ADR.
+- **Fill in** — doc exists but is mostly placeholder. Either fill it in or archive it — a half-written doc is worse than no doc.
+- **Keep** — doc is earning its token cost. No action needed.
+
+For each recommendation, explain the reasoning and estimate the token savings.
+
+End with a summary:
+
+```
+Summary:
+  Total framework token cost: ~N tokens
+  Recommended savings: ~N tokens (X% reduction)
+  Action items: N archive, N consolidate, N trim, N fill in
+```
+
+---
+
+**Phase 5 — Save Report (optional)**
+
+After presenting the Phase 4 report, ask the user: "Would you like to save this as an optimization report? It'll be stored in `audits/` alongside your audit scorecards."
+
+If yes, write a Markdown file to `ROOT_PATH/audits/` named: `YYYY-MM-DD-optimize.md`.
+
+The report includes all four phases plus a timestamp. This creates a baseline for comparing future optimization runs.
 
 ---
 

@@ -10,4 +10,4 @@
 
 ## Future
 
-*No items.*
+*Empty — all planned work is assigned to a milestone.*
