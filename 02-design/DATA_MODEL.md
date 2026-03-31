@@ -2,6 +2,8 @@
 
 **Level 2 — Design** | Contributed by: Product owner + technical collaborators
 
+> **What is this?** A data model describes the "things" your product keeps track of — users, posts, orders, messages, whatever matters to your app — and how they relate to each other. Think of it as a map of what your product remembers. You don't need database experience to fill this in; just think about what information your product needs to work.
+
 This document defines the data your product stores, how it's structured, and how different pieces of data relate to each other. Getting this right before writing code prevents painful refactors later. Even a simple app benefits from thinking through its data model explicitly.
 
 ---

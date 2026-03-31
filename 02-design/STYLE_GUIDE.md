@@ -2,9 +2,9 @@
 
 **Level 2 — Design** | Contributed by: Product owner, design collaborators
 
-This document defines the visual and verbal identity of your product — colors, typography, tone, component patterns, and brand values. It keeps the product feeling consistent across screens, sessions, and contributors.
+> **What is this?** A style guide captures how your product looks and sounds — its colors, fonts, tone of voice, and overall personality. Think of it as a mood board plus a set of ground rules so everything feels consistent, whether you're building the first screen or the fiftieth. You don't need a design background — just opinions about how your product should feel.
 
-You don't need a professional design background to fill this out. You need opinions about how your product should feel.
+This document defines the visual and verbal identity of your product — colors, typography, tone, component patterns, and brand values. It keeps the product feeling consistent across screens, sessions, and contributors.
 
 ---
 

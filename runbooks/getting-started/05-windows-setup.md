@@ -65,7 +65,7 @@ Then follow [02-claude-code.md](./02-claude-code.md) to authenticate.
 
 ## Troubleshooting
 
-**"npm is not recognized as a command"** — Node.js isn't in your PATH. Try restarting your terminal, or reinstall Node.js.
+**"npm is not recognized as a command"** — Your terminal can't find Node.js. This usually means it isn't in your [PATH](../../GLOSSARY.md) (the list of places your computer looks for programs). Try closing and reopening your terminal first — that often fixes it. If not, reinstall Node.js.
 
 **Permission errors during npm install** — Open your terminal as Administrator (right-click → Run as administrator) and retry.
 

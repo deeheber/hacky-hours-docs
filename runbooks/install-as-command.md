@@ -1,4 +1,12 @@
-# Install /hacky-hours as a Global Claude Code Command
+# Install /hacky-hours as a Claude Code Command
+
+## What is this?
+
+When you're in a Claude Code session, you can type **slash commands** — shortcuts that start with `/` — to trigger specific workflows. `/hacky-hours` is a slash command that gives Claude the full Hacky Hours framework as context, so it can guide you through ideation, design, roadmap, build, and release cycles in any project.
+
+Installing it means you can type `/hacky-hours` in any Claude Code session and it just works — no need to clone this repo or copy files around.
+
+---
 
 One command installs `/hacky-hours` so it works in **any repo you open** in Claude Code — no cloning required.
 

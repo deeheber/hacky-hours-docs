@@ -16,7 +16,7 @@ Claude Code is Anthropic's CLI (command-line interface) for working with Claude 
 
 ### 1. Create an Anthropic account
 
-Go to [claude.ai](https://claude.ai) and sign up. Claude Code requires a **Claude Pro** subscription (check [claude.ai/pricing](https://claude.ai/pricing) for current pricing — it is a paid plan). If you're just evaluating, the setup steps below work the same; you'll just need to subscribe before Claude Code will let you run sessions.
+Go to [claude.ai](https://claude.ai) and sign up. Claude Code requires a **Claude Pro** subscription (check [claude.ai/pricing](https://claude.ai/pricing) for current pricing — it is a paid plan). The free Claude account lets you chat on the website, but Claude Code — which reads your project files and works directly inside your codebase — is a Pro feature. If you're just evaluating, the setup steps below work the same; you'll just need to subscribe before Claude Code will let you run sessions.
 
 ### 2. Install Claude Code
 
@@ -25,6 +25,8 @@ In your terminal, run:
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
+
+The `-g` flag means "install globally" — it makes the `claude` command available everywhere on your computer, not just in one project folder.
 
 ### 3. Authenticate
 

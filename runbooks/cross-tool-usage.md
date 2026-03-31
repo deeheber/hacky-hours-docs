@@ -3,11 +3,11 @@
 The `/hacky-hours` slash command is a convenience built for Claude Code. But the framework itself is just Markdown files — it works in **any tool that lets an LLM read project context**.
 
 This includes:
-- **Cursor** (with Claude as the model)
-- **Windsurf**
-- **Claude.ai Projects** (web interface)
-- **Any MCP-compatible client**
-- **Any LLM chat where you can paste context**
+- **Cursor** — a code editor (based on VS Code) with built-in AI features
+- **Windsurf** — another AI-powered code editor
+- **Claude.ai Projects** — Claude's web interface, where you can upload files and set project-level instructions
+- **Any MCP-compatible client** — MCP (Model Context Protocol) is a standard for connecting AI tools to external data; if your tool supports it, it can read these docs
+- **Any LLM chat where you can paste context** — even a plain ChatGPT or Claude conversation works if you copy-paste the relevant docs
 
 ---
 

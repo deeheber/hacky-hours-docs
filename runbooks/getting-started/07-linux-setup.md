@@ -32,7 +32,7 @@ git --version
 
 ## 3. Install Node.js
 
-Use the NodeSource setup script for a current LTS version:
+Use the NodeSource setup script for a current LTS version. This command downloads a setup script from NodeSource (a trusted provider of Node.js packages) and runs it with administrator privileges (`sudo`). It configures your system to install a modern version of Node.js — the version bundled with most Linux distributions is often outdated.
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
@@ -83,14 +83,16 @@ Then follow [02-claude-code.md](./02-claude-code.md) to authenticate.
 
 ## Troubleshooting
 
-**"Permission denied" on npm install -g** — Avoid using `sudo` with npm globals. Instead, configure npm to use a user-local directory:
+**"Permission denied" on npm install -g** — This happens because npm is trying to install files in a system folder your user doesn't own. The fix is to tell npm to use a folder inside your home directory instead. Run these four commands once, and the problem goes away permanently:
+
 ```bash
 mkdir -p ~/.npm-global
 npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 ```
-Then retry the npm install without sudo.
+
+What these do: (1) create a folder for global packages in your home directory, (2) tell npm to use it, (3) tell your terminal where to find programs installed there, (4) reload your terminal settings. After this, retry the npm install without `sudo`.
 
 **Node version too old** — If your distro's default `apt` provides an outdated Node.js, use the NodeSource script above or [nvm](https://github.com/nvm-sh/nvm).
 

@@ -1,86 +1,88 @@
-# Document Hygiene
+# Keeping Your Docs Clean
 
-As a project grows, its documentation can become a liability — bloated files make it harder for Claude to give accurate, focused answers, documents start contradicting each other, and it becomes unclear what's actually true right now. This runbook describes how to keep the framework documents lean, accurate, and useful over time.
+As your project grows, its documentation can become a liability — bloated files make it harder for Claude to give accurate answers, documents start contradicting each other, and it becomes unclear what's actually true right now. This runbook describes how to keep your framework documents lean, accurate, and useful over time.
+
+> **Good news:** If you're using the `/hacky-hours` command, most of this happens automatically. The `iterate`, `audit`, and `optimize` commands handle archiving, cleanup, and consistency checks for you. This runbook explains the *why* behind what those commands do — and covers manual maintenance for people who don't use the command.
 
 ---
 
 ## The Core Principle
 
-Documents should reflect **current state**, not accumulated history. Git is the historical record. The docs are the working set.
+Documents should reflect **current state**, not accumulated history. Git already keeps a complete record of every version of every file. Your working docs are the *current* version — not the archive.
 
 ---
 
-## Hot / Warm / Cold Tiers
+## Which Documents Matter Right Now?
 
-Not all documents need to be in context at all times. Organize your mental model — and your `.claudeignore` — around three tiers:
+Not every document needs to be front-and-center at all times. Think of them in three groups:
 
-| Tier | Documents | When to read |
-|------|-----------|--------------|
-| **Hot** | `04-build/BACKLOG.md`, active design docs, `01-ideate/PRODUCT_OVERVIEW.md` | Always — these define what you're doing right now |
-| **Warm** | `03-roadmap/ROADMAP.md`, `CHANGELOG.md` | On demand — useful for planning and review |
-| **Cold** | `01-ideate/IDEATION.md`, `archive/`, superseded design decisions | Rarely — historical reference only |
+| Group | Documents | When you need them |
+|-------|-----------|-------------------|
+| **Active** | `BACKLOG.md`, the design docs you're currently building from, `PRODUCT_OVERVIEW.md` | Every session — these define what you're doing right now |
+| **Reference** | `ROADMAP.md`, `CHANGELOG.md` | When planning or reviewing — useful but not always needed |
+| **Historical** | `IDEATION.md`, completed milestone notes, old decision records | Rarely — background context only |
 
-Move documents to a colder tier as they become less relevant. Don't delete them — archive them.
+As documents become less relevant to your current work, move them to the `archive/` folder. Don't delete them — just move them out of the way so they don't clutter things up.
 
 ---
 
-## Per-Document Lifecycle
+## How Each Document Works
 
-### BACKLOG.md — strict queue
+### BACKLOG.md — your to-do list
 
-BACKLOG.md is a **queue**, not a ledger. It holds only what is left to build.
+BACKLOG.md holds only what's left to build. It's a queue, not a history.
 
-- Add items at triage (from `iterate` or planning sessions)
-- Remove items when their PR is merged — don't mark them done, delete the line
-- An empty BACKLOG means the milestone is complete
-- Never use BACKLOG as a record of completed work — that's what CHANGELOG is for
+- Add items when you're planning what to work on next
+- Remove items when the work is done and merged — don't mark them as complete, just delete the line
+- When the backlog is empty, the milestone is done
+- Completed work goes in CHANGELOG.md, not here
 
-### CHANGELOG.md — append-only, trimmed periodically
+### CHANGELOG.md — your release history
 
-CHANGELOG.md is a **ledger**. Completed work lands here with a version tag and date.
+CHANGELOG.md records what you shipped. Each release gets an entry with a version number and date.
 
-- Append a new entry for each merged milestone
+- Add a new section each time you finish a milestone and tag a release
 - Keep only the **last 3 releases** in the file — move older entries to `archive/changelog/`
-- GitHub Releases holds the canonical history; the file is a quick human reference
+- GitHub Releases holds the full history; this file is a quick reference
 
-### Design docs — amend with decision records
+### Design documents — keep them current
 
-Design documents (ARCHITECTURE.md, DATA_MODEL.md, etc.) describe **how the product works today**. When a design decision changes:
+Documents like ARCHITECTURE.md, DATA_MODEL.md, etc. describe how your product works *today*. When a design decision changes:
 
-- Do **not** rewrite the original document in place — this loses the reasoning behind the original decision
-- Instead, write a small **Architecture Decision Record (ADR)** — a short note recording what changed and why — in `02-design/decisions/`
+- Don't rewrite the whole document — you'll lose the reasoning behind the original choice
+- Instead, write a short **decision record** (a note explaining what changed and why) in `02-design/decisions/`
 - Name it by date and topic: `2026-03-20-switch-to-postgres.md`
-- Keep the original doc accurate by updating only the affected sections, with a note: `See decisions/2026-03-20-switch-to-postgres.md`
+- Update only the affected sections of the original doc, with a note like: "See `decisions/2026-03-20-switch-to-postgres.md` for why this changed"
 
-ADR format:
+A decision record looks like this:
 
 ```markdown
-# [Decision title]
+# [What changed]
 
 **Date:** YYYY-MM-DD
 **Status:** Accepted
 
 ## Context
-What was true before, and what changed?
+What was true before, and what prompted the change?
 
 ## Decision
-What did we decide?
+What did you decide?
 
 ## Consequences
-What does this mean for the product going forward?
+What does this mean going forward?
 ```
 
-### PRODUCT_OVERVIEW.md — living document
+### PRODUCT_OVERVIEW.md — always up to date
 
-Update PRODUCT_OVERVIEW.md whenever the core who/what/where/when/why changes. It should always reflect the product as it is now, not as it was envisioned at the start.
+Update this whenever your core who/what/where/when/why changes. It should describe the product as it is now, not as you originally imagined it.
 
-### IDEATION.md — archive after Level 1 is complete
+### IDEATION.md — archive after Level 1
 
-Once PRODUCT_OVERVIEW.md is finalized, move IDEATION.md to `archive/`. It served its purpose. Keeping it in the working set adds noise without value.
+Once PRODUCT_OVERVIEW.md is solid, move IDEATION.md to `archive/`. It did its job. Keeping it in the active set adds noise.
 
 ### ROADMAP.md — trim completed milestones
 
-When a milestone is complete, move its section from ROADMAP.md to `archive/roadmap/`. The active roadmap should show only what's ahead.
+When a milestone is done, move its section to `archive/roadmap/`. The active roadmap should only show what's ahead.
 
 ---
 
@@ -88,53 +90,49 @@ When a milestone is complete, move its section from ROADMAP.md to `archive/roadm
 
 ```
 archive/
-  changelog/        # Old CHANGELOG entries (pre-last-3-releases)
+  changelog/        # Old CHANGELOG entries
   roadmap/          # Completed milestone sections
-  decisions/        # (or keep these in 02-design/decisions/ — your call)
   IDEATION.md       # Moved here after Level 1 is complete
 ```
 
-`archive/` is not a graveyard — it's cold storage. Everything in it is accessible via git anyway, but keeping it in a named folder makes it findable without being noisy.
+`archive/` is cold storage, not a graveyard. Everything in it is still accessible through git, but keeping it in a named folder makes it findable without cluttering your working docs.
 
 ---
 
-## .claudeignore
+## Telling Claude What to Skip
 
-The `.claudeignore` file is a convention — not a natively enforced feature. To make it work, add a line to your `CLAUDE.md`:
+The `.claudeignore` file lists files and folders that Claude should skip when building context for a session. This keeps Claude focused on what matters right now instead of getting distracted by historical documents.
 
-```markdown
-When building context, skip any files or folders listed in `.claudeignore`.
-```
-
-With that instruction in place, Claude will respect the file. The scaffold creates a default `.claudeignore` — adjust it as your project evolves.
-
-Default contents:
+The framework creates a default `.claudeignore` when you scaffold a project:
 
 ```
-archive/
-CHANGELOG.md
-01-ideate/IDEATION.md
+hacky-hours/archive/
+hacky-hours/audits/
+hacky-hours/04-build/CHANGELOG.md
+hacky-hours/01-ideate/IDEATION.md
 ```
 
-Add files to `.claudeignore` when:
-- They're historical (no longer reflect current state)
-- They're large and rarely relevant to active work
-- They're causing Claude to give outdated or confused answers
+**Add files to `.claudeignore` when:**
+- They're historical and no longer reflect how things work today
+- They're large and rarely relevant to what you're building right now
+- Claude keeps referencing outdated information from them
 
-Remove files from `.claudeignore` when you're specifically working on them.
+**Remove files from `.claudeignore` when** you're specifically working on them and need Claude to read them.
 
 ---
 
-## Housekeeping Checklist (run at end of each milestone)
+## End-of-Milestone Checklist
+
+Run through this when your backlog is empty and you're ready to call a milestone done:
 
 ```
 [ ] Remove completed items from BACKLOG.md
-[ ] Append milestone entry to CHANGELOG.md
+[ ] Add a milestone entry to CHANGELOG.md
 [ ] Move CHANGELOG entries older than 3 releases to archive/changelog/
-[ ] Move completed roadmap milestone to archive/roadmap/
-[ ] Update any design docs that changed — write ADRs for significant decisions
-[ ] Move IDEATION.md to archive/ if Level 1 is complete and it hasn't been already
-[ ] Review .claudeignore — anything newly cold that should be excluded?
+[ ] Move the completed roadmap milestone to archive/roadmap/
+[ ] Update any design docs that changed — write decision records for significant changes
+[ ] Move IDEATION.md to archive/ if it hasn't been already
+[ ] Review .claudeignore — anything newly historical that should be excluded?
 ```
 
 ---

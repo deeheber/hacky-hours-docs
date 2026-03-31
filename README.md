@@ -25,6 +25,8 @@ Imperfect documents are fine. Honest documents are what matter.
 
 ## How It Works
 
+The diagram below shows the four levels from left to right — you start with an idea, work through each level, and end with a shipped product. Each box is a document you'll fill in along the way.
+
 ```mermaid
 flowchart TD
     A([Your Idea]) --> L1
@@ -101,9 +103,11 @@ Work through these levels in order. Each level's `README.md` explains what "done
 
 ---
 
-## Use as a Claude Code Command
+## Use as a Claude Code Command (if you already have Claude Code set up)
 
-Install `/hacky-hours` as a global Claude Code slash command so it works in **any repo you open** — no cloning required.
+> If you're new to Claude Code, start with the [getting started guide](./runbooks/getting-started/README.md) first — this section is for people who already have it installed and running.
+
+Install `/hacky-hours` as a slash command so it works in **any repo you open** — no cloning required. A slash command is a shortcut you type in a Claude Code session (like `/hacky-hours ideate`) that gives Claude a specific workflow to follow.
 
 **macOS / Linux:**
 ```bash
@@ -121,12 +125,11 @@ Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-c
 
 ---
 
-## Using This Repo as a Resource in Another Project
+## Using This Repo as a Resource in Another Project (advanced)
 
-You can import this framework into any project so Claude can reference it as in-session context. See [`runbooks/using-this-repo/import-as-resource.md`](./runbooks/using-this-repo/import-as-resource.md) for three approaches:
-- Git submodule (recommended)
-- CLAUDE.md reference snippet
-- Manual copy
+> This is for people who already have an existing codebase and want to add the Hacky Hours framework to it. If you're starting fresh, just fork this repo — see the [getting started guide](./runbooks/getting-started/README.md).
+
+You can import this framework into any project so Claude can reference it as in-session context. See [`runbooks/using-this-repo/import-as-resource.md`](./runbooks/using-this-repo/import-as-resource.md) for three approaches, from most to least recommended.
 
 ---
 

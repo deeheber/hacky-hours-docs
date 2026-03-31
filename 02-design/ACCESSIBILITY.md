@@ -1,8 +1,8 @@
-# Accessibility ♿
+# ACCESSIBILITY.md
 
-Accessibility isn't a feature — it's how we build. This document defines how [Product Name] ensures that everyone can use it, regardless of ability, device, or context.
+**Level 2 — Design** | Contributed by: Product owner, with Claude facilitation
 
-Good accessibility makes a product better for everyone: clearer language helps non-native speakers, keyboard navigation helps power users, and sufficient contrast helps people in bright sunlight. It's not extra work — it's good work.
+> **What is this?** Accessibility means making sure your product works for everyone — including people who use screen readers, navigate by keyboard, have low vision, or experience your product differently than you do. This document helps you plan for that from the start, which is much easier than fixing it later. Good accessibility also makes your product better for *all* users: clearer language, better contrast, simpler navigation.
 
 The earlier you design for it, the easier it is. Review this document before implementation begins and revisit it whenever new UI surfaces are added.
 

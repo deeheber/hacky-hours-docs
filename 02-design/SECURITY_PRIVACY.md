@@ -2,9 +2,9 @@
 
 **Level 2 — Design** | Contributed by: Product owner, with Claude facilitation
 
-This document defines how your product handles sensitive data, protects its users, and guards against common threats. It is not optional — if your product touches real users, this document must exist in some form before you write production code.
+> **What is this?** This document helps you think through how your product protects the people who use it — what personal information it collects, how it keeps that information safe, and what could go wrong. You don't need to be a security expert. You just need to think honestly about what you're asking users to trust you with.
 
-You don't need to be a security expert to fill this out. You need to think clearly about what you're responsible for.
+This document defines how your product handles sensitive data, protects its users, and guards against common threats. It is not optional — if your product touches real users, this document must exist in some form before you write production code.
 
 ---
 

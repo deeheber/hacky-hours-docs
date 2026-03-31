@@ -1,6 +1,8 @@
 # GitHub Action: Auto-Sync Docs on Merge
 
-This runbook explains how to set up automatic BACKLOG.md and CHANGELOG.md sync using a GitHub Action and the Claude API. When a PR is merged, the action removes the completed item from your backlog and records it in your changelog — no manual step needed.
+> **This is an advanced feature.** You don't need this to use the Hacky Hours framework — it's for teams or individuals who want to automate their workflow further. If you're just getting started, skip this and come back when you're comfortable with the basics. The `/hacky-hours` command handles backlog and changelog updates for you during normal sessions.
+
+This runbook explains how to set up automatic BACKLOG.md and CHANGELOG.md sync using a GitHub Action and the Claude API. A GitHub Action is a small automated task that GitHub runs for you when something happens in your repo — in this case, when a pull request (PR) is merged. This action removes the completed item from your backlog and records it in your changelog automatically.
 
 This is the "across sessions" piece of the GitHub integration. Within a session, Claude Code handles state through your project CLAUDE.md. This action handles what happens when PRs merge between sessions.
 

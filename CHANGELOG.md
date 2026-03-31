@@ -7,6 +7,71 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.6.0] — 2026-03-30
+
+Readability and accessibility pass — making every document approachable for non-technical users.
+
+### Added
+
+- **"What is this?" intros** on all Level 2 design doc templates — plain-language explanations of what each document type is and why it exists, so non-technical users aren't put off by terms like "architecture" or "data model"
+- **Beginner bridges** on advanced docs — `import-as-resource.md`, `github-action-sync.md`, and `install-as-command.md` now explain prerequisites and audience before diving into instructions
+- **Pre-push git hook** — blocks tag pushes if CHANGELOG.md doesn't have a matching version entry, preventing the version drift that happened with v1.5.1/v1.5.2
+
+### Changed
+
+- **`runbooks/document-hygiene.md`** — full rewrite replacing engineer jargon (Hot/Warm/Cold tiers, ADRs, append-only ledger) with plain-language equivalents; added note that `/hacky-hours` handles most of this automatically
+- **`runbooks/getting-started/03-git-basics.md`** — expanded "Working with Branches" section with plain-language explanations of what branches are, why you'd use them, and what flags like `-b` and `-u origin` do
+- **`runbooks/getting-started/07-linux-setup.md`** — added context for `curl | sudo bash` pattern and step-by-step explanation of the npm permissions workaround
+- **`runbooks/getting-started/02-claude-code.md`** — explained why Claude Pro is required (vs free account) and what `npm install -g` does
+- **`runbooks/cross-tool-usage.md`** — added one-line descriptions of Cursor, Windsurf, MCP, and Claude.ai Projects for readers unfamiliar with them
+- **`README.md`** — added context line before Mermaid diagram; marked advanced sections (slash command install, import-as-resource) with callouts directing beginners elsewhere
+- **`runbooks/getting-started/05-windows-setup.md`** — linked PATH error to glossary with inline explanation
+- **`02-design/ACCESSIBILITY.md`** — reformatted header to match other Level 2 templates (added attribution line, replaced inline intro with "What is this?" callout)
+- **`02-design/LICENSING.md`** — removed redundant intro paragraph (replaced by "What is this?" callout)
+
+### Fixed
+
+- **`runbooks/costs.md`** — replaced Google Domains reference (shut down) with Squarespace Domains
+- **`CHANGELOG.md`** — added missing entries for v1.5.1 and v1.5.2
+
+---
+
+## [1.5.2] — 2026-03-30
+
+Cross-reference fixes and `.claudeignore` from optimize run.
+
+### Fixed
+
+- **CLAUDE.md** — fixed broken path to SECURITY_PRIVACY.md, removed reference to nonexistent `04-build/README.md`
+- **ARCHITECTURE.md** — updated prompt size metric, fixed stale optimize description in lifecycle diagram
+- **Non-linear lifecycle ADR** — noted optimize redesign from v1.5.1
+- **`.claudeignore`** — created (was missing — archived docs were loading into context unnecessarily)
+- Removed empty `03-roadmap/` directory
+
+---
+
+## [1.5.1] — 2026-03-30
+
+Optimize command redesign and milestone housekeeping.
+
+### Changed
+
+- **`/hacky-hours optimize`** — redesigned from metrics-only dashboard to substantive review comparing design intent vs. current reality. For code projects, reads planning docs AND the codebase. For docs-only projects, analyzes the command prompt against design docs.
+
+### Fixed
+
+- **SECURITY_PRIVACY.md** — added GitHub API surface (`sync --issues`), cross-repo writes (`link`), and audit secret scanning limitations
+- **ACCESSIBILITY.md** — added v1.5.0 new command evaluation notes
+- **PRODUCT_OVERVIEW.md** — fixed stale version reference (v1.0.1 → v1.5.0), updated non-goals
+- **CLAUDE.md** — added Project State Machine section (eating our own dogfood)
+
+### Housekeeping
+
+- Archived CHANGELOG entries v0.1.0–v0.8.0 to `archive/changelog/`
+- Archived completed `ITERATION.md` (v1.5.0) and unused `ROADMAP.md` stub
+
+---
+
 ## [1.5.0] — 2026-03-30
 
 Non-linear lifecycle: product pivot, doc efficiency optimization, and two-way GitHub Issues sync.

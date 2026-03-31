@@ -41,7 +41,7 @@ Most solo projects can start for free on modern hosting platforms. You only star
 If you want your app to have a custom URL (like `neighborboard.com` instead of `my-app.vercel.app`):
 
 - Domain names typically cost **$10–$20/year**
-- Purchased through registrars like [Namecheap](https://www.namecheap.com), [Porkbun](https://porkbun.com), or [Google Domains](https://domains.google)
+- Purchased through registrars like [Namecheap](https://www.namecheap.com), [Porkbun](https://porkbun.com), or [Squarespace Domains](https://domains.squarespace.com)
 - Most hosting platforms (Vercel, Netlify) let you connect a custom domain for free
 
 ---

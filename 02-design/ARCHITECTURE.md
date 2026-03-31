@@ -2,6 +2,8 @@
 
 **Level 2 — Design** | Contributed by: Product owner + technical collaborators
 
+> **What is this?** An architecture document is like a blueprint for your software — it describes the major pieces of your product (the website, the database, any services it talks to) and how they connect. You don't need to be technical to fill this in; Claude will ask you questions and translate your answers into the right structure.
+
 This document describes how the technical pieces of your product fit together: what systems exist, how they communicate, and why they're structured the way they are. It doesn't need to be exhaustive — it needs to be clear enough that someone new could understand the big picture and make decisions consistent with your choices.
 
 ---

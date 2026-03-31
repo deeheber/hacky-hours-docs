@@ -2,34 +2,36 @@
 
 You can bring the Hacky Hours framework into an existing project so Claude Code can reference it as in-session context. This is useful when you want Claude to follow the four-level system inside a codebase that already has its own structure.
 
-Three approaches are described below, in order of recommendation.
+Three approaches are described below, from most to least recommended. **If you're not sure which to pick:** Option 1 is best for ongoing projects, Option 2 is easiest for a quick start, and Option 3 is for when you just need a file or two.
 
 ---
 
-## Option 1: Git Submodule (recommended)
+## Option 1: Git Submodule (recommended for ongoing projects)
 
-A git submodule adds this repo as a versioned dependency inside your project. Claude can read its files, and you control exactly which version of the framework you're using.
+A **submodule** is a way to include one project inside another. Think of it as a folder in your project that stays linked to the Hacky Hours repo — you can update it whenever the framework releases improvements, and your project always knows exactly which version of the framework it's using.
 
 ### Setup
 
-Inside your project:
+Inside your project's terminal:
 
 ```bash
-# Add the submodule at docs/hacky-hours/
+# Add the framework as a subfolder called docs/hacky-hours/
 git submodule add https://github.com/empathetech/hacky-hours-docs.git docs/hacky-hours
 
-# Commit the submodule reference
+# Save this change to your project
 git add .gitmodules docs/hacky-hours
 git commit -m "chore: add hacky-hours-docs as submodule"
 ```
 
-### Cloning a project that already has the submodule
+### If you're cloning a project that already has this set up
+
+When you clone the project for the first time, add `--recurse-submodules` so the framework files are downloaded too:
 
 ```bash
 git clone --recurse-submodules https://github.com/your-username/your-project.git
 ```
 
-Or, if you've already cloned:
+If you already cloned without that flag:
 
 ```bash
 git submodule update --init --recursive
@@ -64,9 +66,9 @@ Before starting work:
 
 ---
 
-## Option 2: CLAUDE.md Reference Snippet (lightweight)
+## Option 2: CLAUDE.md Reference Snippet (quickest setup)
 
-If you don't want to add a submodule, you can tell Claude to reference the framework from wherever it's installed on your system. This works well if multiple projects share the same local copy.
+If you don't want to add a submodule, you can simply tell Claude where to find the framework on your computer. This works well if you have the framework checked out somewhere and want multiple projects to reference it.
 
 Add to your project's `CLAUDE.md`:
 
@@ -74,26 +76,26 @@ Add to your project's `CLAUDE.md`:
 ## Hacky Hours Framework
 
 This project follows the Hacky Hours four-level documentation framework.
-The framework reference lives at: `/path/to/hacky-hours-docs/` (adjust to your local path)
+The framework reference lives at: /path/to/hacky-hours-docs/ (adjust to your local path)
 
 When helping with design decisions, read the relevant template from the framework before making suggestions.
 When helping with implementation, read `hacky-hours/02-design/SECURITY_PRIVACY.md` before proceeding.
 When adding any dependency, read `hacky-hours/02-design/LICENSING.md` to check compatibility.
 ```
 
-This approach requires the framework to be available at a consistent path on every machine where you work.
+**Tradeoff:** This only works on machines where the framework is at that exact path. If you work on multiple computers or collaborate with others, they'll need the framework in the same location — or they'll need to update the path.
 
 ---
 
-## Option 3: Manual Copy
+## Option 3: Manual Copy (simplest, but doesn't update)
 
-For the simplest setup — or if you only need one or two documents — copy the relevant folders into your project:
+For the simplest setup — or if you only need a document or two — just copy the files you need into your project:
 
 ```bash
-cp -r path/to/hacky-hours-docs/design/ my-project/docs/design-framework/
+cp -r path/to/hacky-hours-docs/02-design/ my-project/docs/design-framework/
 ```
 
-**Tradeoff:** Your copy won't receive updates from the original framework. This is fine for a stable reference, but you'll need to manually update if the framework evolves.
+**Tradeoff:** Your copy won't receive updates when the framework improves. This is fine for a stable reference, but if the framework adds new features or fixes issues, you won't see those changes unless you copy again manually.
 
 ---
 

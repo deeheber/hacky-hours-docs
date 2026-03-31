@@ -2,7 +2,7 @@
 
 **Level 2 — Design** | Contributed by: Product owner, with Claude facilitation
 
-Licensing shapes what you can build, how you can make money from it, and what obligations you take on when you use other people's code. You don't need a law degree to think it through — but you do need to think it through before you build.
+> **What is this?** A license is a set of rules that says what other people can and can't do with your code — and what you can and can't do with code written by others. This document helps you pick a license for your product and make sure the tools and libraries you use are compatible with that choice. It sounds legal (and it is), but the decisions are straightforward once you understand your options.
 
 This document covers two things: (1) the license you choose for **your product**, and (2) the licenses attached to the **code and services you depend on**, and how they interact.
 

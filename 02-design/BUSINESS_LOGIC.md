@@ -2,6 +2,8 @@
 
 **Level 2 — Design** | Contributed by: Product owner, domain experts
 
+> **What is this?** Business logic is the set of rules that make your product work the way it does — "free users can create up to 3 projects," "orders over $50 get free shipping," "only the event creator can cancel it." Writing these rules down in plain language before coding them prevents confusion later and makes sure Claude builds what you actually mean.
+
 This document captures the rules, calculations, and domain-specific behavior that define how your product actually works under the hood. Business logic is often the hardest thing to reconstruct later — document it explicitly before it gets buried in code.
 
 ---

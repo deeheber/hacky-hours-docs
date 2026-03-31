@@ -2,6 +2,8 @@
 
 **Level 2 — Design** | Contributed by: Product owner, with Claude facilitation
 
+> **What is this?** Market fit is about answering one question honestly: "Would real people actually use this, and why?" This document helps you get specific about who your users are, what pain they have, and why your product is the right solution — before you spend time building something nobody asked for.
+
 This document validates who your product is for, what problem it solves for them, and why they'd choose it over alternatives. It sharpens your thinking before you invest time building features no one needs.
 
 ---

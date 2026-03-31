@@ -25,7 +25,7 @@ Examples:
 
 - "help"                    → print the help message below, then stop
 - "help <command>"          → print help for that specific command (see Subcommand Help below), then stop
-- "version"                 → print "Hacky Hours command v1.5.2", then stop
+- "version"                 → print "Hacky Hours command v1.6.0", then stop
 - "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
@@ -50,7 +50,7 @@ Examples:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v1.5.2
+Hacky Hours framework assistant — v1.6.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -1400,10 +1400,10 @@ Flag any broken references with the exact file, line, and what it points to.
 Based on Phases 1–3, propose **specific changes** — not "review this doc" but exactly what to change and why. Group by priority:
 
 **[FIX] Corrections** — things that are factually wrong or contradicted:
-> "PRODUCT_OVERVIEW.md line 32 says 'v1.0.1' but the project is at v1.5.2 — update to current version."
+> "PRODUCT_OVERVIEW.md line 32 says 'v1.0.1' but the project is at v1.6.0 — update to current version."
 
 **[UPDATE] Stale content** — things that were true but aren't anymore:
-> "SECURITY_PRIVACY.md doesn't document the GitHub API surface introduced by `sync --issues` in v1.5.2 — add a section covering the `gh` CLI trust boundary."
+> "SECURITY_PRIVACY.md doesn't document the GitHub API surface introduced by `sync --issues` in v1.6.0 — add a section covering the `gh` CLI trust boundary."
 
 **[TRIM] Efficiency gains** — things that consume context without adding value:
 > "CHANGELOG.md has entries for v0.1.0–v0.8.0 (180 lines) that should be archived per the milestone housekeeping guidance."

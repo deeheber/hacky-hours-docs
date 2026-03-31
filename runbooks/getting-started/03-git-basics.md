@@ -73,15 +73,38 @@ git pull
 
 ## Working with Branches
 
-Branches let you work on a feature without affecting the main codebase.
+A **branch** is a separate copy of your project that lives alongside the main version. You make changes on the branch without affecting anything else. When you're happy with the changes, you merge them back into the main version.
+
+Why bother? Because it lets you experiment freely. If your changes don't work out, you can throw the branch away without having touched anything important.
+
+### Create a new branch and switch to it
+
+The `-b` flag means "create a new branch." The name after it is whatever you want to call your branch.
 
 ```bash
-git checkout -b feat/user-signup     # create and switch to a new branch
-git checkout main                    # switch back to main
-git push -u origin feat/user-signup  # push the branch to GitHub
+git checkout -b feat/user-signup
 ```
 
-When your work is ready, open a Pull Request on GitHub to merge it into `main`.
+You're now working on the `feat/user-signup` branch. Any changes you make here won't affect `main`.
+
+### Switch back to the main branch
+
+```bash
+git checkout main
+```
+
+### Push your branch to GitHub
+
+The first time you push a new branch, use `-u origin` to tell GitHub about it. After that, plain `git push` works.
+
+```bash
+git push -u origin feat/user-signup  # first time
+git push                             # every time after
+```
+
+### Merge your changes
+
+When your work is ready, open a **Pull Request** (PR) on GitHub — it's a request to merge your branch into `main`. Even working solo, PRs create a record of what changed and why. On your repo's GitHub page, click **Pull requests → New pull request**, select your branch, and follow the prompts.
 
 ---
 
