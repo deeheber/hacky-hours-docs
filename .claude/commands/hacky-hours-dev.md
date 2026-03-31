@@ -69,7 +69,7 @@ Usage: /hacky-hours [argument]
   roadmap     Jump to Level 3 — Roadmap
   build       Jump to Level 4 — Build
   iterate     Post-release cycle — triage bugs/ideas, amend docs, update backlog
-  optimize    Evaluate framework doc efficiency — token cost, staleness, density
+  optimize    Review project efficiency — compare design intent vs. reality, propose fixes
   pivot       Re-ideate with full context — rethink product direction, cascade changes
 
 --- Release workflow ---
@@ -295,26 +295,24 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
 
 /hacky-hours help optimize
 
-  Evaluate framework documentation efficiency — token cost, staleness, and density.
+  Substantive review of project efficiency and effectiveness.
 
   What it does:
-    Phase 1: Measure command prompt size (estimated token count)
-    Phase 2: Scan all framework docs for size, staleness, and density
-    Phase 3: Analyze cross-reference usage (which docs are actually read during builds?)
-    Phase 4: Generate actionable recommendations (archive, consolidate, trim)
-    Phase 5: Optionally save results as an optimization report in audits/
+    Phase 1: Compare design intent vs. current reality (are docs accurate?)
+    Phase 2: Analyze structural efficiency (redundancy, dead artifacts, gaps)
+    Phase 3: Verify cross-reference integrity (broken links, stale paths)
+    Phase 4: Propose specific, actionable changes (not just metrics)
+    Phase 5: Optionally save report and implement confirmed changes
 
-  Metrics:
-    - Token cost: estimated tokens consumed by each doc
-    - Staleness: last modified date vs. last referenced in a git commit
-    - Density: ratio of placeholder/boilerplate text to real content
-    - Cross-reference hits: how often each doc is mentioned in commit messages or other docs
+  For code projects: reads planning docs AND the codebase, identifies where
+  design decisions are being followed or contradicted, flags efficiency
+  opportunities based on architecture and dependency analysis.
 
-  Also runs as a lighter check within /hacky-hours iterate (Step 2) — flags
-  oversized or stale docs during the synthesis phase.
+  For docs-only projects: analyzes the command prompt and templates against
+  design docs, identifies structural issues and stale content.
 
-  Never modifies framework docs. Safe to run anytime.
-  Done when: You know which docs are earning their context cost and which aren't.
+  Also runs as a lighter check within /hacky-hours iterate (Step 2).
+  Done when: You have a list of specific fixes and have applied them.
 
 ---
 
@@ -1334,130 +1332,99 @@ Update `PRODUCT_OVERVIEW.md` with the new answers. Add a note at the top: "Pivot
 
 ---
 
-### Optimize — Evaluate Framework Doc Efficiency
+### Optimize — Substantive Efficiency and Effectiveness Review
 
-**Context to read before starting:** Read `.claudeignore` to understand what's already excluded from context. Do not read every framework doc in full yet — the point of this command is to measure them efficiently.
+**Context to read before starting:** Read ALL framework docs under ROOT_PATH, the project's `CLAUDE.md`, and `.claudeignore`. For projects with code, also read the codebase structure, package manifests, and key implementation files. Build a complete understanding of: (1) what the planning docs say the project should be, and (2) what the project actually is right now.
 
-**Purpose:** A read-only analysis of the framework's documentation footprint. Tells the user which docs are earning their context cost and which are dead weight. Never modifies any framework files. Safe to run at any time.
+**Purpose:** A deep review that compares design intent against current reality and proposes specific, actionable changes to make the project more efficient and effective. This is not a metrics dashboard — it reads everything, understands the intent, and tells you what to fix.
 
-Run all four phases in order. Collect all findings, then present them together at the end as a single report.
+**For docs-only projects** (like hacky-hours-docs itself): the "codebase" is the command prompt and templates. Analyze whether the prompt implements what the design docs describe, and whether the design docs accurately reflect the current state.
 
----
+**For code projects:** compare the hacky-hours planning docs against the actual code — are design decisions being followed? Are there architectural contradictions? Are there efficiency opportunities the design docs don't address?
 
-**Phase 1 — Command Prompt Size**
+**Always present findings before making any changes. Confirm before modifying files.**
 
-Measure the slash command prompt file itself:
-
-```bash
-wc -l < .claude/commands/hacky-hours-dev.md 2>/dev/null || wc -l < .claude/commands/hacky-hours.md 2>/dev/null
-```
-
-Estimate token count using the rule of thumb: ~0.75 tokens per word for English Markdown. Count words:
-
-```bash
-wc -w < .claude/commands/hacky-hours-dev.md 2>/dev/null || wc -w < .claude/commands/hacky-hours.md 2>/dev/null
-```
-
-Report: "Command prompt: ~N lines, ~N words, ~N estimated tokens."
-
-For context, note that Claude's context window is 200K tokens. Frame the prompt size as a percentage: "This uses ~X% of a session's context window before any docs are loaded."
+Run all five phases in order, then present a unified report.
 
 ---
 
-**Phase 2 — Framework Doc Inventory**
+**Phase 1 — Design Intent vs. Current Reality**
 
-Scan all Markdown files under ROOT_PATH. For each file, collect:
+Read each design doc and compare it against what actually exists:
 
-1. **Size:** line count and word count
-2. **Estimated tokens:** words × 0.75
-3. **Last modified:** `git log -1 --format="%ai" -- <file>` (when was this file last changed?)
-4. **Last referenced in a commit:** `git log -1 --format="%ai" --all --grep="<filename without path>" 2>/dev/null` (when was this file last mentioned in a commit message?)
-5. **Density:** scan for placeholder patterns — lines matching `*italicized placeholder text*` or containing only `TBD`, `TODO`, `placeholder`, `needs input`. Report: "N of M lines are placeholder content (X%)"
+- **PRODUCT_OVERVIEW.md** — Are the 5Ws still accurate? Is the "When" section current? Do the Non-Goals still hold? Have Constraints & Values drifted?
+- **ARCHITECTURE.md** — Does the described architecture match the actual project structure? Are there components not mentioned? Are described components that don't exist?
+- **SECURITY_PRIVACY.md** — Does the risk surface section cover all current external interactions? Are there new trust boundaries (new commands, new integrations) not documented?
+- **ACCESSIBILITY.md** — Have new features been evaluated? Are there new terms needing glossary entries?
+- **LICENSING.md** — Have any new dependencies been added without license review?
+- **ADRs** — Are the decisions in `02-design/decisions/` still reflected in the current implementation? Have any been superseded without documentation?
 
-Present as a table sorted by estimated token cost (largest first):
-
-```
-Framework Doc Inventory (sorted by token cost):
-
-File                          Lines  Tokens  Last Modified  Placeholder%  Status
-────────────────────────────  ─────  ──────  ─────────────  ────────────  ──────
-04-build/CHANGELOG.md          300   ~4500   2026-03-21     0%            active
-02-design/ARCHITECTURE.md      110   ~1650   2026-03-30     5%            active
-02-design/SECURITY_PRIVACY.md   85   ~1275   2026-03-20     12%           review
-02-design/LICENSING.md           40    ~600   2026-03-20     30%           stale?
-...
-
-Total: ~N tokens across N files
-```
-
-**Status classification:**
-- **active** — modified within the last 2 releases or referenced in recent commits
-- **review** — not modified recently but has low placeholder content (may be complete, or may be forgotten)
-- **stale?** — not modified in 3+ releases AND either high placeholder content or no commit references
+For each doc, report:
+- **Accurate** — doc matches reality, no changes needed
+- **Stale** — specific sections that no longer reflect current state, with the exact discrepancy
+- **Missing** — things that exist in the project but aren't covered by any design doc
+- **Contradicted** — design says X, but implementation does Y
 
 ---
 
-**Phase 3 — Cross-Reference Analysis**
+**Phase 2 — Structural Efficiency**
 
-Check how often each framework doc is referenced by other docs or by the command prompt:
+Analyze whether the documentation structure is serving the project well:
 
-1. For each doc filename (e.g., `SECURITY_PRIVACY.md`), grep across all other framework docs and the command prompt for references to it
-2. Count inbound references (other docs pointing to this doc)
-3. Count outbound references (this doc pointing to other docs)
+- **Redundancy:** Are multiple docs covering the same ground? Is the command prompt duplicating information that's in design docs (or vice versa)?
+- **Dead artifacts:** Are there docs, sections, or scaffold folders that exist but serve no purpose? (Empty roadmaps, placeholder-only docs, unused archive folders)
+- **Missing artifacts:** Based on the project's current complexity, are there design docs that should exist but don't? (e.g., a project with 5 external integrations but no ARCHITECTURE.md)
+- **CLAUDE.md alignment:** Does the project's CLAUDE.md include a Project State Machine section? Does it reference the right design docs? Is it eating its own dogfood?
+- **`.claudeignore` effectiveness:** Is cold content (old changelogs, archived iterations, audit scorecards) being excluded from context? Is anything excluded that shouldn't be?
 
-Also check git log for how often each doc appears in commit messages:
-
-```bash
-git log --oneline --all | grep -ci "<filename>" 
-```
-
-Present as a reference map:
-
-```
-Cross-Reference Map:
-
-File                          Inbound  Outbound  Commit Mentions
-────────────────────────────  ───────  ────────  ───────────────
-SECURITY_PRIVACY.md              8        3            12
-ARCHITECTURE.md                  6        5            15
-LICENSING.md                     4        2             3
-ACCESSIBILITY.md                 3        1             5
-```
-
-Docs with zero inbound references and zero commit mentions are candidates for archiving or consolidation.
+For command-prompt projects: analyze the prompt itself for structural issues — repeated framing language, overly verbose sections, guidance that could be more concise without losing clarity.
 
 ---
 
-**Phase 4 — Recommendations**
+**Phase 3 — Cross-Reference Integrity**
 
-Based on Phases 1–3, generate actionable recommendations. Categorize each as:
+Verify that all references between docs are valid and current:
 
-- **Archive** — doc is stale, mostly placeholder, and rarely referenced. Move to `archive/`.
-- **Consolidate** — two docs cover overlapping concerns. Merge them and update cross-references.
-- **Trim** — doc is active but oversized relative to its content. Specific sections could be shortened or moved to an ADR.
-- **Fill in** — doc exists but is mostly placeholder. Either fill it in or archive it — a half-written doc is worse than no doc.
-- **Keep** — doc is earning its token cost. No action needed.
+- Links in design docs that point to other docs — do the targets exist?
+- The command prompt references to design doc names — are they accurate?
+- CLAUDE.md references to file paths — do the paths exist?
+- ADR references in design docs — do the ADRs exist?
+- RELATED_REPOS.md routing tables — do the referenced docs and sections exist in the other repo?
 
-For each recommendation, explain the reasoning and estimate the token savings.
+Flag any broken references with the exact file, line, and what it points to.
 
-End with a summary:
+---
 
-```
-Summary:
-  Total framework token cost: ~N tokens
-  Recommended savings: ~N tokens (X% reduction)
-  Action items: N archive, N consolidate, N trim, N fill in
-```
+**Phase 4 — Actionable Recommendations**
+
+Based on Phases 1–3, propose **specific changes** — not "review this doc" but exactly what to change and why. Group by priority:
+
+**[FIX] Corrections** — things that are factually wrong or contradicted:
+> "PRODUCT_OVERVIEW.md line 32 says 'v1.0.1' but the project is at v1.5.0 — update to current version."
+
+**[UPDATE] Stale content** — things that were true but aren't anymore:
+> "SECURITY_PRIVACY.md doesn't document the GitHub API surface introduced by `sync --issues` in v1.5.0 — add a section covering the `gh` CLI trust boundary."
+
+**[TRIM] Efficiency gains** — things that consume context without adding value:
+> "CHANGELOG.md has entries for v0.1.0–v0.8.0 (180 lines) that should be archived per the milestone housekeeping guidance."
+
+**[ADD] Missing coverage** — things the project does that aren't documented:
+> "No design doc covers the two-way sync conflict resolution model — add to ARCHITECTURE.md or create a new doc."
+
+**[REFACTOR] Structural improvements** — reorganizations that would make the project clearer:
+> "ROADMAP.md is a stub that's never been used — archive it. The project effectively uses BACKLOG.md + CHANGELOG.md for planning."
+
+For each recommendation, state: what to change, where (file + section), why it matters, and whether you can implement it now.
 
 ---
 
 **Phase 5 — Save Report (optional)**
 
-After presenting the Phase 4 report, ask the user: "Would you like to save this as an optimization report? It'll be stored in `audits/` alongside your audit scorecards."
+After presenting the report, ask: "Would you like to save this as an optimization report? It'll be stored in `audits/`."
 
-If yes, write a Markdown file to `ROOT_PATH/audits/` named: `YYYY-MM-DD-optimize.md`.
+If yes, write to `ROOT_PATH/audits/YYYY-MM-DD-optimize.md`. Include all phases and a summary of what was found, proposed, and (if applicable) implemented.
 
-The report includes all four phases plus a timestamp. This creates a baseline for comparing future optimization runs.
+If the user confirms the changes, implement them. This is the one optimize output that modifies files — metrics and findings are read-only, but confirmed fixes should be applied.
 
 ---
 

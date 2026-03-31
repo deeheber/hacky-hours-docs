@@ -29,7 +29,7 @@ No server, no backend, no database. The "runtime" is Claude Code reading Markdow
 
 ## When — Timeline and Priority
 
-Active and shipping. Currently at v1.0.1. Iterating continuously based on community use and dogfooding.
+Active and shipping. Currently at v1.5.0 (2026-03-30). Iterating continuously based on community use and dogfooding. The lifecycle is non-linear — iterate for refinement, pivot for direction changes, optimize for efficiency review.
 
 ## Why — Value and Motivation
 
@@ -42,7 +42,7 @@ The design philosophy — safety-first defaults, free before paid, accessible by
 ## Non-Goals
 
 - This is not a code generator — it produces documentation, not application code
-- This is not a project management tool — it doesn't replace GitHub Issues, Linear, or Jira
+- This is not a project management tool — it complements GitHub Issues (via `sync --issues`) but doesn't replace Linear or Jira
 - This is not a CI/CD system — `/hacky-hours sync` publishes releases but doesn't run tests or deployments
 - This is not opinionated about tech stack — it helps you choose, but doesn't prescribe
 

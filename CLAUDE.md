@@ -79,6 +79,28 @@ Before starting work, read the relevant level documents:
 
 See `runbooks/using-this-repo/import-as-resource.md` for full setup instructions.
 
+## Project State Machine
+
+At the start of every session, orient yourself:
+1. Read `hacky-hours/04-build/BACKLOG.md` to see queued tasks
+2. Report current state in one sentence before asking what to do next
+
+When completing a task:
+1. Remove the item from `hacky-hours/04-build/BACKLOG.md`
+2. Add it to `CHANGELOG.md` (root) under the current version
+3. Commit with a clear message
+
+When `hacky-hours/04-build/BACKLOG.md` is empty:
+- Tell the user the milestone is complete
+- Suggest running `/hacky-hours audit` first to check for any issues before publishing
+- Then `/hacky-hours sync` to publish the GitHub Release
+- Do not start new work without direction
+
+Design constraints live in `hacky-hours/02-design/`. Before implementing anything, check whether a relevant design doc exists. In particular:
+- `SECURITY_PRIVACY.md` — before adding any command that interacts with external systems
+- `LICENSING.md` — before adding any dependency
+- `ARCHITECTURE.md` — before adding new commands or changing the lifecycle model
+
 ## Contributing to This Repo
 
 All contributions are Markdown. Follow the skeleton format: purpose header, placeholder sections, Claude guidance block, Related links. See `runbooks/using-this-repo/contributing.md` for the full process.
