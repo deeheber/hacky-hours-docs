@@ -6,7 +6,11 @@
 
 ## Scope
 
-This project has no UI — it's entirely Markdown documentation read by humans and by Claude Code. Accessibility here means:
+As of v1.8.0, this project now has UI artifacts — the generated Astro sites in `hacky-hours/learn/` (tour and quiz). Accessibility now covers both the documentation layer and the generated web layer.
+
+For the generated web layer, the target standard is **WCAG 2.1 AA**. Astro generates semantic HTML by default; the interactive components (feedback form, quiz UI) need explicit accessibility evaluation before they can be considered done. This has not yet been performed.
+
+For the documentation layer, accessibility means:
 
 1. **Language accessibility** — clear, jargon-free writing that doesn't assume prior technical knowledge
 2. **Document structure** — proper heading hierarchy, meaningful link text, logical reading order
@@ -43,6 +47,18 @@ The default voice mode is **non-technical** by design. This is an accessibility 
 
 New terms from this feature to add to GLOSSARY.md:
 - "voice mode" — the current conversation style setting for the framework assistant
+
+### v1.8.0 New Commands — Accessibility Notes
+
+- **`/hacky-hours learn tour`** — the generated Astro tour site has not yet been evaluated for WCAG 2.1 AA compliance. Known items to verify before launch: heading hierarchy in generated pages, keyboard navigation through tour sections, alt text on any diagrams rendered from Mermaid, and accessible markdown editor in the feedback form (focus management, label associations, error states).
+- **`/hacky-hours learn onboard`** — conversation-only; no web UI. The GitHub Issue it creates should use plain-language titles and body text, not jargon. "Onboarding" label should be explained in the issue body for readers unfamiliar with the term.
+- **`/hacky-hours learn quiz`** — the generated quiz site needs WCAG 2.1 AA evaluation. Key concerns: quiz answer interactions must be keyboard-accessible, score/feedback must be announced to screen readers (ARIA live regions), and question text must not rely on color alone to convey meaning.
+- **`/hacky-hours upgrade`** — conversation-only; no web UI. Output should use plain language. The diff it produces (what's new vs. what you have) should be structured as a readable list, not a technical patch format.
+
+New terms to add to GLOSSARY.md:
+- "WCAG 2.1 AA" — already exists, but the entry should now mention it applies to the generated learn suite sites
+- "Astro" — the static site generator used for the learn suite
+- "onboarding" — in the GitHub context (labeled issues, structured starter tasks)
 
 ### Remaining Gaps (not blocking)
 

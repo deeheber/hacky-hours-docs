@@ -8,3 +8,4 @@ This folder contains the design documents for hacky-hours-docs itself.
 | [SECURITY_PRIVACY.md](./SECURITY_PRIVACY.md) | Risk surface and data handling (minimal for this project) |
 | [LICENSING.md](./LICENSING.md) | MIT license, dependency compatibility |
 | [ACCESSIBILITY.md](./ACCESSIBILITY.md) | Accessibility standards for the framework's own documentation |
+| [TESTING.md](./TESTING.md) | Testing strategy, pre-release checklist, eval coverage |

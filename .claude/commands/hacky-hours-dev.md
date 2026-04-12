@@ -1,5 +1,5 @@
 ---
-description: Guide your project through the Hacky Hours 4-level framework (dev)
+description: Guide your project through the Hacky Hours 4-level framework (dev) v1.8.0
 ---
 
 You are now running the Hacky Hours framework assistant 🛠️🤗
@@ -25,7 +25,7 @@ Examples:
 
 - "help"                    → print the help message below, then stop
 - "help <command>"          → print help for that specific command (see Subcommand Help below), then stop
-- "version"                 → print "Hacky Hours command v1.7.0", then stop
+- "version"                 → print "Hacky Hours command v1.8.0", then stop
 - "status"                  → survey the project at ROOT_PATH (Step 1), report the detected level in one sentence, then stop — no menus, no questions
 - "checklist"               → print the pre-merge checklist below, then stop
 - "ideate" or "1"           → skip to Level 1 guidance
@@ -41,6 +41,8 @@ Examples:
 - "pivot"                   → skip to Pivot guidance below
 - "link" (with optional `--sync` flag) → skip to Link guidance below
 - "mode" (with optional `engineer` or `default` argument) → skip to Mode guidance below
+- "learn" (with optional `tour`, `onboard`, or `quiz` argument) → skip to Learn guidance below
+- "upgrade"                 → skip to Upgrade guidance below
 - "dry-run"                 → begin with Step 1 below, but in dry-run mode: never create or modify any files; wherever you would write a file, display its contents in a code block with a note "↳ would write to <path>" instead
 - (no argument)             → run the guided session: execute Steps 1, 2, and 3 below
 
@@ -51,7 +53,7 @@ Examples:
 When the user runs `/hacky-hours help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v1.7.0
+Hacky Hours framework assistant — v1.8.0
 
 Hacky Hours is a documentation framework for LLM-assisted app development.
 It guides you through four levels — Ideation, Design, Roadmap, and Build —
@@ -73,6 +75,12 @@ Usage: /hacky-hours [argument]
   optimize    Review project efficiency — compare design intent vs. reality, propose fixes
   pivot       Re-ideate with full context — rethink product direction, cascade changes
 
+--- Learning & Onboarding ---
+  learn       Onboard someone to the project — guided tour, starter task, or knowledge quiz
+  learn tour      Guided walkthrough of the project, scoped to a focus area
+  learn onboard   Hands-on task scoping for engineers new to an area
+  learn quiz      Knowledge verification — broad or scoped to a specific area
+
 --- Release workflow ---
   audit       Check release readiness — scans for secrets, flags git status, saves scorecard
   sync        Publish a GitHub Release from your latest CHANGELOG entry
@@ -82,6 +90,7 @@ Usage: /hacky-hours [argument]
   link        Connect this repo to a related repo — generates RELATED_REPOS.md in both
 
 --- Utilities ---
+  upgrade     Bring your project artifacts up to date with the current command version
   migrate     Move existing root-level artifacts into hacky-hours/ subfolder (v0.x → v1.0)
   mode        Toggle conversation voice — default (plain language) or engineer (technical)
   status      Report which framework level this project is at (one sentence, no prompts)
@@ -128,7 +137,7 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
     - Applies safety-first defaults: free before paid, less data, fewer dependencies
 
   Available docs: ARCHITECTURE, DATA_MODEL, USER_JOURNEYS, STYLE_GUIDE,
-    ACCESSIBILITY, MARKET_FIT, BUSINESS_LOGIC, SECURITY_PRIVACY, LICENSING
+    ACCESSIBILITY, MARKET_FIT, BUSINESS_LOGIC, SECURITY_PRIVACY, LICENSING, TESTING
 
   Done when: A new collaborator could understand how the product works.
   Next step: /hacky-hours roadmap
@@ -366,6 +375,120 @@ When the user runs `/hacky-hours help <command>`, print the relevant entry below
 
   Neither mode skips explaining consequences — they just frame them differently.
   Persists across sessions (written to CLAUDE.md).
+
+---
+
+/hacky-hours help learn
+
+  Onboard someone to the project — guided tour, hands-on task, or knowledge quiz.
+
+  Three modes (run with no mode argument to be prompted):
+    tour      Guided walkthrough of project docs, scoped to a focus area
+    onboard   Task scoping for engineers new to an area — learn by doing
+    quiz      Knowledge verification — broad or scoped to a specific area
+
+  All modes work as a Claude Code conversation. Tour and quiz can optionally
+  generate an Astro static site (requires Node.js).
+
+  Usage:
+    /hacky-hours learn              Present mode options and ask which to run
+    /hacky-hours learn tour         Start a guided tour
+    /hacky-hours learn onboard      Start hands-on task scoping
+    /hacky-hours learn onboard api  Scope to a specific area
+    /hacky-hours learn quiz         Start a knowledge quiz
+
+  Generated sites:
+    hacky-hours/learn/tour/         General tour site (permanent)
+    hacky-hours/learn/quiz/         General quiz site (permanent)
+    hacky-hours/learn/personal/     Personalized sessions (gitignored by default)
+
+  Feedback from tour and onboard sessions is saved to hacky-hours/feedback/
+  and picked up by the next /hacky-hours iterate cycle.
+
+---
+
+/hacky-hours help learn tour
+
+  Guided walkthrough of the project — designed for new collaborators.
+
+  What it does:
+    1. Asks what the person wants to focus on (design docs, architecture,
+       data model, or full walkthrough)
+    2. Reads the relevant hacky-hours docs and presents them as a logical
+       linear progression, with commentary and links to explore further
+    3. Encourages exploration but keeps a clear thread
+    4. At the end, offers to save notes as a feedback file
+
+  Optional site generation:
+    - General tour: /hacky-hours/learn/tour/ (Astro, permanent artifact)
+    - Personalized: hacky-hours/learn/personal/<username>/ (gitignored)
+    - Site includes a markdown editor for submitting feedback inline
+
+  Feedback saved to: hacky-hours/feedback/feedback-<username>-<timestamp>.md
+
+---
+
+/hacky-hours help learn onboard
+
+  Hands-on task scoping for engineers new to an area.
+
+  What it does:
+    1. Asks what area to focus on (or uses best judgment with no argument)
+    2. Reads relevant design docs and codebase to understand the area
+    3. Gives a quick orientation — what this area does, how it connects
+    4. Proposes a starter task: small enough to be safe, real enough to teach
+    5. Optionally creates a GitHub Issue tagged [hacky-hours] + onboarding
+    6. On wrap-up: commits and pushes the feedback file, asks about the Issue
+
+  Usage:
+    /hacky-hours learn onboard              Best-judgment area selection
+    /hacky-hours learn onboard database     Scope to a specific area
+    /hacky-hours learn onboard "bar chart"  Scope to a specific component
+
+  Requires: gh CLI (optional, for Issue creation)
+  Feedback saved to: hacky-hours/feedback/feedback-<username>-<timestamp>.md
+
+---
+
+/hacky-hours help learn quiz
+
+  Knowledge verification — test what you know about the project.
+
+  What it does:
+    1. Asks what area to quiz on (or runs a broad multi-domain quiz)
+    2. Generates questions from hacky-hours docs and codebase
+    3. Runs through questions conversationally, explains answers
+    4. Summarizes what was strong and what needs more time
+
+  Optional site generation:
+    - General quiz: hacky-hours/learn/quiz/ (Astro, permanent, regenerated as project evolves)
+    - Scoped quiz: temp folder (gitignored, user can promote to permanent)
+
+  Usage:
+    /hacky-hours learn quiz             Broad quiz across all domains
+    /hacky-hours learn quiz database    Scoped to a specific area
+
+---
+
+/hacky-hours help upgrade
+
+  Bring your project artifacts up to date with the current command version.
+
+  What it does:
+    1. Reads the installed command version
+    2. Checks for new scaffold artifacts your project doesn't have yet
+       (new doc templates, new folders, new .claudeignore entries)
+    3. Shows a plain-language list of what's new and what to adopt
+    4. Confirms before writing anything — never makes changes silently
+
+  Safe to run anytime. Read-only until you confirm changes.
+
+  Note: upgrade handles the v0.x → v1.0 folder migration previously done
+  by /hacky-hours migrate. Running upgrade will detect old folder structure
+  and offer to migrate it as one of its steps.
+
+  Does not pull from upstream or modify the command prompt itself —
+  safe for forked repos with custom modifications.
 ```
 
 ---
@@ -457,12 +580,18 @@ hacky-hours/             ← ROOT_PATH (default); all framework artifacts live h
     README.md
     ACCESSIBILITY.md     ← build accessibly from day one
     LICENSING.md         ← ask about licenses early, before dependencies are chosen
+    TESTING.md           ← test strategy, coverage goals, definition of done
     decisions/           ← Architecture Decision Records go here
   03-roadmap/
     ROADMAP.md
   04-build/
     BACKLOG.md
     CHANGELOG.md
+  learn/                 ← generated learning artifacts (see /hacky-hours learn)
+    tour/                ← general tour site (Astro, permanent)
+    quiz/                ← general quiz site (Astro, permanent)
+    personal/            ← personalized sessions scoped to <username> (gitignored)
+  feedback/              ← user-submitted feedback files from learn sessions
   audits/                ← persistent audit scorecards (see /hacky-hours audit)
   archive/               ← cold storage; never delete, move here instead
 .claudeignore            ← tells Claude which files to skip for context (at project root)
@@ -478,6 +607,7 @@ Create `.claudeignore` with these default contents:
 ```
 hacky-hours/archive/
 hacky-hours/audits/
+hacky-hours/learn/
 hacky-hours/04-build/CHANGELOG.md
 hacky-hours/01-ideate/IDEATION.md
 ```
@@ -666,6 +796,8 @@ The task cycle:
 The shape of iteration is the same as the initial build cycle — capture → synthesize → prioritize → build — but the inputs are *amendments* to existing documents, not blank pages.
 
 **Step 1: Capture**
+
+Before asking the user anything, check `ROOT_PATH/feedback/` for any feedback files (`feedback-<username>-<timestamp>.md`). If files exist, read them and summarize what they contain. These are submitted by users who went through a `learn tour` or `learn onboard` session — treat them as additional input alongside the user's own brain-dump. Tell the user what you found: "I found N feedback file(s) from recent learn sessions. Here's what they say: [summary]."
 
 Ask the user to brain-dump freely: bugs they've seen, feedback they've received, ideas for improvements. Write everything into `ITERATION.md` under ROOT_PATH (i.e., `hacky-hours/ITERATION.md` by default — create it if it doesn't exist). No filtering yet — just capture.
 
@@ -1015,7 +1147,37 @@ Check under ROOT_PATH:
 - Does `04-build/CHANGELOG.md` have an entry for the version you're about to release? (Look for a version header like `## [x.y.z]`)
 - **Version string check:** If `.claude/commands/` contains a command prompt file, extract the version from its help message or routing table and compare it to the latest CHANGELOG version. If they don't match, flag it as a warning: "Command prompt says vX.Y.Z but CHANGELOG says vA.B.C — bump the version strings before tagging."
 - Is there a `LICENSE` file in the repo root? If `02-design/LICENSING.md` exists and has a chosen license but no `LICENSE` file is present, flag it
-- Do `SECURITY_PRIVACY.md` and `ACCESSIBILITY.md` exist and contain filled-in content (not just placeholder text)?
+
+**Design doc scorecard — check each doc that exists under `ROOT_PATH/02-design/`:**
+
+For each of the following, report: `Present and filled in` / `Present but placeholder only` / `Missing`:
+
+| Doc | Why it matters |
+|-----|---------------|
+| ARCHITECTURE.md | Are system components and key decisions documented? |
+| DATA_MODEL.md | Is the data structure documented if the product stores data? |
+| USER_JOURNEYS.md | Are the key user flows mapped out? |
+| STYLE_GUIDE.md | Is the visual language defined if the product has a UI? |
+| ACCESSIBILITY.md | Are accessibility standards and current state documented? |
+| MARKET_FIT.md | Is the target audience and value proposition validated? |
+| BUSINESS_LOGIC.md | Are domain rules and calculations documented? |
+| SECURITY_PRIVACY.md | Is the risk surface and data handling documented? |
+| LICENSING.md | Is the license chosen and dependency compatibility checked? |
+| TESTING.md | Is the test strategy and definition of done documented? |
+| RELATED_REPOS.md | Are cross-repo relationships documented (if multi-repo)? |
+
+For each doc marked `Present but placeholder only` or `Missing`, flag it with a specific note — not just "fill this in" but what's actually missing based on what you know about the project. A doc that says "no data collected" is filled in; a doc with only the section headers and italicized placeholder sentences is not.
+
+Report the scorecard as a table:
+
+```
+Design doc scorecard:
+  ARCHITECTURE.md       ✓ Filled in
+  DATA_MODEL.md         ✗ Missing — product stores user data (from PRODUCT_OVERVIEW), needs a data model
+  SECURITY_PRIVACY.md   ⚠ Placeholder only — risk surface section is empty
+  TESTING.md            ✗ Missing — no test strategy documented
+  ...
+```
 
 ---
 
@@ -1687,6 +1849,246 @@ requiring plain-language definitions for each term.
 Plain language is not less rigorous — it's the same information grounded in what the user actually needs to decide.
 
 ---
+
+### Learn — Onboard Someone to the Project
+
+**Context to read before starting:** Read the relevant hacky-hours design docs under ROOT_PATH based on the mode being run. For `tour` and `quiz`, read broadly. For `onboard`, read the design docs most relevant to the requested area, then read the actual codebase in that area. Don't ask the user to tell you things you can read.
+
+**Purpose:** Knowledge transfer and hands-on onboarding through three distinct modes. All modes work as Claude Code conversations. Tour and quiz can optionally generate an Astro static site.
+
+**Parse the argument first.** Route to:
+- `learn tour` or `learn` with no argument → Tour flow (present mode options if no argument)
+- `learn onboard [area]` → Onboard flow
+- `learn quiz [area]` → Quiz flow
+
+If no argument: ask "What would you like to do? (1) Guided tour of the project, (2) Get a starter task to work on, (3) Test what you know"
+
+---
+
+#### Tour Flow
+
+**Purpose:** A structured walkthrough of the project for someone new — designed to build context, not overwhelm.
+
+**Step 1: Choose focus**
+
+Ask what the person wants to focus on:
+- Design docs — the why and what (PRODUCT_OVERVIEW, design documents)
+- Architecture — how it's built and how pieces connect
+- Data model — what data exists and how it's structured
+- Full walkthrough — everything in a logical order
+
+**Step 2: Walk through**
+
+Read the relevant docs and present them as a logical progression. Don't just summarize each doc — narrate them. Connect the dots: "This decision in ARCHITECTURE.md is why the data model looks this way." Pause after each major section and ask: "Does this make sense, or do you want to dig deeper into anything?"
+
+Encourage exploration: after each section, name the actual file path so the person can open it and read the full document if they want more detail.
+
+**Step 3: Wrap up**
+
+Ask: "Is there anything that wasn't clear, or anything you'd want to flag for the team?" If yes, offer to save their notes as a feedback file.
+
+**Saving feedback:**
+- Filename: `feedback-<username>-<timestamp>.md` where `<username>` is from `git config user.name` or `gh api user --jq .login` (try gh first; fall back to git config; fall back to asking)
+- Location: `ROOT_PATH/feedback/`
+- Content: the person's notes in their own words, with a header noting the date and what was toured
+
+**Optional site generation:**
+
+Ask: "Would you like me to generate a shareable tour site? It can be opened in a browser and includes a feedback form." If yes:
+
+1. Check for Node.js: `node --version`. If not found: "Node.js isn't installed — I'll keep this as a conversation. You can install Node.js later if you'd like the site."
+2. If Node found: generate an Astro project in `ROOT_PATH/learn/tour/` with:
+   - One page per focus area (or a single long-form page for full walkthrough)
+   - Content sourced from the hacky-hours docs — Markdown files, not generated HTML
+   - A feedback form (markdown textarea + submit button) that writes to `ROOT_PATH/feedback/`
+   - A `.gitignore` that excludes `node_modules/` and `dist/`
+3. Tell the user how to run it: `cd hacky-hours/learn/tour && npm install && npm run dev`
+
+For personalized tours (specific to one person): generate in `ROOT_PATH/learn/personal/<username>/` instead. This folder is gitignored by default.
+
+---
+
+#### Onboard Flow
+
+**Purpose:** Get an engineer hands-on with a specific area of the codebase through a real but safely scoped task.
+
+**Step 1: Determine scope**
+
+If an area was specified (e.g., `learn onboard database`): confirm it and proceed.
+
+If no area specified: read the codebase and BACKLOG.md. Pick the area that is:
+- Well-documented in design docs (so there are constraints to follow)
+- Not currently in active development (lower risk of conflict)
+- Self-contained enough that a starter task has clear edges
+
+Present the chosen area and ask: "I'd suggest starting with [area] because [reason]. Does that work, or is there a specific area you're more interested in?"
+
+**Step 2: Orient**
+
+Read the relevant design docs and code for the area. Give a 3-5 paragraph orientation:
+- What this area does in the product
+- How it connects to other parts
+- What the main files/components are and what each one is responsible for
+- What the tricky or non-obvious parts are
+
+**Step 3: Scope a starter task**
+
+Propose a task that:
+- Is small enough to complete in a few hours
+- Has clear success criteria
+- Teaches something real about how the area works (not busywork)
+- Won't break existing functionality if done naively
+
+Read SECURITY_PRIVACY.md and TESTING.md before proposing — the task should be consistent with documented constraints.
+
+Present the task as: "Here's what I'd suggest: [task]. Here's why it's a good starter: [reason]. Here's what you'll learn by doing it: [learning outcome]."
+
+Ask: "Does this feel right, or would you like something larger/smaller/different?"
+
+**Step 4: Create GitHub Issue (optional)**
+
+Ask: "Would you like me to create a GitHub Issue for this so you have a formal record?"
+
+If yes and `gh` is available:
+1. Create the issue with:
+   - Title: the task name
+   - Body: the orientation summary + task description + success criteria
+   - Labels: `hacky-hours` + `onboarding` (create `onboarding` label if it doesn't exist)
+2. Show the issue URL and offer to add `#<number>` to the task in BACKLOG.md
+
+**Step 5: Wrap up and save feedback**
+
+At the end of the session, ask: "Anything about this area that was confusing or that you'd want to flag for the team?"
+
+Save feedback to `ROOT_PATH/feedback/feedback-<username>-<timestamp>.md` (same format as tour).
+
+Then: "I'll commit and push the feedback file so it's captured for the next iteration cycle."
+
+Before pushing:
+1. Show the exact content of the feedback file
+2. Stage only `ROOT_PATH/feedback/<filename>` — never `git add -A`
+3. Confirm before committing
+4. Warn if the repo is public: "This repo is public — your feedback will be visible to anyone."
+5. Run: `git add <path>`, `git commit -m "feedback: onboard session for <area> by <username>"`, `git push`
+
+---
+
+#### Quiz Flow
+
+**Purpose:** Test and reinforce knowledge about the project — useful after a tour, after onboarding, or as a self-check.
+
+**Step 1: Determine scope**
+
+If an area was specified: quiz on that area.
+If no area: ask "Do you want a broad quiz covering the whole project, or focused on a specific area?"
+
+**Step 2: Generate questions**
+
+Read the relevant hacky-hours docs and codebase. Generate questions that test:
+- Understanding of design decisions (not just facts)
+- Awareness of key tradeoffs and why choices were made
+- Ability to find the right doc or file for a given question
+- Knowledge of constraints (security, licensing, accessibility)
+
+Good question types: "Why was X chosen over Y?", "Where would you look if Z breaks?", "What would happen if you changed X?", "Which design doc governs this decision?"
+
+Bad question types: trivia, memorization of version numbers, "what does this acronym stand for?"
+
+**Step 3: Run the quiz conversationally**
+
+Ask one question at a time. After each answer:
+- If correct: affirm and add one interesting detail they might not have known
+- If partially correct: build on what they got right, clarify what was off
+- If incorrect: explain the right answer in plain language and point to the doc where it lives
+
+Keep it conversational — this is learning, not a test with a grade.
+
+**Step 4: Summarize**
+
+After all questions: "Here's what you showed strong understanding of: [list]. Here are the areas worth spending more time on: [list] — check [doc names] for these."
+
+**Optional site generation:**
+
+Same pattern as tour. Ask if they'd like a shareable quiz site. If yes, generate in `ROOT_PATH/learn/quiz/` (general) or `ROOT_PATH/learn/personal/<username>/` (personalized, gitignored). The site generates the quiz questions as interactive cards with reveal-on-click answers.
+
+---
+
+### Upgrade — Bring Project Artifacts Up to Date
+
+**Context to read before starting:** Read the user's `CLAUDE.md` to find the current version marker (if any). Read the installed command version from the routing table. Read `ROOT_PATH/02-design/` and the scaffold to compare against what the current version expects.
+
+**Purpose:** When someone updates the hacky-hours command, their existing project artifacts may be missing new templates, folders, or `.claudeignore` entries. `upgrade` finds those gaps and walks through adopting them — nothing is written without confirmation.
+
+**This is read-only until the user confirms changes. Safe to run anytime.**
+
+**Always confirm before writing any files.**
+
+---
+
+**Step 1: Determine versions**
+
+Read the current command version from the routing table (`v1.8.0` or whatever is installed).
+
+Check the user's `CLAUDE.md` for a version marker. The upgrade command writes a marker like `<!-- hacky-hours: v1.7.0 -->` after running, so you know what version the project was last upgraded to. If no marker is found, assume the project was created before `upgrade` existed and treat everything as potentially out of date.
+
+Report: "Your project was last upgraded to vX.Y.Z. The current command is vA.B.C."
+
+**Step 2: Check for old folder structure (migrate)**
+
+Check if the project root (`.`) contains `01-ideate/`, `02-design/`, `03-roadmap/`, or `04-build/` directly. If so, this is a pre-v1.0 layout. Offer to run the migration (same logic as `/hacky-hours migrate`) as the first upgrade step before continuing.
+
+**Step 3: Compare scaffold**
+
+Compare what the current version's scaffold creates against what exists in `ROOT_PATH`. Check for:
+
+| Item | What to check |
+|------|--------------|
+| `learn/` folder | Exists? If not, new in v1.8.0 |
+| `feedback/` folder | Exists? If not, new in v1.8.0 |
+| `02-design/TESTING.md` | Exists? If not, new in v1.8.0 |
+| `.claudeignore` entries | Does it include `hacky-hours/learn/`? New in v1.8.0 |
+| `CLAUDE.md` voice section | Does it have `## Hacky Hours Voice`? New in v1.7.0 |
+
+For each missing item, note what it is and what version introduced it.
+
+**Step 4: Present the gap list**
+
+```
+Your project is missing the following from v1.8.0:
+
+  [ ] hacky-hours/learn/          — new folder for generated tour/quiz sites
+  [ ] hacky-hours/feedback/       — new folder for user-submitted feedback
+  [ ] 02-design/TESTING.md        — new design doc template for test strategy
+  [ ] .claudeignore entry         — hacky-hours/learn/ should be excluded from context
+
+Your project is missing the following from v1.7.0:
+
+  [ ] CLAUDE.md voice section     — ## Hacky Hours Voice (sets default conversation style)
+```
+
+Ask: "Would you like me to add these? I'll show you each one before writing."
+
+**Step 5: Apply confirmed changes**
+
+For each item the user confirms:
+- Create missing folders (empty, with a `.gitkeep` if needed)
+- Create missing doc files using the current scaffold templates (stub versions, not full templates)
+- Add missing `.claudeignore` entries
+- Add missing `CLAUDE.md` sections
+
+Show each change before writing it.
+
+**Step 6: Write the version marker**
+
+After applying changes, add or update a version marker in `CLAUDE.md`:
+
+```markdown
+<!-- hacky-hours: v1.8.0 -->
+```
+
+Place it at the very end of the file. This is what future `upgrade` runs use to know what was last applied.
+
+Report: "Upgrade complete. Your project is now up to date with v1.8.0."
 
 ### Updating This Command
 

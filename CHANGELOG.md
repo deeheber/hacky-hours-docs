@@ -7,6 +7,36 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.8.0] — 2026-04-11
+
+Learn suite, upgrade command, testing design doc, and expanded audit scorecard.
+
+### Added
+
+- **`/hacky-hours learn [tour|onboard|quiz]`** — new learning suite for knowledge transfer and onboarding. Three modes: guided tour of the project (scoped to focus area), hands-on task scoping for engineers new to an area, and knowledge quiz (broad or scoped). All modes work as Claude Code conversations; tour and quiz optionally generate a shareable Astro static site. Conversation-first design means the feature always works even without Node.js.
+- **`/hacky-hours upgrade`** — brings existing project artifacts up to date with the current command version. Detects missing scaffold folders, new doc templates, and `.claudeignore` entries introduced since the project was last scaffolded. Absorbs the v0.x → v1.0 folder migration previously handled by `migrate`. Read-only until the user confirms. Writes a `<!-- hacky-hours: vX.Y.Z -->` version marker to `CLAUDE.md` after running.
+- **`02-design/TESTING.md` template** — new Level 2 design doc for test strategy, test types, definition of done, and test environments. Scaffolded by default alongside ACCESSIBILITY.md and LICENSING.md.
+- **`hacky-hours/learn/` and `hacky-hours/feedback/`** — new scaffold folders. `learn/` holds generated tour/quiz Astro sites (tour/, quiz/, personal/<username>/). `feedback/` holds user-submitted feedback files (`feedback-<username>-<timestamp>.md`) from learn sessions.
+- **Feedback loop** — `iterate` Step 1 Capture now checks `hacky-hours/feedback/` for feedback files from learn sessions before asking the user to brain-dump. Surfaces them as additional input.
+- **Expanded audit scorecard (Phase 2)** — now checks all design doc types (ARCHITECTURE, DATA_MODEL, USER_JOURNEYS, STYLE_GUIDE, ACCESSIBILITY, MARKET_FIT, BUSINESS_LOGIC, SECURITY_PRIVACY, LICENSING, TESTING, RELATED_REPOS) with a consistent per-domain format: exists? filled in? specific gap if not. Reports as a table with ✓/✗/⚠ indicators.
+- **ADR: Learn Suite Architecture** (`02-design/decisions/2026-04-11-learn-suite-architecture.md`) — documents the conversation-first/site-optional design, Astro stack selection, and sub-subcommand grouping decision.
+
+### Changed
+
+- **Scaffold structure** — `learn/` and `feedback/` folders added. `02-design/TESTING.md` added. `hacky-hours/learn/` added to `.claudeignore` defaults.
+- **`help design`** — TESTING added to available docs list.
+- **`hacky-hours/02-design/README.md`** — TESTING.md added to the design doc index.
+- **Version bumped** to v1.8.0 in routing table, help message, and command description.
+
+### Design doc updates
+
+- **`ARCHITECTURE.md`** — Learn Suite section, Static Site Generation section (Astro), Upgrade Command section, Known Fragility updated
+- **`SECURITY_PRIVACY.md`** — `onboard` automated git push, user-generated content in feedback files, Astro/Node.js supply chain surface
+- **`ACCESSIBILITY.md`** — scope updated to include generated web UI; v1.8.0 command notes; WCAG 2.1 AA evaluation flagged as outstanding
+- **`TESTING.md`** — created for hacky-hours-docs: testing layers, pre-release checklist, eval coverage, v1.8.0 testing notes
+
+---
+
 ## [1.7.0] — 2026-04-04
 
 Voice mode — non-technical plain language is now the default conversation style, with an opt-in engineer mode for technical users.

@@ -84,6 +84,70 @@ flowchart TD
 - **pivot** — product direction needs rethinking; re-ideate with full context, cascade changes through Levels 2-4
 - **optimize** — substantive review comparing design intent against current reality; proposes specific fixes; standalone or as an iterate phase
 
+## Learn Suite (v1.8.0)
+
+Three commands for knowledge transfer and onboarding, grouped under `/hacky-hours learn [tour|onboard|quiz]`:
+
+| Mode | Purpose |
+|------|---------|
+| `tour` | Guided walkthrough of the project — scoped to the user's focus (design, architecture, data model, or full) |
+| `onboard` | Task scoping for engineers new to an area — proposes a starter task, optionally creates a GitHub Issue |
+| `quiz` | Knowledge verification — broad or scoped to a specific area |
+
+**Design principle:** Conversation mode (Claude Code) is the baseline for all three — always available, no dependencies. Static site generation (Astro) is an optional richer layer on top. Both deliver the same content; the site is a better presentation, not a different experience.
+
+**Feedback loop:** The tour site includes a markdown editor where readers can submit notes. Submissions are saved as `hacky-hours/feedback/feedback-<username>-<timestamp>.md`. The `onboard` command commits and pushes any generated feedback file on wrap-up, and optionally opens a GitHub Issue. The `iterate` Step 1 Capture checks `hacky-hours/feedback/` as a new input source.
+
+**New scaffold artifacts introduced:**
+
+| Folder | Contents | Gitignored? |
+|--------|----------|-------------|
+| `hacky-hours/learn/tour/` | Generated general tour site | No (permanent) |
+| `hacky-hours/learn/quiz/` | Generated general quiz site | No (permanent) |
+| `hacky-hours/learn/personal/` | Personalized tours/quizzes scoped to `<username>` | Yes (temp until promoted) |
+| `hacky-hours/feedback/` | User-submitted feedback files | No (persisted and pushed) |
+
+Both `hacky-hours/learn/` and `hacky-hours/feedback/` are excluded from Claude context via `.claudeignore` by default — they're generated assets and user input, not planning docs.
+
+## Static Site Generation (v1.8.0)
+
+As of v1.8.0, some commands can optionally generate a static site alongside the conversation output. This is a new output type for the framework.
+
+**Stack: Astro**
+
+Chosen for:
+- **Markdown-native content collections** — generated content lives in `.md` files; regenerating means updating Markdown, not HTML
+- **Islands architecture** — interactive features (feedback form markdown editor, quiz UI) are scoped components; the rest of the site is static
+- **No custom build logic to maintain** — Astro handles the HTML output; the command maintains only content files
+
+**Requirement:** Node.js must be installed. The command checks for this before attempting site generation and falls back gracefully to conversation mode if Node is unavailable.
+
+**Site structure:**
+
+```
+hacky-hours/learn/
+  tour/           ← Astro project: general tour site
+  quiz/           ← Astro project: general quiz site
+  personal/       ← gitignored; one subfolder per <username>
+hacky-hours/feedback/
+  feedback-<username>-<timestamp>.md
+```
+
+## Upgrade Command (v1.8.0)
+
+`/hacky-hours upgrade` bridges the gap between updating the command and updating the user's project artifacts.
+
+**What it does:**
+1. Reads the installed command version from the routing table
+2. Checks for a version marker in the user's `CLAUDE.md` or scaffold (set by previous upgrade runs)
+3. Diffs what the current version expects against what exists in the user's `hacky-hours/` folder — new doc templates, new scaffold folders, new `.claudeignore` entries
+4. Presents a plain-language list of what's new and what to adopt
+5. Confirms before writing anything
+
+**Scope boundary:** `upgrade` operates on the user's own project artifacts only. It does not pull from upstream or modify the command prompt itself. This makes it safe for forked repos with custom modifications.
+
+**Note:** `migrate` (v0.x → v1.0 folder restructure) is absorbed into `upgrade` as a step it detects and handles automatically. The standalone `migrate` command is deprecated as of v1.8.0.
+
 ## Voice Mode
 
 As of v1.7.0, the command supports a persistent voice mode that controls conversation style across sessions.
@@ -111,12 +175,13 @@ Two-way sync between BACKLOG.md and GitHub Issues (see [ADR: Two-Way Sync](decis
 
 ## Known Fragility
 
-The slash command prompt (`.claude/commands/hacky-hours-dev.md`) is the most complex component (~1600 lines, ~8.6K estimated tokens). As of v1.1.0, the command has been harmonized: all workflow sections follow consistent patterns (context preambles, done-when criteria), the scaffold and adopt flows produce matching file structures, and subcommand help documents every argument.
+The slash command prompt (`.claude/commands/hacky-hours-dev.md`) is the most complex component. As of v1.1.0, the command has been harmonized: all workflow sections follow consistent patterns (context preambles, done-when criteria), the scaffold and adopt flows produce matching file structures, and subcommand help documents every argument. The prompt continues to grow with each milestone — prompt size should be re-measured after each release.
 
 Remaining fragility:
 - **No gradual rollout** — changes to the command prompt affect every user on next install. There is no canary or staged release mechanism.
-- **Single-file architecture** — all routing, guidance, and workflow logic lives in one markdown file. As features grow, this file gets harder to review and reason about.
+- **Single-file architecture** — all routing, guidance, and workflow logic lives in one markdown file. As features grow (v1.8.0 adds four new command sections), this file gets harder to review and reason about. The v2.0.0 command audit milestone should evaluate whether splitting is warranted.
 - **Cross-tool portability** — the slash command is Claude Code–specific. Other tools (Cursor, Windsurf) get framework behavior through CLAUDE.md project instructions, not the command itself. The two surfaces need to stay in sync.
+- **Node.js dependency (v1.8.0)** — static site generation requires Node.js. The conversation-first design means the framework degrades gracefully without it, but this is the first external runtime dependency the framework has introduced. Worth monitoring whether it creates friction.
 
 ## Release Process
 
