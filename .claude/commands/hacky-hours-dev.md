@@ -28,11 +28,11 @@ Examples:
 - "help <command>"                      → print help for that specific command, then stop
 - "step"                                → list all steps, then stop
 - "step 0"                              → begin guided session in dry-run mode (no file writes)
-- "step 1" | "ideate"                   → skip to Step 1 guidance
-- "step 2" | "design"                   → skip to Step 2 guidance
-- "step 3" | "roadmap"                  → skip to Step 3 guidance
-- "step 4" | "build"                    → skip to Step 4 guidance
-- "step 5" | "iterate"                  → skip to Step 5 guidance
+- "step 1" | "step ideate" | "ideate"       → skip to Step 1 guidance
+- "step 2" | "step design" | "design"       → skip to Step 2 guidance
+- "step 3" | "step roadmap" | "roadmap"     → skip to Step 3 guidance
+- "step 4" | "step build" | "build"         → skip to Step 4 guidance
+- "step 5" | "step iterate" | "iterate"     → skip to Step 5 guidance
 - "review"                              → list review modes, then run review 1 (audit) by default
 - "review 1" | "review audit"           → skip to Review 1 guidance (audit)
 - "review 2" | "review optimize"        → skip to Review 2 guidance (optimize)
@@ -81,44 +81,42 @@ so you figure out what to build before writing a line of code.
 Usage: /hacky-hours [command]
 
 --- Work the framework ---
-  (none)          Guided session — survey your project and walk you through what's next
-  step            List all steps
-  step 0          Explore without writing any files (safe to try)
-  step 1          Step 1 — Ideation
-  step 2          Step 2 — Design
-  step 3          Step 3 — Roadmap
-  step 4          Step 4 — Build
-  step 5          Step 5 — Post-release iteration
+  (none)                    Guided session — survey your project and walk you through what's next
+  step                      List all steps
+  step 0                    Explore without writing any files (safe to try)
+  step 1 | step ideate      Step 1 — Ideation
+  step 2 | step design      Step 2 — Design
+  step 3 | step roadmap     Step 3 — Roadmap
+  step 4 | step build       Step 4 — Build
+  step 5 | step iterate     Step 5 — Post-release iteration
 
 --- Review your project ---
-  review          List review modes (runs audit by default)
-  review 1        Did we follow best practices?       (audit)
-  review 2        Did we build it well?               (optimize)
-  review 3        Should we build something else?     (pivot)
+  review                    List review modes (runs audit by default)
+  review 1 | review audit   Did we follow best practices?
+  review 2 | review optimize  Did we build it well?
+  review 3 | review pivot   Should we build something else?
 
 --- Onboard and transfer knowledge ---
-  learn           List learn modes
-  learn 1         Big picture — what is this project?     (tour)
-  learn 2         Getting hands dirty — how do I work in it?  (onboard)
-  learn 3         Testing knowledge — do I understand it?  (quiz)
+  learn                     List learn modes
+  learn 1 | learn tour      Big picture — what is this project?
+  learn 2 | learn onboard   Getting hands dirty — how do I work in it?
+  learn 3 | learn quiz      Testing knowledge — do I understand it?
 
 --- Ship and track ---
-  update          List update modes
-  update 1        Publish a new release
-  update 2        Sync BACKLOG ↔ GitHub Issues
+  update                    List update modes
+  update 1 | update version  Publish a new release
+  update 2 | update project  Sync BACKLOG ↔ GitHub Issues
 
 --- Framework tools ---
-  tools           List tools
-  tools upgrade   Update framework artifacts (also: adopt a new codebase, migrate old layout)
-  tools mode      Switch conversation voice (1=builder, 2=engineer)
-  tools walkthrough  Narrative overview of how all the commands work together
-  tools help      Show this message
+  tools                     List tools
+  tools upgrade             Update framework artifacts (also: adopt a new codebase, migrate old layout)
+  tools mode 1 | tools mode builder   Plain language mode
+  tools mode 2 | tools mode engineer  Technical mode
+  tools walkthrough         Narrative overview of how all the commands work together
+  tools help                Show this message
 
 Options:
   --root <path>   Operate in a subdirectory instead of hacky-hours/ (e.g. --root . for project root)
-
-Named aliases: step ideate|design|roadmap|build|iterate, review audit|optimize|pivot,
-               learn tour|onboard|quiz, update version|project, tools mode builder|engineer
 
 Learn more: https://github.com/empathetech/hacky-hours-docs
 ```
