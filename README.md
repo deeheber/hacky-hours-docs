@@ -15,7 +15,7 @@ This repo is two things at once:
 
 You drive the product. Claude helps you build it — but it needs your direction, not just your instructions. This framework gives you the artifacts to provide that direction: who you're building for, what you're making, how it should work, and what values it should uphold.
 
-The goal isn't to vibe-code blindly, and it isn't to get paralyzed trying to plan everything perfectly. It's to build with confidence, ownership, and growing expertise — one level at a time.
+The goal isn't to vibe-code without direction, and it isn't to get paralyzed trying to plan everything perfectly. It's to build with confidence, ownership, and growing expertise — one level at a time.
 
 Imperfect documents are fine. Honest documents are what matter.
 
