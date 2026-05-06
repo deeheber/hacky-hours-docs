@@ -18,7 +18,7 @@ For each design doc, compare against what actually exists. Report:
 - **Missing** — things that exist in the project but aren't covered
 - **Contradicted** — design says X, implementation does Y
 
-For two-tier docs (v3.0.0+): also check that the summary and deep doc agree. The summary is the source of intent — flag if the deep doc has drifted ahead.
+For two-tier docs (v3.0.0+): the deep dive is the source of truth and what implementation reads. Compare against reality starting from the deep dive. Then validate the summary against the deep dive — flag if the summary makes claims the deep dive doesn't, or omits load-bearing detail from the deep dive's Key Decisions / Known Constraints sections.
 
 ---
 

@@ -2,13 +2,14 @@
 
 *Supporting file for the `hacky-hours` skill. Loaded when the user is at Step 4.*
 
-**Context:** Read `04-build/BACKLOG.md` to see what's queued. For each task, read the relevant design doc sections — particularly `SECURITY_PRIVACY.md` and `LICENSING.md`. If `ROADMAP.md` exists, confirm the task belongs to the current milestone before starting.
+**Context:** Read `04-build/BACKLOG.md` to see what's queued. For each task, read the relevant design doc sections — particularly `SECURITY_PRIVACY` and `LICENSING.md`. If `ROADMAP.md` exists, confirm the task belongs to the current milestone before starting.
 
 **Purpose:** Implement incrementally, with review at each step, aligned to design decisions.
 
 Before starting any task:
-1. Read the relevant design doc sections — they constrain the implementation
-2. If a design doc doesn't address something you need to implement, surface it to the user first — it may need to be added to the design doc
+1. **Read the deep-dive design docs (`<DOC>-deep.md`), not the summaries.** The deep dive is the source of truth and contains the Implementation Notes section that drives the build. Summaries are derivative — for human gut-checks only — and intentionally omit build-phase detail.
+2. If a project still has single-tier design docs (e.g., `ARCHITECTURE.md` without the `-deep` / `-summary` split), read those. The two-tier pattern is opt-in for projects upgrading from earlier versions.
+3. If a design doc doesn't address something you need to implement, surface it to the user first — the deep dive may need a new section. Update the deep dive, then regenerate the summary.
 
 The task cycle:
 1. Pick a task from BACKLOG.md

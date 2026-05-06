@@ -21,10 +21,17 @@ Start by asking which documents this project actually needs:
 | LICENSING | Almost always — ask early, before dependencies are chosen |
 | TESTING | Almost always — test strategy and definition of done |
 
-**Two-tier design artifacts (v3.0.0):** Each design doc consists of a **summary** (one-screen, diagram-led, what the user signs off on) plus a **deep** technical expansion (for engineers and build-phase AI). The summary is the source of intent — if the deep doc disagrees, the summary wins. Templates live in `${CLAUDE_SKILL_DIR}/templates/design/<DOC>-summary.md` and `<DOC>-deep.md`. Read `${CLAUDE_SKILL_DIR}/templates/design/README.md` for the full pattern before working through any doc.
+**Two-tier design artifacts (v3.0.0):** Each design doc consists of a **deep dive** (`<DOC>-deep.md` — the actual blueprint, source of truth) plus a **summary** (`<DOC>-summary.md` — a derivative one-screen view for quick gut checks and as a navigation onramp for non-technical readers). Templates live in `${CLAUDE_SKILL_DIR}/templates/design/<DOC>-deep.md` and `<DOC>-summary.md`. **Read `${CLAUDE_SKILL_DIR}/templates/design/README.md` first** — it specifies the pattern, the workflow, and the discipline that keeps the two files in sync.
 
-For each document, work through the summary first — section by section, with questions. Generate Mermaid diagrams proactively and lead the summary with the diagram. Only expand into the deep doc once the summary is signed off.
+**Workflow for each doc:**
 
-**When a design decision changes during iteration:** write an Architecture Decision Record (ADR) in `02-design/decisions/` named by date and topic (e.g., `2026-03-20-switch-to-postgres.md`). Update only the affected sections of the original doc — both summary and deep, if relevant — and add a note pointing to the ADR.
+1. **Build the deep dive first.** Walk the user through it section by section using questions, the same way you would for any design doc. Generate Mermaid diagrams proactively. The deep dive is what gets the time investment — the summary is mechanical compression that comes after.
+2. **Sign off on the deep dive.** Confirm with the user that the deep dive captures the architecture / data model / threat model / etc. Make this an explicit milestone before moving on.
+3. **Generate the summary as a faithful condensation.** Walk through the standard summary shape (diagram → one-sentence what-it-does → three key decisions max → most-important tradeoff → cross-links). Each summary item is distilled from the corresponding deep-dive section, with a section-anchor link so readers can drill in. **Never add information to the summary that isn't in the deep dive. Never make new decisions in the summary.**
+4. **Validate the summary against the deep dive.** Read both side by side. Does the summary make any claim the deep dive doesn't? Does it omit anything load-bearing? If yes, fix the summary, not the deep dive (unless validation surfaced a real bug — in which case fix the deep dive, then regenerate the summary).
 
-**Done when:** A new collaborator could read the summaries and understand how the product is meant to work, with the deep docs available when they need to build. ✅
+If the user wants to skip the deep dive and just write the summary: push back. The summary alone is the failure mode the two-tier pattern was designed to prevent. The deep dive is where the thinking happens; the summary is just the view.
+
+**When a design decision changes during iteration:** write an Architecture Decision Record (ADR) in `02-design/decisions/` named by date and topic (e.g., `2026-03-20-switch-to-postgres.md`). Update the **deep dive** first — that's the source of truth. Then regenerate or update the affected lines of the summary. Add a note in the deep dive pointing to the ADR.
+
+**Done when:** Both `<DOC>-deep.md` and `<DOC>-summary.md` exist for every design doc the project needs, the deep dive contains the actual blueprint with implementation-ready detail, and the summary is a faithful one-screen condensation that cross-links into the deep dive. ✅

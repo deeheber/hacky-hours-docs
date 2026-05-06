@@ -1,10 +1,22 @@
 # ADR: Migrate from slash command to SKILL.md format
 
 **Date:** 2026-05-06
-**Status:** Accepted
+**Status:** Accepted (with two-tier model corrected after first real-session test — see Amendments below)
 **Relates to:** ARCHITECTURE.md, install.sh, install.ps1, README.md, command prompt
 **Research input:** `02-design/research/2026-05-06-skill-vs-slash-command.md`
 **Coupled with:** Two-tier design artifacts spike (see BACKLOG)
+
+## Amendments
+
+**2026-05-06 (same day, post-first-test):** First real-session test on a toy tamagotchi project surfaced that the originally-described two-tier model (summary as source of intent, deep doc as expansion) had the polarity inverted: only summary docs got generated, the build worked from those alone, and the deep docs never materialized. Corrected model:
+
+- **Deep dive (`<DOC>-deep.md`) is the source of truth.** Built first via Step 2 questions. Step 4 reads it for build. Implementation Notes live here.
+- **Summary (`<DOC>-summary.md`) is a derivative.** Generated from the deep dive after signoff. Never adds new information; never makes new decisions. For quick gut checks and as a navigation onramp for non-technical readers, with cross-links into deep-dive sections.
+- If summary and deep dive disagree, the summary is wrong — regenerate it.
+
+This inversion is the correct framing: it's how technical writing actually works (specs come first, executive summaries derive from them), and it gives the deep dive a real forcing function (it's what gets built from). The prior framing left the deep doc with no job, so it never got written.
+
+Templates, Step 2 / Step 4 instructions, audit / optimize / pivot guidance, learn 1, and tools/upgrade Flow A all updated to reflect the corrected model.
 
 ## Context
 

@@ -1,17 +1,19 @@
 # {{Product Name}} — Architecture (Deep)
 
-**Step 2 — Design** | Companion to [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md)
+**Step 2 — Design** | **Source of truth for the architecture.** The companion summary at [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md) is a derivative view — it never adds information that isn't here.
 **Contributed by:** Product owner + technical collaborators
 
-This document is the full technical expansion of the architecture. The user-facing artifact — the one they sign off on and share — is [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md). This file exists for engineers and for AI doing the build, where decisions need full context, not just headlines.
+This document is the actual architectural blueprint. Step 4 (Build) reads it when implementing. Other design docs cross-link into specific sections of this doc when they need to reference architectural decisions.
 
-If the summary and the deep doc disagree, **the summary is the source of intent.** Update this file to match, not the other way around.
+If the summary and this doc disagree, the **summary is wrong** — regenerate the summary; do not edit this doc to match the summary.
 
 ---
 
 > **Claude Guidance:** Start by reading the **Constraints & Values** section of `PRODUCT_OVERVIEW.md` before making any recommendations — the user's licensing intent, privacy stance, and infrastructure preference should shape every architectural suggestion.
 >
-> **Two-tier discipline:** Every decision documented here must have a corresponding entry in [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md) — either as one of the three key decisions or rolled into the "what this rules out" paragraph. If a decision is too detailed for the summary, that's fine — but the summary should at minimum acknowledge it exists. Never let the summary fall behind the deep doc.
+> **Workflow:** Build this doc *first*, walking the user through each section conversationally. Once it is signed off, generate [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md) as a faithful condensation. Never reverse the order.
+>
+> **Section anchors:** This doc's sections will be cross-linked from the summary and from other design docs. Use stable, slug-friendly section headers; avoid renaming them once the summary references them.
 >
 > **Safety-first defaults:** Lead with the simplest, cheapest, least-infrastructure-heavy option that meets the product's needs. Specifically:
 > - Prefer **managed/hosted** services (Supabase, Vercel, Netlify, Railway, Neon) over self-hosted infrastructure
@@ -27,11 +29,11 @@ If the summary and the deep doc disagree, **the summary is the source of intent.
 
 ## System Overview
 
-*A paragraph or two summarizing the overall architecture — what exists, how it fits together, and the key design philosophy. Free to be more detailed than the summary's one-sentence version.*
+*A paragraph or two summarizing the overall architecture — what exists, how it fits together, and the key design philosophy. The summary will distill this into one sentence; here, give it the room it needs.*
 
 ## Architecture Diagram
 
-*A more detailed Mermaid diagram than the summary's. Include subsystems, data flows, and any external integrations the summary diagram omits for clarity.*
+*A detailed Mermaid diagram showing the major components, data flows, and external integrations.*
 
 ```mermaid
 %% Replace this placeholder with your detailed architecture diagram
@@ -64,23 +66,21 @@ graph TD
 
 ## Key Technical Decisions
 
-*The most important architectural choices made, and the reasoning behind them. Future Claude sessions should read this section before making implementation decisions.*
-
-*Each decision should map to either a "Key decision" bullet in the summary, or be acknowledged in the summary's "what this rules out" paragraph.*
+*The most important architectural choices made, and the reasoning behind them. Step 4 (Build) reads this section before making implementation decisions. The summary will lift its three highest-priority bullets from here.*
 
 ## Known Constraints and Tradeoffs
 
-*What this architecture is not optimized for. What would need to change as the product scales.*
+*What this architecture is not optimized for. What would need to change as the product scales. The summary's "what this rules out" paragraph distills this section.*
 
 ## Implementation Notes
 
-*Build-phase guidance that doesn't belong in the summary. File layout conventions, environment variable expectations, deployment specifics, common pitfalls. AI doing the build should read this section before writing code.*
+*Build-phase guidance: file layout conventions, environment variable expectations, deployment specifics, common pitfalls. AI doing the build should read this section before writing code. This section is **not** condensed into the summary — it lives here, build-side only.*
 
 ---
 
 ## Related
 
-- [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md) — the human-facing one-screen version (source of intent)
+- [ARCHITECTURE-summary.md](./ARCHITECTURE-summary.md) — the derivative one-screen view (regenerated from this doc)
 - [Design README](../../README.md)
 - [DATA_MODEL-deep.md](./DATA_MODEL-deep.md)
 - [SECURITY_PRIVACY-deep.md](./SECURITY_PRIVACY-deep.md)

@@ -52,7 +52,11 @@ Check whether `.gitignore` covers: `.env`, `.env.*`, `*.pem`, `*.key`, `id_rsa*`
 | LICENSING | Is the license chosen and dependency compatibility checked? |
 | TESTING | Is the test strategy and definition of done documented? |
 
-For docs using the v3.0.0 two-tier pattern: check both `<DOC>-summary.md` and `<DOC>-deep.md`. Flag if the summary is stale relative to the deep doc (the summary is the source of intent — staleness here is a real problem).
+For docs using the v3.0.0 two-tier pattern: check that both `<DOC>-deep.md` and `<DOC>-summary.md` exist. The deep dive is the source of truth (it's what Step 4 builds from); the summary is a derivative view. Flag any of:
+- Deep dive missing or placeholder-only — this is the spec and must be filled in
+- Summary missing — should exist as a derivative once the deep dive is signed off
+- Summary makes a claim the deep dive doesn't (summary drift) — summary needs to be regenerated from the deep dive
+- Summary omits something load-bearing from the deep dive's Key Decisions or Known Constraints — same fix
 
 Report as: `✓ Filled in` / `⚠ Placeholder only` / `✗ Missing — <specific gap>`
 

@@ -42,7 +42,7 @@ Ask: "Does this diff capture the pivot accurately?"
 
 For each change in the diff, identify which design docs are affected. For each: amend (update sections), rewrite (start over), or retire (no longer relevant)? Also check for docs that should be created or consolidated.
 
-For two-tier docs (v3.0.0+): start with the summary file. If the summary changes, the deep doc must be updated to match.
+For two-tier docs (v3.0.0+): pivots land in the **deep dive first** (the source of truth). Once the deep dive reflects the new direction, regenerate the summary from it. Never edit the summary directly during a pivot.
 
 ---
 

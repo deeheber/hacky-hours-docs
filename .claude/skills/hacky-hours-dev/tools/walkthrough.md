@@ -10,7 +10,7 @@ Walk through the framework as a story:
 
 1. **Step 1 — Ideate.** You start with `/hacky-hours step 1`. This is where you get your idea out of your head and into structured form. No code yet — just who you're building for, what it does, and why it matters.
 
-2. **Step 2 — Design.** Once you know what you're building, `/hacky-hours step 2` helps you define how it works. Architecture, data model, user journeys, security, accessibility — whichever ones your project needs. As of v3.0.0, each design doc has a short human summary plus a deep technical expansion — the summary is what you sign off on; the deep doc is what AI builds from.
+2. **Step 2 — Design.** Once you know what you're building, `/hacky-hours step 2` helps you define how it works. Architecture, data model, user journeys, security, accessibility — whichever ones your project needs. As of v3.0.0, each design doc is built as a deep dive first (the actual blueprint, what AI builds from), then a one-screen summary is generated from it as a faithful condensation for quick gut-checks and as an onramp for non-technical readers.
 
 3. **Step 3 — Roadmap.** `/hacky-hours step 3` takes everything from your design docs and helps you decide what to build first. The goal is a small, shippable MVP.
 

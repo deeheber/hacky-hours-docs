@@ -30,7 +30,7 @@ Gather context from: README.md, package manifests (package.json, pyproject.toml,
 
 Draft stubs for:
 - **PRODUCT_OVERVIEW.md** — infer 5Ws from README; mark Constraints & Values as "needs input"
-- **ARCHITECTURE-summary.md** + **ARCHITECTURE-deep.md** (v3.0.0 two-tier pattern) — infer from directory structure and package manifest. Read `${CLAUDE_SKILL_DIR}/templates/design/README.md` first.
+- **ARCHITECTURE-deep.md** + **ARCHITECTURE-summary.md** (v3.0.0 two-tier pattern, deep first) — infer the deep dive from directory structure and package manifest, then generate the summary as a faithful condensation. Read `${CLAUDE_SKILL_DIR}/templates/design/README.md` first to confirm the workflow (deep is source of truth; summary is derivative).
 - **SECURITY_PRIVACY-summary.md** + **SECURITY_PRIVACY-deep.md** — infer from auth files and env vars; leave threat model blank
 - **BACKLOG.md** — seed from TODO/FIXME comments, README "coming soon" language, recent WIP commits
 

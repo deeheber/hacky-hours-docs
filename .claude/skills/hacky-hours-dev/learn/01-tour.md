@@ -14,7 +14,7 @@ Ask what the person wants to focus on:
 - Data model — what data exists and how it's structured
 - Full walkthrough — everything in a logical order
 
-For projects using two-tier docs (v3.0.0+): start with the summaries. Offer the deep docs only if the person wants to go deeper after the summary lands.
+For projects using two-tier docs (v3.0.0+): use the summaries as onramps — they're the navigation surface designed for non-technical readers. Each summary cross-links into specific deep-dive sections; offer to drill into those when the person wants more depth or asks a question the summary can't answer. The deep dive is the source of truth; the summary is the gentle entry point.
 
 **Phase 2: Walk through**
 

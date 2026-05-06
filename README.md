@@ -144,7 +144,7 @@ After install, **restart Claude Code**, then type `/hacky-hours` in any session.
 └── templates/design/       # two-tier design doc templates (summary + deep)
 ```
 
-**Two-tier design templates (v3.0.0):** Each design doc consists of a short, diagram-led, one-screen `<DOC>-summary.md` (the artifact you sign off on) plus a `<DOC>-deep.md` (full technical expansion for engineers and the AI doing the build). The summary is the source of intent — if the deep doc disagrees, the summary wins. Currently prototyped on `ARCHITECTURE` only; other docs follow in v3.x once the pattern is validated in real sessions.
+**Two-tier design templates (v3.0.0):** Each design doc is built as a deep dive (`<DOC>-deep.md` — the actual blueprint, source of truth, what Step 4 builds from) plus a faithful one-screen summary (`<DOC>-summary.md` — for quick gut-checks and as a navigation onramp into specific deep-dive sections, especially helpful for non-technical readers). The deep dive is built first; the summary is generated from it as a condensation that never adds new information. If they disagree, the summary is regenerated. Currently prototyped on `ARCHITECTURE` only; other docs follow in v3.x once the pattern is validated in real sessions.
 
 ### Upgrading
 
