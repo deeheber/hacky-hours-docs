@@ -22,12 +22,13 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - **Install path:** `~/.claude/commands/hacky-hours.md` → `~/.claude/skills/hacky-hours/` (a directory)
 - **Install script:** now downloads the GitHub repo tarball (instead of a single file), extracts the skill directory tree, transforms SKILL.md frontmatter from dev shape to installed shape, and removes the old v2.x slash command file if present
-- **`tools upgrade` Flow A:** drafts both `<DOC>-summary.md` and `<DOC>-deep.md` for inferred design docs; reads `templates/design/README.md` first to follow the two-tier pattern
+- **`tools upgrade` Flow A:** drafts the deep dive first (`<DOC>-deep.md`) for inferred design docs, then generates the `<DOC>-summary.md` as a faithful condensation; reads `templates/design/README.md` first to confirm the workflow
 - **`tools upgrade` Flow C:** scaffold table adds row for two-tier templates (v3.0.0 introduction)
-- **`review 1` audit:** design-doc scorecard handles both single-tier (legacy) and two-tier docs; flags summary-vs-deep staleness
-- **`review 2` optimize, `review 3` pivot:** updated to handle two-tier docs (summary as source of intent)
-- **`learn 1` tour:** starts with summaries; offers deep docs only on request
-- **`tools walkthrough`:** Step 2 description mentions the two-tier shape
+- **`review 1` audit:** design-doc scorecard handles both single-tier (legacy) and two-tier docs; flags missing deep dives, missing summaries, and summary drift from the deep dive
+- **`review 2` optimize, `review 3` pivot:** updated for the two-tier model (deep dive as source of truth — changes land in the deep dive first, summary regenerates)
+- **`learn 1` tour:** uses summaries as onramps for non-technical readers, with cross-links to drill into specific deep-dive sections on demand
+- **`tools walkthrough`:** Step 2 description correctly describes "deep first, summary derived"
+- **`steps/04-build`:** explicitly directs Claude to read `-deep.md` docs (not summaries) for implementation
 
 ### Backward compatibility
 
