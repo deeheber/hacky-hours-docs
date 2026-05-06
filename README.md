@@ -115,7 +115,7 @@ Work through these steps in order. Each step's `README.md` explains what "done e
 
 > If you're new to Claude Code, start with the [getting started guide](./runbooks/getting-started/README.md) first — this section is for people who already have it installed and running.
 
-Install `/hacky-hours` as a slash command so it works in **any repo you open** — no cloning required. A slash command is a shortcut you type in a Claude Code session (like `/hacky-hours step 1`) that gives Claude a specific workflow to follow.
+Install `/hacky-hours` so it works in **any repo you open** — no cloning required. You type `/hacky-hours [command]` in a Claude Code session (like `/hacky-hours step 1`) and Claude follows the framework's workflow.
 
 **macOS / Linux:**
 ```bash
@@ -127,9 +127,30 @@ curl -fsSL https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/i
 irm https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.ps1 | iex
 ```
 
-Then type `/hacky-hours` in any Claude Code session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`step`, `review`, `learn`, `update`, `tools`, `--root`, and more).
+After install, **restart Claude Code**, then type `/hacky-hours` in any session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`step`, `review`, `learn`, `update`, `tools`, `--root`, and more).
 
-> **Upgrading from v1.x?** Run `/hacky-hours tools upgrade` after installing — it detects what's changed and shows you exactly what it plans to update before touching anything.
+### What gets installed (v3.0.0+)
+
+`hacky-hours` ships as a [Claude Code Skill](https://code.claude.com/docs/en/skills) — a directory at `~/.claude/skills/hacky-hours/` with a small `SKILL.md` entrypoint and per-step / per-review supporting files that Claude loads only when you invoke them. This keeps the per-session prompt small and lets the framework grow without bloating context.
+
+```
+~/.claude/skills/hacky-hours/
+├── SKILL.md                # routing, global values, scaffold
+├── steps/                  # Step 1–5 guidance
+├── reviews/                # review 1–3 (audit / optimize / pivot)
+├── learn/                  # learn 1–3 (tour / onboard / quiz)
+├── update/                 # update 1–2 (release / issues sync)
+├── tools/                  # tools (upgrade / mode / walkthrough)
+└── templates/design/       # two-tier design doc templates (summary + deep)
+```
+
+**Two-tier design templates (v3.0.0):** Each design doc is built as a deep dive (`<DOC>-deep.md` — the actual blueprint, source of truth, what Step 4 builds from) plus a faithful one-screen summary (`<DOC>-summary.md` — for quick gut-checks and as a navigation onramp into specific deep-dive sections, especially helpful for non-technical readers). The deep dive is built first; the summary is generated from it as a condensation that never adds new information. If they disagree, the summary is regenerated. Currently prototyped on `ARCHITECTURE` only; other docs follow in v3.x once the pattern is validated in real sessions.
+
+### Upgrading
+
+> **Upgrading from v2.x to v3.0.0?** Re-run the install script above. The installer downloads the new skill directory tree to `~/.claude/skills/hacky-hours/` and **automatically removes** the old `~/.claude/commands/hacky-hours.md` from your v2.x install, so `/hacky-hours` resolves cleanly to the new skill. **Restart Claude Code** after installing for the new top-level `.claude/skills/` directory to be watched. After restarting, run `/hacky-hours tools upgrade` in your projects to surface the v3.0.0 scaffold gaps (e.g., the option to adopt two-tier design templates).
+>
+> **Upgrading from v1.x?** Same install command. Then run `/hacky-hours tools upgrade` in your projects — it detects what's changed across all the versions you skipped and shows you exactly what it plans to update before touching anything.
 
 ---
 

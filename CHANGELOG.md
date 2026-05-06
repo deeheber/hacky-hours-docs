@@ -7,6 +7,36 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.0.0] — 2026-05-06
+
+**Breaking install path change.** The `hacky-hours` framework now ships as a Claude Code Skill (`SKILL.md` format) instead of a single slash command file. `/hacky-hours` continues to work exactly the same — only the install location changes, from `~/.claude/commands/hacky-hours.md` to `~/.claude/skills/hacky-hours/`. The installer handles the migration automatically (downloads new structure, removes old file).
+
+> **To upgrade:** Re-run the install script from the README. The installer detects and removes the v2.x file. **Restart Claude Code** after install for the new top-level `.claude/skills/` directory to be watched.
+
+### Added
+
+- **SKILL.md skill format** — `hacky-hours` is now a Claude Code Skill with bundled supporting files. SKILL.md is a small entrypoint (~600 lines, down from 1500); per-step / per-review / per-tool guidance lives in `steps/`, `reviews/`, `learn/`, `update/`, `tools/` subdirectories under `${CLAUDE_SKILL_DIR}` and is loaded only when invoked. Pre-approves a narrow set of read-only Bash + Read tools via `allowed-tools` to reduce permission prompts during sessions. See [ADR: Migrate to SKILL.md format](hacky-hours/02-design/decisions/2026-05-06-migrate-to-skill-format.md).
+- **Two-tier design templates** — Each design doc is now a deep dive (`<DOC>-deep.md` — the actual blueprint, source of truth, what Step 4 builds from) plus a one-screen summary (`<DOC>-summary.md` — a faithful condensation for quick gut-checks and as an onramp for non-technical readers). The deep dive is built first; the summary is generated from it and never adds new information. Prototype currently exists for ARCHITECTURE only; DATA_MODEL, USER_JOURNEYS, SECURITY_PRIVACY, etc. follow in a v3.x release once the pattern is validated in real sessions. See `${CLAUDE_SKILL_DIR}/templates/design/README.md` for the pattern.
+
+### Changed
+
+- **Install path:** `~/.claude/commands/hacky-hours.md` → `~/.claude/skills/hacky-hours/` (a directory)
+- **Install script:** now downloads the GitHub repo tarball (instead of a single file), extracts the skill directory tree, transforms SKILL.md frontmatter from dev shape to installed shape, and removes the old v2.x slash command file if present
+- **`tools upgrade` Flow A:** drafts both `<DOC>-summary.md` and `<DOC>-deep.md` for inferred design docs; reads `templates/design/README.md` first to follow the two-tier pattern
+- **`tools upgrade` Flow C:** scaffold table adds row for two-tier templates (v3.0.0 introduction)
+- **`review 1` audit:** design-doc scorecard handles both single-tier (legacy) and two-tier docs; flags summary-vs-deep staleness
+- **`review 2` optimize, `review 3` pivot:** updated to handle two-tier docs (summary as source of intent)
+- **`learn 1` tour:** starts with summaries; offers deep docs only on request
+- **`tools walkthrough`:** Step 2 description mentions the two-tier shape
+
+### Backward compatibility
+
+- Slash command surface (`.claude/commands/`) remains supported by Claude Code; this migration affects only how `hacky-hours` itself ships
+- Existing user projects with single-tier design docs continue to work without modification — `tools upgrade` Flow C will surface the two-tier templates as a v3.0.0 scaffold gap users can opt into
+- Users on v2.x continue working until they re-run the installer
+
+---
+
 ## [2.1.0] — 2026-04-18
 
 `tools upgrade` now detects and fixes stale framework-authored boilerplate in existing `hacky-hours/` docs.

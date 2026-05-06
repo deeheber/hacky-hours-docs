@@ -175,32 +175,36 @@ Two-way sync between BACKLOG.md and GitHub Issues (see [ADR: Two-Way Sync](decis
 
 ## Known Fragility
 
-The slash command prompt (`.claude/commands/hacky-hours-dev.md`) is the most complex component. As of v2.0.0, the prompt has been restructured: five parent command groups replace a flat list of 19 commands, "Level" language replaced with "Step" throughout, and the prompt reduced from ~2,100 to ~1,470 lines. Prompt size should be re-measured after each release.
+The skill entrypoint (`.claude/skills/hacky-hours-dev/SKILL.md`) is the most complex component. As of v3.0.0, the skill is broken into a small entrypoint (~600 lines, down from ~1,500) plus per-step / per-review / per-tool supporting files that load only when invoked. Per-file size should be monitored after each release; if any single supporting file grows past ~500 lines, consider splitting it further.
 
 Remaining fragility:
-- **No gradual rollout** — changes to the command prompt affect every user on next install. There is no canary or staged release mechanism.
-- **Single-file architecture** — all routing, guidance, and workflow logic lives in one markdown file. The v2.0.0 restructure reduced size and improved organization, but the file will grow with future features. Monitor whether a split into per-command files becomes warranted.
-- **Breaking changes on major versions** — v2.0.0 broke all v1.x command entry points. Users must relearn paths after updating. The `tools upgrade` command mitigates this for CLAUDE.md references, but there is no automated migration for user muscle memory.
-- **Cross-tool portability** — the slash command is Claude Code–specific. Other tools (Cursor, Windsurf) get framework behavior through CLAUDE.md project instructions, not the command itself. The two surfaces need to stay in sync.
+- **No gradual rollout** — changes to the skill affect every user on next install. There is no canary or staged release mechanism.
+- **Top-level directory watch on first install** — Claude Code requires a restart for newly created top-level `.claude/skills/` directories to be watched. Users upgrading from v2.x must restart once after their first v3.0.0 install. The installer surfaces this in its final message but it is still a manual step.
+- **Cross-tool portability** — the skill is Claude Code–specific. Other tools (Cursor, Windsurf) get framework behavior through CLAUDE.md project instructions, not the skill itself. The two surfaces need to stay in sync.
+- **Breaking changes on major versions** — v2.0.0 broke all v1.x command entry points; v3.0.0 changes the install path. Users must relearn paths or re-run installers after each major version. The `tools upgrade` command mitigates this for CLAUDE.md references, but there is no automated migration for user muscle memory.
 - **Node.js dependency (v1.8.0)** — static site generation requires Node.js. The conversation-first design means the framework degrades gracefully without it, but this is the first external runtime dependency the framework has introduced. Worth monitoring whether it creates friction.
 
 ## Release Process
 
-The command prompt has two versions:
+As of v3.0.0, the framework ships as a Claude Code Skill (directory tree), not a single slash command file:
 
-| File | Purpose |
+| Path | Purpose |
 |------|---------|
-| `.claude/commands/hacky-hours-dev.md` | Development version, used when working in this repo |
-| `~/.claude/commands/hacky-hours.md` | Installed version, used in any other repo |
+| `.claude/skills/hacky-hours-dev/` | Development version, used when working in this repo |
+| `~/.claude/skills/hacky-hours/` | Installed version, used in any other repo |
+
+Each is a directory containing `SKILL.md` (entrypoint) plus subdirectories: `steps/`, `reviews/`, `learn/`, `update/`, `tools/`, `templates/design/`. SKILL.md routes to supporting files via `${CLAUDE_SKILL_DIR}` so per-step content loads only when invoked.
 
 **How a release works:**
 
-1. All development happens in `hacky-hours-dev.md` (description includes "(dev)")
+1. All development happens in `.claude/skills/hacky-hours-dev/` — the SKILL.md frontmatter description includes "(dev)" and `name: hacky-hours-dev`
 2. When ready to release, bump the version string in two places:
-   - Routing table comment or description
-   - Help message: `Hacky Hours framework assistant — vX.Y.Z`
-3. Commit, tag (`vX.Y.Z`), push, publish GitHub Release
-4. The install script (`install.sh` / `install.ps1`) downloads `hacky-hours-dev.md` from `main`, strips "(dev)" from the description, and saves it as `hacky-hours.md`
+   - SKILL.md frontmatter description
+   - SKILL.md help message: `Hacky Hours framework assistant — vX.Y.Z`
+3. Bump version markers in `tools/upgrade.md` (the `<!-- hacky-hours: vX.Y.Z -->` template and the upgrade-complete report message)
+4. Commit, tag (`vX.Y.Z`), push, publish GitHub Release
+5. Users re-run `install.sh` / `install.ps1`. The installer downloads the repo tarball, extracts `.claude/skills/hacky-hours-dev/`, places it at `~/.claude/skills/hacky-hours/`, transforms the SKILL.md frontmatter (`name: hacky-hours-dev` → `hacky-hours`, strips "(dev)" from description), and removes any stale v2.x `~/.claude/commands/hacky-hours.md`
+6. Users restart Claude Code so the new top-level `.claude/skills/` directory is watched (one-time per machine on first v3.0.0 install)
 
 **What constitutes a version bump:**
 - **Patch (x.y.Z):** Bug fixes, wording improvements, no new arguments

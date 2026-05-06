@@ -1,10 +1,12 @@
-# Install /hacky-hours as a Claude Code Command
+# Install /hacky-hours as a Claude Code Skill
 
 ## What is this?
 
-When you're in a Claude Code session, you can type **slash commands** — shortcuts that start with `/` — to trigger specific workflows. `/hacky-hours` is a slash command that gives Claude the full Hacky Hours framework as context, so it can guide you through ideation, design, roadmap, build, and release cycles in any project.
+When you're in a Claude Code session, you can type `/hacky-hours` to give Claude the full Hacky Hours framework as context, so it can guide you through ideation, design, roadmap, build, and release cycles in any project.
 
-Installing it means you can type `/hacky-hours` in any Claude Code session and it just works — no need to clone this repo or copy files around.
+As of v3.0.0, `hacky-hours` ships as a [Claude Code Skill](https://code.claude.com/docs/en/skills) — a directory under `~/.claude/skills/` with a small entrypoint plus per-step / per-review supporting files that load only when you use them. (Prior versions shipped as a single `.md` file under `~/.claude/commands/`. The installer migrates you automatically.)
+
+Installing means you can type `/hacky-hours` in any Claude Code session and it just works — no need to clone this repo or copy files around.
 
 ---
 
@@ -30,7 +32,7 @@ Open PowerShell and run:
 irm https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.ps1 | iex
 ```
 
-That's it. The script downloads the command file directly from GitHub and places it in `~/.claude/commands/`.
+That's it. The script downloads the skill directory from GitHub and places it at `~/.claude/skills/hacky-hours/`. If you have a v2.x install at `~/.claude/commands/hacky-hours.md`, the script removes it automatically. **Restart Claude Code** after install — the new top-level `.claude/skills/` directory needs to be picked up.
 
 ---
 
@@ -72,7 +74,7 @@ Claude should print the help message listing all available arguments.
 
 ## Updating
 
-Re-run the same install command. It overwrites the existing file with the latest version.
+Re-run the same install command. It downloads the latest version, replaces the existing skill directory, and removes any stale v2.x command file. Restart Claude Code after the install completes.
 
 ```bash
 # macOS/Linux
@@ -85,12 +87,16 @@ curl -fsSL https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/i
 
 ```bash
 # macOS/Linux
-rm ~/.claude/commands/hacky-hours.md
+rm -rf ~/.claude/skills/hacky-hours
+# If a stale v2.x file is still around, also:
+rm -f ~/.claude/commands/hacky-hours.md
 ```
 
 ```powershell
 # Windows PowerShell
-Remove-Item "$env:USERPROFILE\.claude\commands\hacky-hours.md"
+Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\skills\hacky-hours"
+# If a stale v2.x file is still around, also:
+Remove-Item -Force "$env:USERPROFILE\.claude\commands\hacky-hours.md" -ErrorAction SilentlyContinue
 ```
 
 ---
