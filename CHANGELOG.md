@@ -28,6 +28,34 @@ See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
 - **SKILL.md description** — expanded into a rich, model-matchable description so context-driven invocation fires on relevant prompts (and stays silent on tactical one-offs)
 - **Help message** — updated to v4.0.0-dev with v4 verbs prominent and v3 verbs marked as legacy-but-supported
 
+### Added (Slice 2 — default team roster)
+
+- **Default team template** at `templates/team/default/` — full 12-agent roster with:
+  - Maya Tanaka (📊 Product) — user value, scope discipline, roadmap
+  - Felix Okafor (🎨 Design) — user journeys, IA, interaction
+  - Priya Chen (🏗️ Architect) — system design, ADRs, technology selection
+  - Marcus Rivera (🖥️ Frontend) — components, state, perf, progressive enhancement
+  - Sam Park (⚙️ Backend) — APIs, reliability, integration
+  - Alex Davies (🛡️ Security) — threat modeling, secrets, auth, validation
+  - Jordan Kim (🚀 Ops/SRE) — deployment, observability, runbooks, on-call
+  - Emma Wright (🔍 QA) — test strategy, edge cases, regression risk
+  - Lena Mwangi (♿ Accessibility) — WCAG, keyboard, screen reader, contrast
+  - Diego Romano (📜 Licensing) — license compatibility, compliance scope
+  - Yuki Nakamura (📈 Data) — schema, pipelines, retention, analytics
+  - Kai Patel (🤖 AI/ML) — model selection, evals, AI safety
+- **Each agent has 5 files**: profile.md (SSG-renderable frontmatter + bio), system-prompt.md (full role definition with audience adaptation), history.md (compactable resume), feedback.md (durable conductor feedback), preferences.yml (per-agent config)
+- **Team-level files**: README.md (team description), tier.yml (full-tier roster + multiplexing config), VERSION (4.0.0-dev), LICENSE (private by default per item 18), .gitignore
+- **`/hacky-hours team` verb** — full implementation upgraded from Slice 1 stub:
+  - Default Team Bootstrap on first invocation (copies template, stamps dates, `git init` + initial commit)
+  - `team` no-arg: survey + roster view
+  - `team list` — list all teams
+  - `team show <agent-id>` — view agent profile (and `--prompt` for full system prompt)
+  - `team switch <name>` — bind current project to a different team
+  - `team new` — create a new team
+  - `team init` — idempotent default-team creation
+  - `team help` — full help
+- **Team architecture made tangible**: teams are user-owned, separate from any project, applied by binding via project `AGENTS.md`. Each team is its own git repo (local-only default; GitHub-friendly remote optional).
+
 ### Backward compatibility
 
 - All v3 verbs (`step`, `review 1..3`, `learn 1..3`, `update 1..2`, `tools upgrade|mode|walkthrough`) continue to work in v4

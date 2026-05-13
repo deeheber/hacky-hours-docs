@@ -1,0 +1,82 @@
+# Team tier configuration
+#
+# Tier determines roster shape and role multiplexing. The default team is "full" tier —
+# 12 specialists, one per discipline, no multiplexing.
+#
+# Other tiers available via /hacky-hours team new --tier <tier>:
+#   solo      — 1 polymath engineer + product + design (light)
+#   lean      — 1 engineering agent + product + design + security (light) + ops (light)
+#   startup   — 3-4 engineering agents (FE+BE merged, Data+ML merged) + product + design + security + ops + QA
+#   full      — 12 specialists (this team)
+
+tier: full
+
+roles:
+  - id: product
+    agent_id: product
+    hats: [product]
+    required: true
+
+  - id: design
+    agent_id: design
+    hats: [design]
+    required: true
+
+  - id: architect
+    agent_id: architect
+    hats: [architect]
+    required: true
+
+  - id: frontend
+    agent_id: frontend
+    hats: [frontend]
+    required: true
+
+  - id: backend
+    agent_id: backend
+    hats: [backend]
+    required: true
+
+  - id: security
+    agent_id: security
+    hats: [security]
+    required: true
+
+  - id: ops
+    agent_id: ops
+    hats: [ops]
+    required: true
+
+  - id: qa
+    agent_id: qa
+    hats: [qa]
+    required: true
+
+  - id: accessibility
+    agent_id: accessibility
+    hats: [accessibility]
+    required: true
+
+  - id: licensing
+    agent_id: licensing
+    hats: [licensing]
+    required: true
+
+  - id: data
+    agent_id: data
+    hats: [data]
+    required: true
+
+  - id: ai-ml
+    agent_id: ai-ml
+    hats: [ai-ml]
+    required: true
+
+# SMEs (subject-matter experts) are project-scoped by default — see /hacky-hours ideate.
+# To embed a permanent SME on this team (e.g., a healthcare-focused team always has a medical SME),
+# add an entry below with `kind: sme` and `domain: <domain>`.
+permanent_smes: []
+
+# Customer voice (advocates demand-side perspective) is project-scoped by default.
+# Set to true to make customer voice a permanent member of this team.
+permanent_customer_voice: false
