@@ -406,6 +406,201 @@ This is the bet test — if v4 can't audit hacky-hours sensibly, the thesis isn'
 
 ---
 
+---
+
+## Test 6 — Slice 7 verification (improvement loop)
+
+### 6.1 Capture feedback
+
+```
+/hacky-hours feedback tool "audit asked me to confirm fan-out twice when once would have been enough"
+```
+
+**Expected:** Captures to `~/.hacky-hours/feedback/<date>-tool-<slug>.md`. Short acknowledgment, no over-explaining.
+
+```bash
+ls ~/.hacky-hours/feedback/
+cat ~/.hacky-hours/feedback/<date>-tool-*.md
+```
+
+Should show the structured note with frontmatter (kind, target, captured datetime, etc.).
+
+### 6.2 Try the three kinds
+
+```
+/hacky-hours feedback role "Alex over-flagged a Tier 1 finding as P0 when P2 was appropriate"
+/hacky-hours feedback seam "After audit, the P0 findings didn't get queued into BACKLOG.md automatically"
+```
+
+Each should create its own note with appropriate `kind:` frontmatter.
+
+### 6.3 Submit one upstream (opt-in)
+
+```
+/hacky-hours issue --from-recent
+```
+
+**Expected:**
+- Lists recent feedback files, lets you pick one
+- Composes an issue body
+- Shows it for review
+- Four-option permission gate: `yes` / `edit` / `save draft` / `cancel`
+- **Don't submit during QA** unless you want to send real feedback to empathetech. Pick `cancel` or `save draft`.
+
+✅ Pass criteria: feedback captures locally, issue verb gates submission behind explicit yes, no auto-upload.
+
+### 6.4 Meta clustering (requires accumulated feedback)
+
+```
+/hacky-hours meta
+```
+
+**Expected with 3+ feedback items accumulated:** clusters by kind/target, proposes diffs against framework source files, presents each cluster with apply/submit/skip/edit options.
+
+**Expected with too few items:** notice that you need more feedback for meaningful patterns.
+
+✅ Pass criteria: meta reads the feedback corpus and either clusters meaningfully or honestly says it needs more signal.
+
+---
+
+## Test 7 — Slice 8 verification (team update + arbitrate)
+
+### 7.1 Team update with no pending
+
+```
+/hacky-hours team update
+```
+
+**Expected** (if no pending session changes): *"Nothing to promote. Agents are unchanged from the team repo."*
+
+### 7.2 Trigger a pending change (manual)
+
+Since session-pending capture wiring is preliminary in v4.0.0-dev, manually stage a pending change:
+
+```bash
+mkdir -p ~/.hacky-hours/sessions/test-session-001/pending/
+cat > ~/.hacky-hours/sessions/test-session-001/pending/security.md <<'EOF'
+[behavior feedback] Be terser when flagging at Tier 1 — single-line summary plus link to detail, not multi-paragraph explanation.
+
+Captured during a session where Alex's audit output was overly verbose for a personal weekend project.
+EOF
+```
+
+Then:
+```
+/hacky-hours team update
+```
+
+**Expected:** Walks through the staged change for Alex (security), offers accept/edit/reject/defer. Pick accept.
+
+After accept:
+```bash
+cd ~/.hacky-hours/teams/default/ && git log --oneline -3
+```
+
+Should show a new commit `Update 1 agent(s) — <date>` with Alex's feedback applied.
+
+### 7.3 Arbitrate (any mode)
+
+```
+/hacky-hours arbitrate decide "should we use strict CSP from launch or relax it for the MVP"
+```
+
+**Expected:** 
+- Asks which roles are in disagreement (security + FE typically)
+- Each role gives compressed position
+- Side-by-side presentation
+- Asks the conductor to decide
+- Writes an ADR to `hacky-hours/02-design/decisions/<date>-csp-strictness.md`
+
+Try `resolve` and `watch` modes too (warning: `watch` is the most expensive).
+
+✅ Pass criteria: team update commits pending changes; arbitrate produces an ADR regardless of mode chosen.
+
+---
+
+## Test 8 — Slice 9 verification (static team site)
+
+### 8.1 Build the team site
+
+```
+/hacky-hours team site build
+```
+
+(Or just `/hacky-hours team site`.)
+
+**Expected:**
+- Copies `templates/team-site/` into `~/.hacky-hours/teams/default/site/` (first run only)
+- Runs `python3 generate.py`
+- Output: `~/.hacky-hours/teams/default/docs/` with `index.html`, `agents/<id>.html` for each agent, `style.css`
+
+### 8.2 Browse via file://
+
+```bash
+open ~/.hacky-hours/teams/default/docs/index.html
+```
+
+(On Linux: `xdg-open`; or just paste the path into your browser.)
+
+**Expected:** clean team-roster page with all 12 agents as cards (emoji avatar, name, role, tagline). Click any card → navigates to that agent's profile page (background, how-I-work, what-I-produce content rendered as HTML).
+
+### 8.3 Local serve
+
+```
+/hacky-hours team site serve
+```
+
+**Expected:** prints the command to start a local server (`cd ... && python3 -m http.server 8000`). Run that command yourself in a separate terminal, then visit http://localhost:8000.
+
+### 8.4 Publish (don't actually publish during QA)
+
+```
+/hacky-hours team site publish
+```
+
+**Expected:** walks through GitHub Pages setup with a clear privacy gate. Don't proceed unless you want to actually publish — pick "don't publish" or cancel.
+
+✅ Pass criteria: site builds successfully, file:// rendering works (no broken links, no missing CSS), serve command is given correctly, publish guidance is privacy-aware.
+
+---
+
+## Test 9 — Slice 10 verification (export verb)
+
+In `/tmp/v4-adopt-test` (the adopted test project):
+
+### 9.1 Markdown bundle
+
+```
+/hacky-hours export markdown-bundle
+```
+
+**Expected:**
+- Lists docs to include, asks for confirmation
+- Generates `hacky-hours/exports/<date>-bundle.md`
+- Confirmation print with file size, line count
+
+```bash
+head -30 /tmp/v4-adopt-test/hacky-hours/exports/<date>-bundle.md
+```
+
+Should show a clean TOC + each included doc concatenated, with headings demoted appropriately.
+
+### 9.2 Paste-test (optional)
+
+Copy the bundle's content into a Notion page, Obsidian note, or GitHub Discussion. Verify it renders cleanly — headings hierarchy intact, links work, code blocks formatted.
+
+### 9.3 HTML bundle deferral notice
+
+```
+/hacky-hours export html-bundle
+```
+
+**Expected:** honest deferral notice with MkDocs setup recommendation.
+
+✅ Pass criteria: markdown-bundle generates clean concatenated docs, deferral notices are honest about what's missing.
+
+---
+
 ## Cleanup (optional)
 
 If you want to revert after testing:
@@ -445,7 +640,7 @@ File against `empathetech/hacky-hours-docs` with label `v4-qa`, or just leave in
 
 ## Sign-off
 
-When all five test suites pass to your satisfaction, the branch is mergeable. Open the PR (or merge directly if you're comfortable). Suggested merge commit message:
+When all nine test suites pass to your satisfaction, the branch is mergeable. Open the PR (or merge directly if you're comfortable). Suggested merge commit message:
 
 ```
 feat(v4.0.0): orchestra of stakeholder-role agents

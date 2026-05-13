@@ -370,22 +370,131 @@ emoji_in_artifacts: false
 
 Add `hacky-hours/.hacky-hours-denylist.local` to `.gitignore` (create or extend).
 
-## Step 6 — First-impressions design docs (deferred to Slice 4b)
+## Step 6 — First-impressions design docs
 
-For v4.0.0-dev Slice 4 MVP: stop here. The baseline artifacts are sufficient for the project to be "in the orchestra." Per-role first-impressions design docs (ARCHITECTURE.md, SECURITY_PRIVACY.md, etc.) come from running `/hacky-hours design <topic>` on demand or from a Slice 4b commit that automates them.
+For each role with **High** or **Critical** involvement (as confirmed by the conductor in Step 4), have the role produce their first-impressions design doc. These are the team's actual work product from meeting the codebase — not just an assessment, but the durable artifacts that make the project legible.
+
+### Which docs from which roles
+
+| Role | Doc produced (if High/Critical involvement) | Location |
+|------|---------------------------------------------|----------|
+| Product | `01-ideate/PRODUCT_OVERVIEW.md` | hacky-hours/01-ideate/ |
+| Architect | `ARCHITECTURE.md` (two-tier: deep + summary, per v3 template) | hacky-hours/02-design/ |
+| Security | `SECURITY_PRIVACY.md` (two-tier) | hacky-hours/02-design/ |
+| Accessibility | `ACCESSIBILITY.md` (two-tier) | hacky-hours/02-design/ |
+| Backend + Data (co-author) | `DATA_MODEL.md` | hacky-hours/02-design/ |
+| Design | `USER_JOURNEYS.md`, `STYLE_GUIDE.md` (if UI exists) | hacky-hours/02-design/ |
+| QA | `TESTING.md` | hacky-hours/02-design/ |
+| Licensing | `LICENSING.md` | hacky-hours/02-design/ |
+| Ops | runbooks for known failure modes | hacky-hours/runbooks/ |
+| AI/ML | AI/ML section of ARCHITECTURE.md (or dedicated `AI_ML.md`) | hacky-hours/02-design/ |
+| Frontend | FE section of ARCHITECTURE.md | hacky-hours/02-design/ |
+
+Skip roles with **Medium**, **Low**, or **N/A** involvement — those docs come later when the team accumulates enough decisions in the discipline to justify them.
+
+### Per-role generation prompt
+
+For each High/Critical role, spawn or roleplay the agent with this task:
+
+```
+You are <Name> (<Role>). Your system prompt is your context.
+
+Your task: write the first-impressions design doc you own for this project.
+
+Doc to write: <doc name> at <path>
+Project context:
+  - Tier: <N>
+  - Voice mode: <builder | engineer>
+  - Voice template per VOICE.md: <relevant tone for this doc type>
+  - Conductor's brief: <Q1 from orientation>
+  - Existing assessment findings (your section): <quote your findings from the assessment>
+  - Two-tier template guidance: <if applicable, read ${CLAUDE_SKILL_DIR}/templates/design/README.md for the deep + summary pattern>
+
+Write in **team-grade voice**:
+  - Declarative, not exploratory ("This system uses X" — not "We're thinking about X")
+  - Include `owner:` and `last_reviewed:` frontmatter
+  - Cross-reference related docs with relative-path links that work outside hacky-hours folder
+  - Avoid framework jargon ("hacky-hours says...") — write as if a team member wrote this and committed it
+  - Include "what this covers" and "what this doesn't" at the top — be honest about scope
+
+The doc must be standalone-readable. If someone copy-pastes it into a Notion page, it should still make sense.
+
+Cite specific file paths and line numbers where you reference code. Don't make up details — read the codebase as needed (respect the denylist).
+
+Aim for thorough but not exhaustive. The doc should let a new contributor understand this dimension of the project in one sitting.
+```
+
+### Frontmatter template for every first-impressions doc
+
+```yaml
+---
+owner: <agent-id>          # e.g., security-lead-alex
+co_owners: []              # if multiple roles co-author
+last_reviewed: <YYYY-MM-DD>
+status: first-impressions  # → reviewed | living
+tier: <N>
+covers:
+  - <thing 1>
+  - <thing 2>
+does_not_cover:
+  - <out-of-scope item 1>
+related_docs:
+  - <path to related doc>
+---
+```
+
+### Parallelization
+
+If Agent tool is available: spawn first-impressions doc generation in parallel across roles (up to 4 concurrent). Doc generation per role takes longer than the assessment — token budget here is significant.
+
+Otherwise: sequentially, in this order to respect dependencies:
+1. Product (`PRODUCT_OVERVIEW.md` — anchors everything else)
+2. Architect (`ARCHITECTURE.md` — needed by Security, Data, FE, BE, AI/ML)
+3. Then in parallel: Security, A11y, Data/BE, Design, QA, Licensing, Ops, AI/ML, FE
+
+### Budget warning
+
+These docs are expensive. Surface budget before starting:
+
+> *"Generating first-impressions design docs for <count> high-involvement roles. Estimated total: ~<estimate> tokens (your warn threshold: <warn>, hard cap: <hard>). Proceed?"*
+
+Conductor can opt out and run them later on demand: *"defer all design docs → I'll generate them later with /hacky-hours design <topic>"*.
+
+### v3 → v4 migration case
+
+If the project has pre-existing v3 design docs at `hacky-hours/02-design/<DOC>.md`:
+- **Don't overwrite.** Surface them to the conductor: *"You already have an ARCHITECTURE.md from earlier work. Want Priya to: (a) review and augment, (b) rewrite in v4 team-grade voice, (c) leave as-is and skip?"*
+- Default to (c). v3 docs are existing work that may already be good.
+
+### After generation
+
+For each completed doc:
+1. Write it to the target path
+2. Add an entry to AGENTS.md "Owned Artifacts" section if not already there
+3. Note in NARRATIVE.md that the doc was produced
+4. Add a `HANDOFFS.yml` entry from the producing role to `/hacky-hours audit` recommending the doc be included in the next audit's doc-audit lane
+
+## Step 7 — Wrap up
+
+After Step 6 completes:
 
 Print to conductor:
 
-> *"Adoption complete. The team is in. Files created:*
+> *"Adoption complete. The team is in.*
+>
+> *Files created:*
 > *  - `hacky-hours/adoption-assessment-<date>.md` — the team's first-impressions report*
 > *  - `hacky-hours/NARRATIVE.md`, `STATE.md`, `HANDOFFS.yml`, `VOICE.md`*
 > *  - `hacky-hours/.hacky-hours-denylist`, `.hacky-hours-denylist.local`*
 > *  - `AGENTS.md` — team roster index*
-> *  - `CLAUDE.md` — project tier + voice + guardrails (created or merged)*
+> *  - `CLAUDE.md` — project tier + voice + guardrails*
+> *  - <count> first-impressions design docs from high-involvement roles (listed above)*
 >
-> *Next suggested step: `/hacky-hours audit` to get a scorecard on the current state, then triage the P0s from the assessment.*
->
-> *Or browse the team: `/hacky-hours team`.*"
+> *Next suggested steps:*
+> *  - `/hacky-hours audit` for a scorecard + doc-audit lane evaluating the new design docs*
+> *  - Triage the P0s from the assessment*
+> *  - `/hacky-hours team` to browse the roster*
+> *  - `/hacky-hours team update` to promote any feedback you've given the agents during this session*"
 
 ## Notes for the assistant running this
 

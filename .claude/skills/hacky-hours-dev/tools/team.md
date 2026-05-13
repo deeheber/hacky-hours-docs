@@ -12,8 +12,8 @@ Parse the rest of `$ARGUMENTS` after `team`:
 - "switch <team-name>"        → change the active team for the current project (writes to project's AGENTS.md)
 - "new [--tier <tier>]"       → create a new team (interactive; defaults to "full" tier)
 - "init"                      → if `~/.hacky-hours/teams/default/` doesn't exist, create it from the template; otherwise no-op
-- "update"                    → promote pending session customizations into the team repo (see `tools/team-update.md` — deferred slice)
-- "site [serve|build|publish]" → static site for browsing (deferred slice)
+- "update"                    → Read `${CLAUDE_SKILL_DIR}/tools/team-update.md` and follow it (promote session customizations into the team repo)
+- "site" or "site <subcommand>" → Read `${CLAUDE_SKILL_DIR}/tools/team-site.md` and follow it (static site for browsing — serve / build / publish)
 - "help"                      → print the help message below, then stop
 
 ## Step 0 — Ensure global skeleton exists
@@ -142,9 +142,13 @@ Interactive flow to create a new team:
 
 Same as Default Team Bootstrap. Useful for users who want to re-create the default team after deletion.
 
-### `update` / `site` / `update`
+### `update`
 
-Print *"This subcommand is deferred to a later slice in v4.0.0 development."*
+Routed to `${CLAUDE_SKILL_DIR}/tools/team-update.md`. See that file for the full flow — captures pending session changes, presents per-change accept/edit/reject/defer review, commits accepted changes to the team repo.
+
+### `site` (and subcommands `serve`, `build`, `publish`)
+
+Routed to `${CLAUDE_SKILL_DIR}/tools/team-site.md`. See that file for the full flow — generates static HTML site from agent profiles using a Python 3 stdlib-only generator (no npm), supports `serve`, `build`, `publish` (GitHub Pages).
 
 ### `help`
 

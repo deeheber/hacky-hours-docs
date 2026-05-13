@@ -1,7 +1,7 @@
 ---
 name: hacky-hours-dev
 description: Hacky Hours v4.0.0 (dev) — a competence prosthesis for LLM-assisted software development. Engages an orchestra of stakeholder-role AI agents (product, design, architect, frontend, backend, security, ops, QA, accessibility, licensing, Data, AI/ML) calibrated to the user's technical background, producing team-grade artifacts that can graduate to a real team's knowledge base. Use when the user wants to build a new app/tool/site/project, harden or productionize an existing codebase, audit code or documentation, draft architecture diagrams / ERDs / ADRs / design docs / runbooks, ship a release, adopt the framework onto an existing repo, or get team-grade rigor from solo work. Triggers on phrases like "build me an app/tool/site," "I have an idea," "help me design/architect this," "harden this codebase," "audit this," "is this production-grade," "we're shipping," "vibe-coded this and want to ship it," "draft an architecture diagram," "generate an ERD." Does NOT trigger on typo fixes, single-file scripts, "explain this function," or tactical one-off code tasks. When triggered from context, opens with an invitation pattern — never auto-enters the framework.
-argument-hint: [team | adopt | audit | ideate | design | implement | ship | arbitrate | feedback | issue | step | review | learn | update | tools | help]
+argument-hint: [team | team update | team site | adopt | audit | arbitrate | feedback | issue | meta | export | ideate | design | implement | ship | step | review | learn | update | tools | help]
 allowed-tools: Read Bash(git status*) Bash(git log*) Bash(git diff*) Bash(gh issue list*) Bash(gh release*)
 ---
 
@@ -64,6 +64,7 @@ v4.0.0 verbs (new in v4 — orchestra of stakeholder-role agents):
 - "feedback"                            → Read `${CLAUDE_SKILL_DIR}/tools/feedback.md` and follow it (capture session friction locally)
 - "issue"                               → Read `${CLAUDE_SKILL_DIR}/tools/issue.md` and follow it (submit a GitHub issue to empathetech, opt-in)
 - "meta"                                → Read `${CLAUDE_SKILL_DIR}/tools/meta.md` and follow it (cluster local feedback into framework patches)
+- "export <target>"                     → Read `${CLAUDE_SKILL_DIR}/tools/export.md` and follow it (export project docs for graduation — markdown-bundle, html-bundle)
 
 v3 verbs (still supported in v4 for backward compatibility — see migration in `tools/upgrade.md`):
 
@@ -129,12 +130,15 @@ Usage: /hacky-hours [command]
 --- v4 verbs (orchestra of stakeholder roles) ---
   (none)                    Guided session — survey your project and walk you through what's next
   team                      Browse / manage / switch your persistent team of AI agents
+  team update               Promote session feedback into the team repo (agents learn from you)
+  team site [serve|build|publish]   Static team-browser site (Python stdlib generator; GitHub Pages-ready)
   adopt                     Bring an existing codebase into the framework (the only operation on existing code)
   audit                     Three-lane audit (code + docs + cross-ref) with traffic-light scorecard
   arbitrate <mode> <topic>  Resolve disagreement between roles — modes: decide | resolve | watch
   feedback                  Capture session friction (local-only, drives /meta improvements)
   issue                     Submit a GitHub issue to empathetech (opt-in)
   meta                      Cluster local feedback into framework improvement patches
+  export <target>           Export project docs for graduation — markdown-bundle | html-bundle
 
 --- v3 verbs (still supported in v4) ---
   step                      List all steps (ideate, design, roadmap, build, iterate)

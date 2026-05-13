@@ -56,6 +56,50 @@ See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
   - `team help` — full help
 - **Team architecture made tangible**: teams are user-owned, separate from any project, applied by binding via project `AGENTS.md`. Each team is its own git repo (local-only default; GitHub-friendly remote optional).
 
+### Added (Slice 4b — per-role first-impressions design docs in adopt)
+
+- Adopt's Step 6 now produces real design docs from each **High** or **Critical** involvement role, not a placeholder.
+- Each first-impressions doc is written in team-grade voice with frontmatter (`owner`, `last_reviewed`, `status: first-impressions`, `tier`, `covers`, `does_not_cover`, `related_docs`) so docs are standalone-readable and graduation-ready from day one.
+- Two-tier template (per v3.0.0) used for ARCHITECTURE, SECURITY_PRIVACY, ACCESSIBILITY: deep + summary.
+- Per-role doc generation respects denylist + tier calibration + voice mode.
+- Parallel via Agent tool where available; sequential fallback otherwise.
+- v3 → v4 migration case: existing v3 design docs are NOT overwritten — conductor is asked whether to augment, rewrite, or skip each.
+
+### Added (Slice 7 — improvement loop closer)
+
+- **`/hacky-hours feedback`** — capture session friction (tool / seam / role kinds) to `~/.hacky-hours/feedback/<date>-<kind>-<slug>.md`. Structured frontmatter, local-only, never auto-uploaded.
+- **`/hacky-hours issue`** — opt-in submission of a feedback bundle (or fresh-composed content) as a GitHub issue against `empathetech/hacky-hours-docs`. Per-submission permission gate (`yes` / `edit` / `save draft` / `cancel`). Uses `gh` CLI.
+- **`/hacky-hours meta`** — clusters accumulated feedback by kind/target/tags, proposes specific diffs against framework source files (verb files, role system prompts, schemas). Conductor reviews each cluster's proposed patch and chooses apply / submit-as-issue / submit-as-PR / skip / edit. Confidence-rated per cluster. Closes the dogfood improvement loop.
+
+### Added (Slice 8 — team update + arbitration modes)
+
+- **`/hacky-hours team update`** — promotes pending session changes (behavior feedback, prompt edits) into the team repo with per-change accept/edit/reject/defer review. Single git commit on the team repo per session-update; honest multi-session race-condition handling; never silently overwrites.
+- **`/hacky-hours arbitrate <mode> <topic>`** — three named arbitration patterns:
+  - `decide` — cheapest, framework summarizes positions, conductor decides directly
+  - `resolve` — conductor states concerns, framework asks each role to propose against them
+  - `watch` — agents converse with each other while conductor observes, ends on convergence or interrupt
+- Every arbitration produces an ADR at `hacky-hours/02-design/decisions/<date>-<topic>.md` regardless of mode. `watch` mode appends the full transcript.
+
+### Added (Slice 9 — static team site)
+
+- **`/hacky-hours team site [serve|build|publish]`** — pure Python 3 stdlib static site generator (no npm, no Astro, no PyYAML, no Jinja). Reads agent `profile.md` frontmatter + bodies, generates HTML roster grid + per-agent profile pages.
+- Three browse modes:
+  - `serve` — local server (`python3 -m http.server 8000`); user runs the command themselves (no background-spawn risk)
+  - `build` — generates `~/.hacky-hours/teams/<team>/docs/`; works via `file://` (relative URLs, no fetch dependencies)
+  - `publish` — guides through GitHub Pages setup with a clear privacy gate before exposing team data
+- Respects per-field `published` flag in profile.md frontmatter — `false` skips the agent entirely.
+- Optional auto-deploy GitHub Action template for users who push the team repo.
+- Mobile-friendly CSS; emoji avatars; clean readable typography.
+
+### Added (Slice 10 — export verb)
+
+- **`/hacky-hours export <target>`** — exports project docs for graduation into a team's knowledge base.
+- v4.0.0-dev ships:
+  - `markdown-bundle` — single concatenated `.md` with TOC, paste-ready for Notion / Confluence / Obsidian / GDocs. Smart heading-demotion, cross-doc link rewriting, two-tier doc handling.
+  - `html-bundle` — designed; v4.0.0-dev recommends running `markdown-bundle` then any SSG (MkDocs/Hugo/etc.). Native html-bundle in v4.1+.
+- Excludes operational state files (NARRATIVE.md, STATE.md, adoption-assessment) — exports are team-grade artifacts, not internal working state.
+- API-based exporters (notion, gdocs, confluence) designed-but-not-implemented; honest deferral notice.
+
 ### Backward compatibility
 
 - All v3 verbs (`step`, `review 1..3`, `learn 1..3`, `update 1..2`, `tools upgrade|mode|walkthrough`) continue to work in v4
