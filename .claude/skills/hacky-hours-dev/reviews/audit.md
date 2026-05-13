@@ -1,19 +1,215 @@
 # /hacky-hours audit — three-lane audit with traffic-light scorecard
 
-**Status: stub for v4.0.0-dev (Slice 5 — in development on `feat/v4.0.0`).**
+Supersedes v3's `review 1`. Runs three parallel lanes that evaluate the project from different angles, then consolidates into a single scorecarded report.
 
-The v4 audit verb supersedes v3's `review 1`. When complete (Slice 5), it will run three parallel lanes:
+The three lanes:
 
-- **(a) Role-driven codebase audit** — security, a11y, ops, QA, architect read the actual code and flag issues (P0/P1/P2)
-- **(b) Doc audit** — context-free Claude session reads only `hacky-hours/docs/` and answers structured questions about clarity, completeness, would-a-stranger-onboard-from-this
+- **(a) Role-driven codebase audit** — Security, A11y, Ops, QA, Architect read the actual code and flag issues
+- **(b) Doc audit** — a context-free Claude session reads only `hacky-hours/docs/` (or the project's design docs if there's no `docs/` folder yet) and answers structured questions about whether a stranger could onboard from the docs
 - **(c) Cross-reference integrity** — broken links, stale paths, contradictions between docs
 
-Output: consolidated report at `hacky-hours/audits/<date>.md` with a **scorecard** at the top — points + traffic lights (🟢/🟡/🔴 per dimension), at-a-glance section, then detailed findings.
+Output: `hacky-hours/audits/<YYYY-MM-DD>.md` with a scorecard at the top (traffic lights + numerical aggregate), at-a-glance section, and detailed findings.
 
-Until Slice 5 lands, tell the user:
+---
 
-> *"The v4 audit verb is in active development — landing as Slice 5 of the v4.0.0 work.*
+## Step 0 — Pre-flight
+
+1. **Project is adopted:** if no `hacky-hours/NARRATIVE.md` exists, this project hasn't been adopted into v4 yet. Print *"Audit assumes the project has been adopted. Run `/hacky-hours adopt` first, or use v3 `review 1` if you want the older single-lane audit."*
+2. **Active team:** read `AGENTS.md` for team binding; default if absent.
+3. **Settings & tier:** read `CLAUDE.md` for tier and voice; respect them in calibration.
+
+## Step 1 — Three-lane fan-out
+
+Run the three lanes in parallel where possible (Agent tool); sequentially otherwise.
+
+### Lane A — Role-driven codebase audit
+
+For each of these roles, spawn or roleplay the agent reading the codebase:
+
+- **Security (Alex)** — secrets, auth, input validation, dependency vulns, threat model coverage
+- **Accessibility (Lena)** — WCAG conformance, semantic HTML, keyboard nav, contrast, screen reader correctness
+- **Ops (Jordan)** — observability, runbook coverage, deploy automation, rollback story
+- **QA (Emma)** — test coverage on critical paths, regression risk, integration test presence
+- **Architect (Priya)** — accidental complexity, dependency hygiene, missing observability hooks, brittle integrations
+
+Each role uses this task prompt:
+
+```
+You are <Name> (the <Role>). Your system prompt is your full context.
+
+Your task: audit this codebase from your discipline's lens. Calibrate to tier <N>.
+
+Produce findings in this exact format:
+
+### <Role> findings
+
+**Dimension scores:**
+- <dimension 1>: 🟢 | 🟡 | 🔴 (numeric: 0-10) — <one-line summary>
+- <dimension 2>: ...
+- ...
+
+**Findings:**
+- **P0:** <Specific finding with file:line ref> — <impact>
+- **P1:** <...>
+- **P2:** <...>
+
+**What I deliberately didn't flag at this tier:**
+- <Something you'd flag at a higher tier but isn't worth surfacing here>
+
+Calibrate honestly. Don't pad. If you have no findings, say so plainly.
+```
+
+### Lane B — Doc audit (context-free Claude)
+
+Spawn an Agent subagent with **no project context** — fresh slate. Give it ONLY the contents of the docs folder (`hacky-hours/docs/` if present; else `hacky-hours/02-design/` + `hacky-hours/01-ideate/` + key root docs like `README.md`).
+
+Task prompt for the doc-audit subagent:
+
+```
+You are a senior engineer joining a project for the first time. You have NO prior context. You are reading these docs to onboard.
+
+Read every doc in the input bundle. Answer these questions honestly:
+
+1. **Onboarding signal:** Could you onboard from this? Give a traffic-light score (🟢 ready / 🟡 mostly / 🔴 not really) and explain in 2-3 sentences.
+2. **Comprehension gaps:** What's missing or confusing? List the 3 biggest gaps a new contributor would hit.
+3. **Voice & tone consistency:** Do the docs read like they were authored by a coherent team? Score 🟢/🟡/🔴 + one-sentence diagnosis.
+4. **Cross-reference clarity:** Do the docs reference each other usefully, or do you feel orphaned reading any of them? Score + diagnosis.
+5. **Decision visibility:** Can you see *why* this project made its key choices? (E.g., are ADRs present and readable? Are non-obvious trade-offs explained?) Score + diagnosis.
+6. **First fix to onboarding friction:** If you could change ONE thing about these docs to make onboarding smoother, what would it be?
+
+Be direct. The team wants honest signal, not validation.
+```
+
+The subagent's response becomes the doc-audit section.
+
+### Lane C — Cross-reference integrity
+
+Spawn or roleplay a brief framework-internal check:
+- Find all internal links in markdown files (`[text](relative/path.md)`, `[link](#anchor)`, etc.)
+- Verify each target exists
+- Find file path references in design docs and verify they match actual file paths
+- Find contradictions between docs (e.g., README says Python 3.11, but `pyproject.toml` says Python 3.10) — heuristic check
+
+Output:
+
+```
+### Cross-reference integrity
+
+**Broken links:** <count>
+- <list>
+
+**Stale paths:** <count>
+- <list>
+
+**Contradictions:** <count>
+- <list with file refs>
+
+Overall: 🟢 / 🟡 / 🔴
+```
+
+## Step 2 — Consolidate into audit report
+
+Write to `hacky-hours/audits/<YYYY-MM-DD>.md`:
+
+```markdown
+# Audit — <project name> — <date>
+
+**Tier:** <N>  ·  **Team:** <team-name>  ·  **Framework:** v4.0.0-dev
+
+---
+
+## Scorecard
+
+| Dimension | Current | Target (Tier <N>) | Δ |
+|-----------|---------|--------------------|---|
+| Security | 🟢/🟡/🔴 (X/10) | 🟢 (10/10) | <delta> |
+| Accessibility | ... | ... | ... |
+| Ops readiness | ... | ... | ... |
+| Test coverage | ... | ... | ... |
+| Architecture | ... | ... | ... |
+| Documentation (stranger-test) | ... | ... | ... |
+| Cross-reference integrity | ... | ... | ... |
+| **Aggregate** | **🟢/🟡/🔴 (X/10)** | **🟢 (10/10)** | **<delta>** |
+
+**At-a-glance:**
+- <count> P0 findings (must fix before next ship)
+- <count> P1 findings (should fix before next milestone)
+- <count> P2 findings (improve over time)
+
+Aggregate computed as the mean of dimension scores. Delta is current minus target.
+
+---
+
+## Findings by lane
+
+### Lane A — Role audits
+
+<concatenate Security / A11y / Ops / QA / Architect sections from fan-out>
+
+### Lane B — Doc audit (context-free reader)
+
+<doc audit subagent response, verbatim>
+
+### Lane C — Cross-reference integrity
+
+<from Lane C output>
+
+---
+
+## Recommended actions
+
+**Before next ship (address all P0):**
+- <list>
+
+**Before next milestone (address P1):**
+- <list>
+
+**Improve over time (P2):**
+- <list>
+
+**Audit→CLAUDE.md threading:** Every P0 finding should produce a corresponding guardrail + enforcement mechanism in CLAUDE.md. Recommended additions:
+
+| New guardrail | Owning role | Suggested enforcement |
+|---------------|-------------|----------------------|
+| <derived from P0> | <role> | <hook/CI/script suggestion> |
+
+After this audit, run `/hacky-hours team update` to absorb durable findings into agent feedback files, and add the guardrails above to CLAUDE.md (the team will pair each with an enforcement mechanism — or honestly note "manual review only" where no automation exists yet).
+```
+
+## Step 3 — Update state
+
+After writing the audit report:
+
+1. Update `hacky-hours/NARRATIVE.md` — replace its trailing sentence with a fresh one: *"Last action: audit complete on <date>; <P0 count> P0s, <P1 count> P1s. Next likely action: address P0s before shipping."*
+2. Update `hacky-hours/STATE.md` `last_action` and `pending_actions`.
+3. Add a handoff in `hacky-hours/HANDOFFS.yml`:
+   ```yaml
+   - from: audit
+     to: implement
+     reason: "<count> P0 findings staged. Recommend fix-first iteration before further feature work."
+     created: <date>
+     expires: +7d
+   ```
+4. Optionally add P0 items to `hacky-hours/04-build/BACKLOG.md` (ask the conductor first — *"Want me to queue the P0s into BACKLOG.md?"*).
+
+## Step 4 — Print summary
+
+Print to the conductor:
+
+> *"Audit complete. Aggregate score: <traffic light> (<X>/10), <delta> from Tier <N> target.*
+> *  - <P0 count> P0 findings — must fix before next ship*
+> *  - <P1 count> P1 findings*
+> *  - <P2 count> P2 findings*
+> *  - Doc audit (stranger-test) verdict: <traffic light>*
 >
-> *For now, you can run `/hacky-hours review 1` (v3 audit, still supported in v4) which provides a single-lane audit. The v4 audit adds the doc-audit lane (fresh-context Claude evaluates if your docs survive contact with someone unfamiliar) and the traffic-light scorecard."*
+> *Full report: `hacky-hours/audits/<date>.md`*
+>
+> *Suggested next step: review the P0s, then `/hacky-hours implement` to start fixing them, or `/hacky-hours arbitrate` if any findings sit at a cross-role conflict point.*"
 
-See `hacky-hours/02-design/V4_DESIGN.md` §4.1 for the full audit design.
+## Notes for the assistant running this
+
+- **Parallelism via Agent tool** is the high-fidelity path. Sequential roleplay is the fallback.
+- **Tier calibration is mandatory.** A 🔴 on observability at Tier 1 is wrong if a managed-host log file is sufficient for a personal tool. Re-read tier guide before scoring.
+- **Cost awareness:** all-lane fan-out is the most token-expensive verb in v4. Surface a budget bar before starting.
+- **Scorecard math:** dimension scores 0-10. 🟢 = 8-10, 🟡 = 4-7, 🔴 = 0-3. Aggregate = mean. Numbers are diagnostic, not gospel — the prose findings matter more.
+- **Doc audit lane (b) is the "stranger test" from the design conversation, now named honestly as an audit lane.** This is the built-in graduation test — if a context-free Claude session can onboard from the docs, the graduation property is working.
