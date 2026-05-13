@@ -7,6 +7,36 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — feat/v4.0.0
+
+**v4.0.0 in active development.** Reframes hacky-hours as a *competence prosthesis* — an orchestra of stakeholder-role AI agents (product, design, architect, FE, BE, security, ops, QA, a11y, licensing, Data, AI/ML) so one person can build software at team-grade and graduate the work to a real team. Replaces v3's "documentation framework for LLM-assisted app development" framing.
+
+See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
+
+### Added (Slice 1 — v4 foundation)
+
+- **v4 identity in SKILL.md** — framework is now the "conductor's podium" for an orchestra of stakeholder-role agents; matches the v4 thesis
+- **Reversed model invocation** — `disable-model-invocation: true` removed. Framework can now be invited from context (natural-language prompts like "build me an app", "harden this codebase", "audit this"). Always opens with an invitation pattern — never auto-enters.
+- **v4 routing** — new verbs added to SKILL.md: `team`, `adopt`, `audit`, `arbitrate`, `feedback`, `issue`, `meta`. v3 verbs (`step`, `review`, `learn`, `update`, `tools`) remain supported for backward compatibility.
+- **v4 first-run flow** — `tools/v4-first-run.md` creates the global user-level skeleton at `~/.hacky-hours/` (version, settings.yml, teams/, feedback/, sessions/, versions/) on first invocation. Seeds the audience profile with one short question.
+- **`~/.hacky-hours/settings.yml` schema** — user-level preferences: session budgets, default model + per-role overrides, voice baseline, audience profile (technical background + per-role fluency), privacy toggles.
+- **Routing stubs** for v4 verbs not yet implemented in Slice 1 — each stub honestly reports its slice status and points to the v3 fallback where applicable.
+- **V4_DESIGN.md** — 503-line design document at `hacky-hours/02-design/V4_DESIGN.md` capturing the thesis, architectural foundations, all 19 locked design decisions, role roster, operations & state files, update flow, deferral list, kickoff order, and risks held consciously.
+
+### Changed
+
+- **SKILL.md description** — expanded into a rich, model-matchable description so context-driven invocation fires on relevant prompts (and stays silent on tactical one-offs)
+- **Help message** — updated to v4.0.0-dev with v4 verbs prominent and v3 verbs marked as legacy-but-supported
+
+### Backward compatibility
+
+- All v3 verbs (`step`, `review 1..3`, `learn 1..3`, `update 1..2`, `tools upgrade|mode|walkthrough`) continue to work in v4
+- Existing v3 projects function without modification
+- Migration story for v3 → v4 will land in `tools/upgrade.md` updates as subsequent slices complete
+- `disable-model-invocation` removal is a behavioral change but not a breaking install — v3 projects that never relied on context-driven invocation are unaffected
+
+---
+
 ## [3.0.0] — 2026-05-06
 
 **Breaking install path change.** The `hacky-hours` framework now ships as a Claude Code Skill (`SKILL.md` format) instead of a single slash command file. `/hacky-hours` continues to work exactly the same — only the install location changes, from `~/.claude/commands/hacky-hours.md` to `~/.claude/skills/hacky-hours/`. The installer handles the migration automatically (downloads new structure, removes old file).
