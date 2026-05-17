@@ -57,7 +57,7 @@ Improvements to v4 come from running v4 on real work (including on the framework
 
 ---
 
-## 4. The 19 Locked Decisions
+## 4. The 20 Locked Decisions
 
 ### 4.1 Audit verb full spec
 `/hacky-hours audit` runs three parallel lanes:
@@ -329,6 +329,61 @@ To change this license (e.g., to open-source this team), edit this file.
 - `/hacky-hours export <target>` — v4.0.0 ships Google Docs + static site
 - `/hacky-hours meta` — cluster feedback → framework patches
 - `/hacky-hours arbitrate <mode> <topic>` — three arbitration modes
+- `/hacky-hours team chat <off | minimal | full>` — set closed-captioned multi-agent dialogue mode (see §4.20)
+
+### 4.20 Team chat — tiered closed-captioned multi-agent dialogue
+
+The orchestra metaphor is the thesis of v4. Without visible team presence, the framework reads as a smarter single-narrator assistant. Chat mode makes the orchestra audible — tiered so the user can choose how much of it to hear at what cost.
+
+**Command:** `/hacky-hours team chat <off | minimal | full>` (default: `minimal`).
+
+**The three modes:**
+
+| Mode | What surfaces |
+|------|---------------|
+| `off` | Single narrator. The assistant speaks for the team. Current pre-v4 behavior. |
+| `minimal` | Speaker attribution at **meaningful moments only**: a role introducing a concern not yet on the table, two roles disagreeing on a recommendation, control handing off between roles. One header per moment; content flows from there. No empty acknowledgments. |
+| `full` | Closed-captioned multi-agent dialogue. Per-role fan-out, side chatter visible, mid-stride observations, hand-off conversations rendered as turns. Distinct voices in each agent's `profile.md` baseline. |
+
+**On cost:** `minimal` and `full` cost meaningfully more tokens than `off` — `full` substantially more, because per-role fan-out genuinely happens. The framework deliberately does **not** print upfront cost estimates. Honest reasons: we don't have per-verb calibration data yet, Anthropic doesn't publish a tier → token-envelope mapping precisely, and skills running inside Claude Code have no API access to the user's current `/usage`. Any preflight number would be folklore. The existing `session_budget_warn` from §4.3 still applies — it fires on **actual** consumption, no estimation needed. A future slice (v4.1+) may calibrate per-verb baselines from accumulated session data and revisit upfront surfacing.
+
+**Format (`minimal` and `full`):** canonical role emoji (from §5 roster) + bold `Name (Role) [HH:MM]` header, content on the next line.
+
+```
+🛡️ **Sam (Security) [14:32]**
+PII colocated with auth state in the user table. Workable, but the blast radius
+if leaked is larger than it needs to be.
+
+🏗️ **Alex (Architect) [14:33]**
+What's the alternative cost? Splitting means a join on every auth check.
+
+🛡️ **Sam (Security) [14:34]**
+Sensitive data behind an encryption layer. Auth doesn't need it — only profile
+reads do. Join cost lands on profile, not the hot path.
+
+🏗️ **Alex (Architect) [14:34]**
+Fair. Redrawing the data model.
+```
+
+**The hard rule — no tokens for tokens' sake.** *Every voice turn must add information the conductor needs* — a reasoning step, a tradeoff, a concern, a hand-off, a mid-stride observation. Forbidden:
+- Empty acknowledgments ("Got it." "Sounds good.")
+- Filler agreement without addition ("I agree with Maya." with nothing after)
+- Manufactured disagreement that doesn't reflect actual per-role reasoning
+- Restating what another role just said in different words
+
+This rule applies to all modes. In `full` mode it's load-bearing — the cost premium buys depth, not theater. If a role has nothing substantive to add at a moment, they don't speak.
+
+**Real dialogue, not theater.** Speaking turns reflect *actual* per-role reasoning fan-out, not a single voice dressing up its output in name tags. When chat mode is `minimal` or `full`, the verb's role fan-out must genuinely happen and the captured per-role reasoning is what gets rendered. Voices should be recognizable from tone alone (Alex's terse architectural framing vs Maya's product-discovery questioning vs Sam's risk-first lens) before reading the speaker tag.
+
+**Cadence:** semi-regular at meaningful moments — entering a step, surfacing a tradeoff, mid-stride observation worth seeing, hand-off to another role, finishing a piece. Not every sentence.
+
+**Persistence:** the mode lives in `~/.hacky-hours/settings.yml` as `team_chat: off | minimal | full`. Persists across sessions. Per-session override via `/hacky-hours team chat <mode>`; never silently changed.
+
+**Verb compatibility:** chat mode applies to verbs that fan out to multiple roles (`ideate`, `design`, `audit`, `adopt`, `arbitrate`, `implement`, `ship`). Single-role verbs (`feedback`, `issue`, `team`, `meta`) are unaffected — they run as before regardless of mode.
+
+**Default-minimal rationale.** The thesis of v4 is "working with a team," not "working with a smarter assistant who can be configured to act like a team." Default-`off` would hide the headline change of the major version behind a flag most users won't find. Default-`full` would surprise users with the largest cost premium on first run. `minimal` is the middle path: the team is audibly present at meaningful moments, the cost premium is the smallest of the visible modes, and the user can dial up to `full` or down to `off` per session as needed.
+
+**v4.0.0 deliverable.** This is part of the v4.0.0 release, not a follow-on. Shipping v4 without it underdelivers on the orchestra thesis.
 
 ---
 
