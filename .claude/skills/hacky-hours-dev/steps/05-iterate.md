@@ -6,6 +6,8 @@
 
 **Purpose:** Capture bugs, ideas, and improvements after a release, amend the docs that need updating, and queue the work.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
 **Phase 1: Capture**
 
 Before asking the user anything, check `ROOT_PATH/feedback/` for any feedback files (`feedback-<username>-<timestamp>.md`). If files exist, read and summarize them. Tell the user: "I found N feedback file(s) from recent learn sessions. Here's what they say: [summary]."

@@ -100,12 +100,28 @@ See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
 - Excludes operational state files (NARRATIVE.md, STATE.md, adoption-assessment) — exports are team-grade artifacts, not internal working state.
 - API-based exporters (notion, gdocs, confluence) designed-but-not-implemented; honest deferral notice.
 
+### Added (Slice 11 — team chat, tiered closed-captioned multi-agent dialogue)
+
+Closes the v4 thesis gap pilot surfaced: orchestra was loaded as context but invisible during flow.
+
+- **`/hacky-hours team chat <off | minimal | full>`** — toggle team visibility for multi-role verbs. Default `minimal`.
+  - `off` — single narrator, pre-v4 behavior
+  - `minimal` — speaker attribution at meaningful moments only (concern introduction, disagreement, hand-off)
+  - `full` — closed-captioned dialogue with real per-role fan-out, side chatter, voice fidelity
+- **`references/chat-format.md`** — canonical render contract: emoji glyphs (from V4_DESIGN.md §5), `**Name (Role) [HH:MM]**` header, per-mode rules, voice baselines table.
+- **The hard rule** — "no tokens for tokens' sake" enforced across all modes. Every turn must add information; filler agreement, empty acknowledgments, manufactured disagreement, and restated points forbidden. Documented in `references/chat-format.md`.
+- **`team_chat` setting** added to `~/.hacky-hours/settings.yml` (added by `v4-first-run.md` for new installs; existing users get a one-line append on first use).
+- **Verb guidance updated** to honor `team_chat` mode: steps 1–5, `reviews/audit`, `tools/adopt`, `tools/arbitrate`. Each verb reads the mode and `chat-format.md` at entry.
+- **Cost surfacing explicitly deferred to v4.1+** — no per-verb calibration data, no published tier → token-envelope mapping, no skill-level access to `/usage`. Switching to `full` prints a one-line caveat without numbers; existing `session_budget_warn` (§4.3) fires on actual consumption.
+- Design source: V4_DESIGN.md §4.20.
+
 ### Backward compatibility
 
 - All v3 verbs (`step`, `review 1..3`, `learn 1..3`, `update 1..2`, `tools upgrade|mode|walkthrough`) continue to work in v4
 - Existing v3 projects function without modification
 - Migration story for v3 → v4 will land in `tools/upgrade.md` updates as subsequent slices complete
 - `disable-model-invocation` removal is a behavioral change but not a breaking install — v3 projects that never relied on context-driven invocation are unaffected
+- **Slice 11 (team chat):** existing `~/.hacky-hours/settings.yml` files without `team_chat:` are treated as `team_chat: minimal` until the user sets it explicitly. No breaking change to first-time invocation.
 
 ---
 

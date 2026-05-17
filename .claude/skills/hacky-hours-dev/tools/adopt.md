@@ -4,6 +4,8 @@ This is the **only operation on existing code** in v4. There is no separate "pro
 
 When this verb runs, the active team meets the codebase. Each role reads the relevant parts, roleplays its assessed level of involvement, and contributes a section to a consolidated adoption assessment. The conductor reviews, confirms, and the framework generates the v4 baseline artifacts (CLAUDE.md, AGENTS.md, NARRATIVE.md, STATE.md, HANDOFFS.yml, VOICE.md, plus first-impressions design docs from high-involvement roles).
 
+**Team chat mode:** Adopt is the *meet the team* moment — chat mode is especially valuable here. Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
 ---
 
 ## Step 0 — Pre-flight

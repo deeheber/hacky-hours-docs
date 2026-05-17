@@ -2,6 +2,8 @@
 
 When roles disagree on a project, the conductor arbitrates. This verb gives the conductor three named patterns to do that, calibrated to how much depth they want and how much budget they're willing to spend.
 
+**Team chat mode:** Arbitration is inherently multi-voice — chat mode is the natural rendering. Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. Even with `team_chat: off`, position summaries should be clearly attributed to roles — that's the verb's whole point. **No tokens for tokens' sake** — every voice turn must add information.
+
 ## Three modes
 
 - **`decide`** (cheapest) — framework summarizes positions concisely; conductor decides directly. No further agent dialogue.

@@ -6,6 +6,8 @@
 
 **Purpose:** Sequence what to build and prioritize ruthlessly.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
 List every feature mentioned across the Step 2 documents. Then categorize each:
 
 - **MVP** — the smallest version that proves the core value proposition. Push back hard. "Can the product prove its value without this?" If yes, it's not MVP.

@@ -6,6 +6,8 @@
 
 **Purpose:** Define how the product works in enough detail to build it.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
 Start by asking which documents this project actually needs:
 
 | Document | Use when... |

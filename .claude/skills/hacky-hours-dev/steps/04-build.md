@@ -6,6 +6,8 @@
 
 **Purpose:** Implement incrementally, with review at each step, aligned to design decisions.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
 Before starting any task:
 1. **Read the deep-dive design docs (`<DOC>-deep.md`), not the summaries.** The deep dive is the source of truth and contains the Implementation Notes section that drives the build. Summaries are derivative — for human gut-checks only — and intentionally omit build-phase detail.
 2. If a project still has single-tier design docs (e.g., `ARCHITECTURE.md` without the `-deep` / `-summary` split), read those. The two-tier pattern is opt-in for projects upgrading from earlier versions.

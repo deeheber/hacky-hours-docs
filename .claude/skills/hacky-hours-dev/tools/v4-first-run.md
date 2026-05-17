@@ -62,6 +62,13 @@ role_models:
 # Voice baseline — overridden per project via VOICE.md
 voice_default: builder    # builder (plain language) | engineer (technical)
 
+# Team chat — how visible the orchestra is during multi-role verbs
+# See references/chat-format.md and V4_DESIGN.md §4.20
+team_chat: minimal        # off | minimal | full
+# off     — single narrator, no team voices (cheapest)
+# minimal — speaker attribution at meaningful moments only (default)
+# full    — closed-captioned multi-agent dialogue (substantially more tokens)
+
 # Audience modeling — informs how every role adapts its communication to you
 profile:
   technical_background: unspecified    # non_engineer | engineer | mixed | unspecified

@@ -601,6 +601,94 @@ Copy the bundle's content into a Notion page, Obsidian note, or GitHub Discussio
 
 ---
 
+## Test 10 — Slice 11 verification (team chat, tiered)
+
+The orchestra goes from invisible to audible. Verify each tier behaves correctly, the toggle command works, the "no filler" rule holds, and `off` truly restores pre-v4 behavior.
+
+### 10.1 Inspect the setting
+
+```bash
+grep team_chat ~/.hacky-hours/settings.yml
+```
+
+**Expected:** a `team_chat:` line with value `off`, `minimal`, or `full`. If absent, the first-run template should have added it — note as a regression if missing for a fresh install.
+
+### 10.2 Read current mode (no argument)
+
+```
+/hacky-hours team chat
+```
+
+**Expected:** prints current mode + the three options + how to switch. No file writes.
+
+### 10.3 Switch to `off`
+
+```
+/hacky-hours team chat off
+```
+
+**Expected:** confirmation line; `~/.hacky-hours/settings.yml` updated in place (other fields and comments preserved); no other output.
+
+### 10.4 Run a multi-role verb with `team_chat: off`
+
+```
+/hacky-hours audit
+```
+
+(Or any multi-role verb on an adopted project.) **Expected:** output reads as a single narrator — no `**Name (Role) [HH:MM]**` headers, no per-role emoji glyphs introducing turns. Matches pre-v4 (Slice 5) audit rendering.
+
+### 10.5 Switch to `minimal`
+
+```
+/hacky-hours team chat minimal
+```
+
+**Expected:** confirmation; settings updated.
+
+### 10.6 Run a multi-role verb with `team_chat: minimal`
+
+```
+/hacky-hours audit
+```
+
+**Expected:** speaker attribution appears at meaningful moments only — when a role introduces a concern, when roles disagree, when control hands off. One header per moment, content flows. No turn-by-turn back-and-forth.
+
+✅ Pass criteria: visibly more team presence than `off`, visibly less verbose than `full`. Each attributed moment adds real information.
+
+### 10.7 Switch to `full`
+
+```
+/hacky-hours team chat full
+```
+
+**Expected:** confirmation **plus** a one-line cost caveat: "Heads up: full mode runs real per-role fan-out and costs meaningfully more tokens..." (no numeric estimate — Slice 11 explicitly defers calibration to v4.1+).
+
+### 10.8 Run a multi-role verb with `team_chat: full`
+
+```
+/hacky-hours audit
+```
+
+**Expected:** closed-captioned multi-agent dialogue. Each role surfaces in its own voice with the canonical emoji glyph (📊 Product, 🎨 Design, 🏗️ Architect, 🛡️ Security, etc. — see V4_DESIGN.md §5). Hand-offs render as turns. Side chatter visible.
+
+### 10.9 The no-filler audit
+
+Re-read the `full`-mode output from 10.8. **Manually verify** no turn:
+- Says only "Got it." / "Sounds good." / "Makes sense."
+- Agrees without adding ("I agree with X." with nothing after)
+- Restates another role's point in different words
+- Manufactures disagreement that doesn't reflect actual reasoning
+
+Any of the above is a Slice 11 regression — the "no tokens for tokens' sake" rule is load-bearing.
+
+### 10.10 Voice distinctness
+
+In the same `full`-mode output, can you tell which role is speaking from the *tone* alone, before reading the speaker tag? If voices feel uniform, the agents aren't using their `profile.md` baselines — flag as a regression.
+
+✅ Pass criteria: three modes behave distinctly; `off` restores pre-v4 behavior verbatim; switching to `full` warns about cost without quoting numbers; the no-filler rule holds; voices are distinguishable.
+
+---
+
 ## Cleanup (optional)
 
 If you want to revert after testing:

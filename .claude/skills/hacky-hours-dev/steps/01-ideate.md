@@ -6,6 +6,8 @@
 
 **Purpose:** Get ideas out of the user's head and into structured form.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
 **IDEATION.md** is a free-writing space. No rules — just capture everything. Prompt the user with:
 - "Who is the first person you'd want to use this, and what would they do with it?"
 - "What problem have you personally experienced that this solves?"

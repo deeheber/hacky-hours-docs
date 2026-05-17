@@ -14,6 +14,7 @@ Parse the rest of `$ARGUMENTS` after `team`:
 - "init"                      → if `~/.hacky-hours/teams/default/` doesn't exist, create it from the template; otherwise no-op
 - "update"                    → Read `${CLAUDE_SKILL_DIR}/tools/team-update.md` and follow it (promote session customizations into the team repo)
 - "site" or "site <subcommand>" → Read `${CLAUDE_SKILL_DIR}/tools/team-site.md` and follow it (static site for browsing — serve / build / publish)
+- "chat" or "chat <mode>"     → run the **Chat Mode** handler below (set or report `team_chat` in `~/.hacky-hours/settings.yml`)
 - "help"                      → print the help message below, then stop
 
 ## Step 0 — Ensure global skeleton exists
@@ -150,6 +151,51 @@ Routed to `${CLAUDE_SKILL_DIR}/tools/team-update.md`. See that file for the full
 
 Routed to `${CLAUDE_SKILL_DIR}/tools/team-site.md`. See that file for the full flow — generates static HTML site from agent profiles using a Python 3 stdlib-only generator (no npm), supports `serve`, `build`, `publish` (GitHub Pages).
 
+### `chat` and `chat <mode>`
+
+Controls how visible the team is during multi-role verbs. Mode lives in `~/.hacky-hours/settings.yml` as `team_chat`. See `${CLAUDE_SKILL_DIR}/references/chat-format.md` for the full render contract and `hacky-hours/02-design/V4_DESIGN.md` §4.20 for the design.
+
+**No mode argument** (`/hacky-hours team chat`):
+
+Read the current value from `~/.hacky-hours/settings.yml` and print:
+
+```
+Team chat: <current-mode>
+
+Modes:
+  off      — single narrator, no team voices (cheapest)
+  minimal  — speaker attribution at meaningful moments only
+  full     — closed-captioned multi-agent dialogue (substantially more tokens)
+
+Switch with:  /hacky-hours team chat <mode>
+```
+
+**With a mode argument** (`/hacky-hours team chat off|minimal|full`):
+
+1. Validate the value is one of `off`, `minimal`, `full`. If not, print the valid options and stop.
+2. Read `~/.hacky-hours/settings.yml`. If a `team_chat:` line exists, update it in place. If not, append the team_chat block:
+   ```
+   # Team chat — how visible the orchestra is during multi-role verbs
+   # See references/chat-format.md and V4_DESIGN.md §4.20
+   team_chat: <mode>
+   ```
+3. Confirm:
+
+   For `off`:
+   > *"Team chat is now `off`. Single-narrator output — the assistant speaks for the team."*
+
+   For `minimal`:
+   > *"Team chat is now `minimal`. Roles will surface at meaningful moments — concerns, disagreements, hand-offs. No filler."*
+
+   For `full`:
+   > *"Team chat is now `full`. Closed-captioned multi-agent dialogue.*
+   >
+   > *Heads up: full mode runs real per-role fan-out and costs meaningfully more tokens than `off` or `minimal`. We don't have calibration data to quantify by how much — your `session_budget_warn` (currently in settings.yml) still fires on actual usage. Switch back with `/hacky-hours team chat minimal` if it feels expensive."*
+
+4. The change takes effect on the **next** multi-role verb you run. Verbs already in flight keep their starting mode.
+
+**Implementation note:** when reading/writing settings.yml, do not reformat the rest of the file. Preserve comments and ordering. If `team_chat:` isn't present, append the block to the end of the file (with a leading blank line so it's clearly separated).
+
 ### `help`
 
 Print this:
@@ -165,8 +211,7 @@ Subcommands:
   switch <name>            Bind current project to a different team
   new [--tier <tier>]      Create a new team
   init                     Create the default team (idempotent)
-
-Coming in later slices:
+  chat [off|minimal|full]  Show or set team chat mode (multi-agent dialogue visibility)
   update                   Promote pending session changes to team repo
   site [serve|build|publish]  Static site for browsing
   help                     Show this message

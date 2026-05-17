@@ -2,6 +2,8 @@
 
 Supersedes v3's `review 1`. Runs three parallel lanes that evaluate the project from different angles, then consolidates into a single scorecarded report.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. Lane A's role findings are an ideal chat-mode surface — when mode is `minimal` or `full`, render the per-role headers and let voices be distinct. **No tokens for tokens' sake** — every voice turn must add information.
+
 The three lanes:
 
 - **(a) Role-driven codebase audit** — Security, A11y, Ops, QA, Architect read the actual code and flag issues
