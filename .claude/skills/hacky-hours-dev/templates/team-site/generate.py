@@ -83,6 +83,108 @@ def parse_frontmatter(text: str) -> tuple[dict, str]:
     return fm, body
 
 
+# ---- Metrics block extractor (Slice 13) -------------------------------------
+
+def extract_metrics(fm_text: str) -> dict:
+    """Pull the metrics: block out of frontmatter text and parse 1 level deep.
+    Returns empty dict if no metrics block found."""
+    # Find the metrics: line and the contiguous indented block after it
+    lines = fm_text.split("\n")
+    metrics: dict = {}
+    in_metrics = False
+    for line in lines:
+        if not in_metrics:
+            if re.match(r"^metrics:\s*$", line):
+                in_metrics = True
+            continue
+        # Stop on first un-indented line or empty-then-something line
+        if line and not line.startswith("  "):
+            break
+        if not line.strip():
+            continue
+        # Parse "  key: value" (2-space indent)
+        m = re.match(r"^  ([a-zA-Z_][\w-]*):\s*(.*)$", line)
+        if not m:
+            # 4-space indent = nested sub-dict (by_verb). Skip — we don't render those.
+            continue
+        key, value = m.group(1), m.group(2).strip()
+        if value == "" or value == "[]":
+            metrics[key] = [] if value == "[]" else None
+        elif value.startswith("[") and value.endswith("]"):
+            inner = value[1:-1].strip()
+            metrics[key] = [s.strip().strip('"').strip("'") for s in inner.split(",") if s.strip()]
+        elif value in ("null", "~"):
+            metrics[key] = None
+        else:
+            stripped = value.strip('"').strip("'")
+            try:
+                metrics[key] = int(stripped)
+            except ValueError:
+                metrics[key] = stripped
+    return metrics
+
+
+def read_history(agent_dir: Path, limit: int = 10) -> list[dict]:
+    """Read history.md (and history-archive/*.md if present); return last N parsed entries.
+    Returns newest-first. Each entry: {date, project, verb, summary, backfilled}."""
+    history_file = agent_dir / "history.md"
+    if not history_file.exists():
+        return []
+    text = history_file.read_text()
+    # Match structured entry lines: "- YYYY-MM-DD · project · verb · summary"
+    entries: list[dict] = []
+    line_re = re.compile(r"^-\s+(\d{4}-\d{2}-\d{2})\s+·\s+([^·]+?)\s+·\s+([^·]+?)\s+·\s+(.+)$")
+    for line in text.split("\n"):
+        m = line_re.match(line.strip())
+        if not m:
+            continue
+        date, project, verb, summary = m.group(1), m.group(2).strip(), m.group(3).strip(), m.group(4).strip()
+        backfilled = "(backfilled" in verb or "(backfilled" in summary
+        # Clean the "(backfilled, anchor)" annotation from verb display
+        verb_display = re.sub(r"\s*\(backfilled[^)]*\)", "", verb).strip()
+        entries.append({
+            "date": date,
+            "project": project,
+            "verb": verb_display,
+            "summary": summary,
+            "backfilled": backfilled,
+        })
+    # Sort newest-first by date string (ISO dates sort lexicographically)
+    entries.sort(key=lambda e: e["date"], reverse=True)
+    return entries[:limit]
+
+
+def read_feedback(agent_dir: Path, limit: int = 5) -> list[str]:
+    """Read feedback.md and return up to N durable notes as raw strings.
+    Skips the boilerplate intro that ships with the template."""
+    feedback_file = agent_dir / "feedback.md"
+    if not feedback_file.exists():
+        return []
+    text = feedback_file.read_text()
+    # Skip everything before the first "- " bullet or numbered list item
+    # If file only contains the template placeholder, return empty
+    if "No feedback yet" in text:
+        return []
+    notes: list[str] = []
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("- ") or re.match(r"^\d+\.\s+", stripped):
+            content = re.sub(r"^(-\s+|\d+\.\s+)", "", stripped)
+            if content:
+                notes.append(content)
+    return notes[:limit]
+
+
+def read_resume(agent_dir: Path) -> str | None:
+    """Read resume.md if it exists. Returns the markdown body (frontmatter stripped) or None."""
+    resume_file = agent_dir / "resume.md"
+    if not resume_file.exists():
+        return None
+    text = resume_file.read_text()
+    _, body = parse_frontmatter(text)
+    return body if body.strip() else None
+
+
 # ---- Minimal markdown → HTML (just enough for profile bodies) ---------------
 
 def md_to_html(text: str) -> str:
@@ -163,7 +265,7 @@ PAGE_SHELL = """<!DOCTYPE html>
 </head>
 <body>
 <header>
-  <a href="{home}" class="home-link">← Team</a>
+  <a href="{home}" class="home-link">← {home_label}</a>
   <span class="team-badge">{team_name}</span>
 </header>
 <main>
@@ -192,8 +294,17 @@ CARD_TEMPLATE = """
     <p class="role">{role}</p>
     <p class="tagline">{tagline}</p>
     <p class="hats">{hats}</p>
+    {metrics_badge}
   </div>
 </a>
+"""
+
+# Slice 13 — metrics badge for cards. Hidden when level=0 (no history yet — keeps grid clean for fresh teams).
+METRICS_BADGE_TEMPLATE = """
+    <p class="metrics-badge">
+      <span class="level">lvl {level}</span>
+      <span class="contributions">{history_entries} contribution{plural}</span>{projects_clause}
+    </p>
 """
 
 PROFILE_HEADER = """
@@ -204,11 +315,43 @@ PROFILE_HEADER = """
     <p class="pronouns">{pronouns}</p>
     <p class="role">{role}</p>
     <p class="tagline">{tagline}</p>
-    <p class="meta">Hats: {hats} · Joined: {joined}</p>
+    <p class="meta">Hats: {hats} · Joined: {joined}{metrics_clause}</p>
     {specialties_section}
+    {resume_link}
   </div>
 </section>
 """
+
+# Slice 13 — Recent track record section on profile pages
+TRACK_RECORD_SECTION = """
+<section class="track-record">
+  <h2>Recent track record</h2>
+  <p class="section-meta">Latest {count} of {total} contribution{plural} · last active {last_active}</p>
+  <ul class="history-list">
+{entries}
+  </ul>
+</section>
+"""
+
+HISTORY_ENTRY_TEMPLATE = """    <li class="history-entry">
+      <span class="date">{date}</span>
+      <span class="project-verb"><code>{project}</code> · <code>{verb}</code></span>
+      <span class="summary">{summary}</span>
+    </li>"""
+
+# Slice 13 — Lessons applied (from feedback.md) on profile pages
+LESSONS_SECTION = """
+<section class="lessons">
+  <h2>Lessons applied</h2>
+  <p class="section-meta">Durable corrections this agent has internalized from conductor feedback.</p>
+  <ul class="lessons-list">
+{items}
+  </ul>
+</section>
+"""
+
+# Slice 13 — Resume link section
+RESUME_LINK_TEMPLATE = """    <p class="resume-link"><a href="{id}-resume.html">📄 Read full résumé →</a></p>"""
 
 
 # ---- Generators -------------------------------------------------------------
@@ -224,7 +367,7 @@ def read_team_metadata(team_root: Path) -> dict:
 
 
 def list_agents(team_root: Path) -> list[dict]:
-    """Read all agent profile.md files; return list of frontmatter dicts (+ body)."""
+    """Read all agent profile.md files; return list of frontmatter dicts (+ body + Slice 13 history/feedback/resume)."""
     agents = []
     agents_dir = team_root / "agents"
     if not agents_dir.is_dir():
@@ -243,6 +386,19 @@ def list_agents(team_root: Path) -> list[dict]:
         fm["_dir_id"] = agent_dir.name
         # Fallback ID if frontmatter doesn't have one
         fm.setdefault("id", agent_dir.name)
+        # Slice 13: parse the metrics block and gather history/feedback/resume
+        # extract_metrics reads the raw frontmatter text directly (parse_frontmatter
+        # is flat-only by design — keeping it that way for backwards compatibility)
+        end_match = re.search(r"\n---\n", text[4:]) if text.startswith("---\n") else None
+        if end_match:
+            fm_text = text[4:4 + end_match.start()]
+            fm["_metrics"] = extract_metrics(fm_text)
+        else:
+            fm["_metrics"] = {}
+        fm["_history"] = read_history(agent_dir, limit=10)
+        fm["_history_total"] = fm["_metrics"].get("history_entries", len(fm["_history"]))
+        fm["_feedback"] = read_feedback(agent_dir, limit=5)
+        fm["_resume_body"] = read_resume(agent_dir)
         agents.append(fm)
     return agents
 
@@ -256,6 +412,69 @@ def role_label(agent: dict) -> str:
     return ", ".join(h.replace("-", " ").title() for h in hats)
 
 
+def render_metrics_badge(metrics: dict) -> str:
+    """Slice 13 — small badge on cards showing level + contributions + projects.
+    Returns empty string for level-0/no-history agents (keeps fresh team grids clean)."""
+    level = metrics.get("level", 0) or 0
+    history_entries = metrics.get("history_entries", 0) or 0
+    if level == 0 and history_entries == 0:
+        return ""
+    projects = metrics.get("projects", []) or []
+    projects_clause = ""
+    if isinstance(projects, list) and len(projects) > 0:
+        projects_clause = f' · <span class="projects">{len(projects)} project{"s" if len(projects) != 1 else ""}</span>'
+    return METRICS_BADGE_TEMPLATE.format(
+        level=level,
+        history_entries=history_entries,
+        plural="s" if history_entries != 1 else "",
+        projects_clause=projects_clause,
+    )
+
+
+def render_metrics_clause(metrics: dict) -> str:
+    """Slice 13 — inline metrics line on profile header."""
+    level = metrics.get("level", 0) or 0
+    history_entries = metrics.get("history_entries", 0) or 0
+    if history_entries == 0:
+        return ""
+    return f" · Level {level} · {history_entries} contribution{'s' if history_entries != 1 else ''}"
+
+
+def render_track_record(agent: dict) -> str:
+    """Slice 13 — Recent track record section (from history.md)."""
+    history = agent.get("_history") or []
+    if not history:
+        return ""
+    total = agent.get("_history_total", len(history))
+    metrics = agent.get("_metrics", {}) or {}
+    last_active = metrics.get("last_active") or history[0]["date"]
+    entry_html = "\n".join(
+        HISTORY_ENTRY_TEMPLATE.format(
+            date=html.escape(e["date"]),
+            project=html.escape(e["project"]),
+            verb=html.escape(e["verb"]),
+            summary=html.escape(e["summary"]),
+        )
+        for e in history
+    )
+    return TRACK_RECORD_SECTION.format(
+        count=len(history),
+        total=total,
+        plural="s" if total != 1 else "",
+        last_active=html.escape(str(last_active)),
+        entries=entry_html,
+    )
+
+
+def render_lessons(agent: dict) -> str:
+    """Slice 13 — Lessons applied section (from feedback.md)."""
+    notes = agent.get("_feedback") or []
+    if not notes:
+        return ""
+    items = "\n".join(f"    <li>{html.escape(n)}</li>" for n in notes)
+    return LESSONS_SECTION.format(items=items)
+
+
 def render_card(agent: dict) -> str:
     return CARD_TEMPLATE.format(
         id=html.escape(agent.get("id", "agent")),
@@ -264,6 +483,7 @@ def render_card(agent: dict) -> str:
         role=html.escape(role_label(agent)),
         tagline=html.escape(agent.get("tagline", "")),
         hats=html.escape(", ".join(agent.get("hats", []) if isinstance(agent.get("hats"), list) else [])),
+        metrics_badge=render_metrics_badge(agent.get("_metrics", {}) or {}),
     )
 
 
@@ -276,6 +496,10 @@ def render_profile_page(agent: dict, team_meta: dict) -> str:
         items = "".join(f"<li>{html.escape(s)}</li>" for s in specialties)
         specialties_section = f"<p class=\"specialties\"><strong>Specialties:</strong></p><ul>{items}</ul>"
 
+    resume_link = ""
+    if agent.get("_resume_body"):
+        resume_link = RESUME_LINK_TEMPLATE.format(id=html.escape(agent.get("id", "agent")))
+
     header = PROFILE_HEADER.format(
         avatar=html.escape(agent.get("avatar", "🧑")),
         name=html.escape(agent.get("name", agent.get("id", "Agent"))),
@@ -284,16 +508,38 @@ def render_profile_page(agent: dict, team_meta: dict) -> str:
         tagline=html.escape(agent.get("tagline", "")),
         hats=html.escape(", ".join(agent.get("hats", []) if isinstance(agent.get("hats"), list) else [])),
         joined=html.escape(agent.get("joined", "unknown")),
+        metrics_clause=render_metrics_clause(agent.get("_metrics", {}) or {}),
         specialties_section=specialties_section,
+        resume_link=resume_link,
     )
 
     body = agent.get("_body_html", "")
-    content = header + body
+    # Slice 13: append track record + lessons after the bio body
+    track_record = render_track_record(agent)
+    lessons = render_lessons(agent)
+    content = header + body + track_record + lessons
 
     return PAGE_SHELL.format(
         title=f"{agent.get('name', 'Agent')} — {team_meta.get('name', 'Team')}",
         stylesheet="../style.css",
         home="../index.html",
+        home_label="Team",
+        team_name=html.escape(team_meta.get("name", "Team")),
+        content=content,
+        framework_link='<a href="https://github.com/empathetech/hacky-hours-docs">empathetech/hacky-hours-docs</a>',
+    )
+
+
+def render_resume_page(agent: dict, team_meta: dict) -> str:
+    """Slice 13 — render agents/<id>-resume.html if resume.md exists for the agent."""
+    body_md = agent.get("_resume_body") or ""
+    body_html = md_to_html(body_md)
+    content = f'<section class="resume-page">{body_html}</section>'
+    return PAGE_SHELL.format(
+        title=f"{agent.get('name', 'Agent')} — Résumé — {team_meta.get('name', 'Team')}",
+        stylesheet="../style.css",
+        home=f"{agent.get('id', 'agent')}.html",
+        home_label="Profile",
         team_name=html.escape(team_meta.get("name", "Team")),
         content=content,
         framework_link='<a href="https://github.com/empathetech/hacky-hours-docs">empathetech/hacky-hours-docs</a>',
@@ -316,6 +562,7 @@ def render_index(team_meta: dict, agents: list[dict]) -> str:
         title=team_meta.get("name", "Team"),
         stylesheet="style.css",
         home="index.html",
+        home_label="Team",
         team_name=html.escape(team_meta.get("name", "Team")),
         content=content,
         framework_link='<a href="https://github.com/empathetech/hacky-hours-docs">empathetech/hacky-hours-docs</a>',
@@ -436,9 +683,117 @@ footer {
   font-size: 0.85rem;
 }
 footer a { color: var(--muted); }
+
+/* Slice 13 — metrics badge, track record, lessons, resume link */
+.metrics-badge {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.02em;
+}
+.metrics-badge .level {
+  background: var(--accent);
+  color: white;
+  padding: 0.08rem 0.42rem;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  font-weight: 600;
+}
+.metrics-badge .contributions,
+.metrics-badge .projects { color: var(--muted); }
+
+.profile-header .meta { font-variant-numeric: tabular-nums; }
+.resume-link {
+  margin: 0.85rem 0 0 0;
+  font-size: 0.95rem;
+}
+.resume-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.resume-link a:hover { text-decoration: underline; }
+
+.section-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0.2rem 0 0.85rem 0;
+  font-style: italic;
+}
+
+.track-record { margin-top: 2.5rem; }
+.history-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0;
+  border-left: 2px solid var(--card-border);
+}
+.history-entry {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.5rem 1rem;
+  padding: 0.7rem 0 0.7rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.history-entry:last-child { border-bottom: none; }
+.history-entry .date {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+.history-entry .project-verb {
+  grid-column: 2;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+.history-entry .project-verb code {
+  font-size: 0.72rem;
+  padding: 0.05rem 0.3rem;
+}
+.history-entry .summary {
+  grid-column: 2;
+  font-size: 0.95rem;
+}
+
+.lessons { margin-top: 2.5rem; }
+.lessons-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0;
+}
+.lessons-list li {
+  padding: 0.6rem 0.9rem;
+  background: var(--card-bg);
+  border-left: 3px solid var(--accent);
+  margin: 0.5rem 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.92rem;
+}
+
+.resume-page { padding: 0.5rem 0 2rem; }
+.resume-page h1 { margin-top: 0; }
+.resume-page h2 {
+  margin-top: 2rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.resume-page blockquote {
+  font-style: italic;
+  color: var(--muted);
+  border-left: 3px solid var(--accent);
+  padding-left: 0.9rem;
+  margin: 1rem 0;
+}
+
 @media (max-width: 600px) {
   .profile-header { flex-direction: column; gap: 0.75rem; }
   .avatar.large { font-size: 3rem; }
+  .history-entry { grid-template-columns: 1fr; }
+  .history-entry .project-verb,
+  .history-entry .summary { grid-column: 1; }
 }
 """
 
@@ -472,12 +827,19 @@ def main():
     (out_dir / "index.html").write_text(render_index(team_meta, agents))
 
     # Write per-agent pages
+    resumes_written = 0
     for agent in agents:
         (out_dir / "agents" / f"{agent['id']}.html").write_text(render_profile_page(agent, team_meta))
+        # Slice 13: also render a resume page if resume.md exists
+        if agent.get("_resume_body"):
+            (out_dir / "agents" / f"{agent['id']}-resume.html").write_text(render_resume_page(agent, team_meta))
+            resumes_written += 1
 
     print(f"Generated site at {out_dir}/")
     print(f"  index.html — team roster ({len(agents)} agents)")
     print(f"  agents/    — per-agent profile pages")
+    if resumes_written:
+        print(f"  agents/    — plus {resumes_written} résumé page(s) (from agents/<id>/resume.md)")
     print(f"  style.css")
     print()
     print(f"Browse:")

@@ -1,7 +1,7 @@
 ---
 name: hacky-hours-dev
 description: Hacky Hours v4.0.0 (dev) — a competence prosthesis for LLM-assisted software development. Engages an orchestra of stakeholder-role AI agents (product, design, architect, frontend, backend, security, ops, QA, accessibility, licensing, Data, AI/ML) calibrated to the user's technical background, producing team-grade artifacts that can graduate to a real team's knowledge base. Use when the user wants to build a new app/tool/site/project, harden or productionize an existing codebase, audit code or documentation, draft architecture diagrams / ERDs / ADRs / design docs / runbooks, ship a release, adopt the framework onto an existing repo, or get team-grade rigor from solo work. Triggers on phrases like "build me an app/tool/site," "I have an idea," "help me design/architect this," "harden this codebase," "audit this," "is this production-grade," "we're shipping," "vibe-coded this and want to ship it," "draft an architecture diagram," "generate an ERD." Does NOT trigger on typo fixes, single-file scripts, "explain this function," or tactical one-off code tasks. When triggered from context, opens with an invitation pattern — never auto-enters the framework.
-argument-hint: [team | team update | team site | team chat | adopt | audit | arbitrate | feedback | issue | meta | export | ideate | design | implement | ship | step | review | learn | update | tools | help]
+argument-hint: [team | team update | team backfill | team resume | team reflect | team site | team chat | adopt | audit | arbitrate | feedback | issue | meta | export | ideate | design | implement | ship | step | review | learn | update | tools | help]
 allowed-tools: Read Bash(git status*) Bash(git log*) Bash(git diff*) Bash(gh issue list*) Bash(gh release*)
 ---
 
@@ -131,6 +131,9 @@ Usage: /hacky-hours [command]
   (none)                    Guided session — survey your project and walk you through what's next
   team                      Browse / manage / switch your persistent team of AI agents
   team update               Promote session feedback into the team repo (agents learn from you)
+  team backfill [flags]     Retroactively populate agent history.md from this project's CHANGELOG/git log
+  team resume <id> | --all  Generate synthetic resume per agent (composited from profile + history + feedback)
+  team reflect <id> | --all Agent self-reflection — refresh Track record + propose prose evolution
   team site [serve|build|publish]   Static team-browser site (Python stdlib generator; GitHub Pages-ready)
   team chat [off|min|full]  Toggle how visible the team is during multi-role verbs
   adopt                     Bring an existing codebase into the framework (the only operation on existing code)

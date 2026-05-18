@@ -4,6 +4,8 @@ Supersedes v3's `review 1`. Runs three parallel lanes that evaluate the project 
 
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. Lane A's role findings are an ideal chat-mode surface — when mode is `minimal` or `full`, render the per-role headers and let voices be distinct. **No tokens for tokens' sake** — every voice turn must add information.
 
+**Team learning capture:** Audit is always multi-role (Lane A engages Security, A11y, Ops, QA, Architect at minimum). At the tail (Step 5 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each agent that produced findings, then the one-line behavior-feedback prompt. Lane B (doc-stranger) and Lane C (cross-ref) are framework-internal and do not count as agent participation.
+
 The three lanes:
 
 - **(a) Role-driven codebase audit** — Security, A11y, Ops, QA, Architect read the actual code and flag issues
@@ -83,6 +85,28 @@ Be direct. The team wants honest signal, not validation.
 ```
 
 The subagent's response becomes the doc-audit section.
+
+#### Saturation guard (post Lane B, conductor-side, before consolidation)
+
+Once Lane B's response is in hand and before it lands in the consolidated report, the conductor (this assistant, not the subagent) does a saturation check against the project's audit history. This addresses the failure mode where a context-free stranger keeps surfacing "first-fix" recommendations that are factually already in the docs they just read — the lane's prompt has no way to know it's already iterated against those gaps in prior runs.
+
+Procedure:
+
+1. **Read prior audit reports** in `hacky-hours/audits/` (most-recent first; cap at the last 3 to bound cost).
+2. **Cross-check the "First fix" recommendation against current doc state.** If the stranger says "add an anchor callout to the README opening paragraph" and the README's first 10 lines already contain an anchor callout — that's a saturation signal. Use Grep/Read against the actual doc files cited in the recommendation.
+3. **Cross-check against Lane C's cross-reference scan from this same run.** If Lane C verified the structure the stranger asked to be added, that's strong saturation evidence.
+4. **Cross-check against prior audit asks.** If the same recommendation appears in any of the last 3 audits' "Recommended actions" sections and that action has subsequently been addressed (it's present in the current docs), saturation is highly likely.
+
+If saturation is detected on the "First fix" item:
+
+- **Preserve the lane's traffic-light score and the first 5 question answers.** Don't override the stranger's judgment on overall onboarding signal — they're allowed to remain 🟡 on a saturated project; that's the lane being honest about "I can't find a 🟢-tier improvement here."
+- **Replace the "First fix" answer with a saturation note**: *"Lane B saturation flag: stranger's proposed first-fix [<verbatim recommendation>] is already present at [<file:line citation>] (verified during Lane C cross-ref scan / verified against [<prior audit YYYY-MM-DD>]'s recommendations). No actionable first-fix this round — the lane has run out of onboarding-gap signal for the current doc state. Consider this a graduation indicator: stranger-test is saturated."*
+- **Annotate the scorecard**: append `· saturated (N)` to the Documentation dimension where N is the number of consecutive audits the lane has saturated on. Track this in `hacky-hours/audits/.lane-b-saturation` (a single-line counter file) so the count is durable across audits.
+- **Honestly note in the audit report's "At-a-glance" section**: the Documentation dimension is graduation-saturated and that's a *positive* signal, not a stuck 🟡 score.
+
+If saturation is *not* detected, pass Lane B's response through verbatim. The default behavior is unchanged.
+
+This preserves the stranger's purity (Lane B itself is unchanged — it still reads only the docs with no prior context) while letting the conductor calibrate against the project's audit history. The stranger is the test; the conductor is the test interpreter.
 
 ### Lane C — Cross-reference integrity
 
@@ -207,6 +231,19 @@ Print to the conductor:
 > *Full report: `hacky-hours/audits/<date>.md`*
 >
 > *Suggested next step: review the P0s, then `/hacky-hours implement` to start fixing them, or `/hacky-hours arbitrate` if any findings sit at a cross-role conflict point.*"
+
+## Step 5 — Stash (team learning)
+
+Run per `${CLAUDE_SKILL_DIR}/references/capture-format.md`:
+
+1. List the Lane A agents that actually produced findings (typically: Security, A11y, Ops, QA, Architect; skip any that returned "no findings at this tier"). Lane B and Lane C are framework-internal — do not capture for them.
+2. Compose a one-sentence past-tense contribution summary per participant (concrete — what they flagged and at what priority).
+3. Resolve the session ID per the algorithm in `capture-format.md`.
+4. **History append + metrics refresh (silent):** for each participant, append `- <date> · <project-slug> · audit · <summary>` to `~/.hacky-hours/teams/<active>/agents/<agent-id>/history.md`. Then refresh the `metrics:` block in each participating agent's `profile.md` per `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Derived metrics" + §"Level derivation". Commit both files together: `git -C ~/.hacky-hours/teams/<active>/ add agents/*/history.md agents/*/profile.md && git commit -m "history: audit @ <project> @ <date> — <N> agent(s)"`.
+5. **Behavior feedback prompt:** ask the conductor *"Anything you said during this audit that should change how an agent works in future sessions? Free-form by agent, or `none`."* For each agent named, write `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` per the schema.
+6. **Footer:** print *"Stashed <N> behavior note(s) for <agents>. Appended history to <count> agent(s) (commit <sha>). Promote with `/hacky-hours team update` when ready."*
+
+If Lane B's saturation guard fired, the footer additionally notes: *"Lane B saturation noted — graduation indicator, not a stuck score."*
 
 ## Notes for the assistant running this
 

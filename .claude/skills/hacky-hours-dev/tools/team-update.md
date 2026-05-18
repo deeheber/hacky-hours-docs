@@ -6,13 +6,16 @@ This is **how agents learn**. Without it, agents are frozen at their starter pro
 
 ## What gets captured during a session
 
-The framework collects pending changes to agents in `~/.hacky-hours/sessions/<session-id>/pending/`. Captured automatically when:
+Pending changes for agents accumulate at `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md`. The capture contract — what shape the file takes, how the session ID is resolved, when capture fires — is canonical in **`${CLAUDE_SKILL_DIR}/references/capture-format.md`**. Read it before promoting if you need to understand schema.
 
-- **You give behavior feedback to an agent.** E.g., during a session you say "Alex, be terser when flagging at Tier 1." That's a behavior note staged for Alex.
-- **You directly edit an agent's prompt.** E.g., you run `/hacky-hours team show alex --edit` and modify their system prompt or profile.
-- **You override an agent's recommendation more than once in similar shape.** Implicit signal that the agent's defaults need adjustment.
+Two ways an entry lands:
 
-Each pending change is one file in the session's pending folder: `<agent-id>.md` containing the proposed change.
+- **End-of-verb Stash prompt (the primary path).** Every multi-role verb (`step 1–5`, `audit`, `adopt`, `arbitrate`) ends with a stash phase that asks the conductor: *"Anything you said during this run that should change how an agent works in future sessions?"* Free-form by agent, or `none` to skip. Whatever the conductor names lands as one pending file per agent named.
+- **Direct prompt edit.** If the conductor runs `/hacky-hours team show <agent-id> --edit` and modifies the system prompt mid-session, the diff is staged as a `prompt_edit` kind pending entry for the next `team update` cycle. (`--edit` flag and this hook are scaffold for v4.1+; v4.0.0 honors the schema but the entrypoint is the Stash prompt above.)
+
+Each pending change is one file per agent per verb invocation. If the conductor stashes feedback for the same agent twice in one verb (rare), entries append to the same file separated by `---`.
+
+History append is the *other* slot Stash writes to (silent, no review needed) — see `references/capture-format.md` for the distinction. `team update` is only the promoter for behavior-feedback pending entries; history.md commits land directly at end-of-verb without going through this review loop.
 
 ## Step 0 — Pre-flight
 

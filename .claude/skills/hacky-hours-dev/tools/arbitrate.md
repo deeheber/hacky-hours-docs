@@ -4,6 +4,8 @@ When roles disagree on a project, the conductor arbitrates. This verb gives the 
 
 **Team chat mode:** Arbitration is inherently multi-voice — chat mode is the natural rendering. Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. Even with `team_chat: off`, position summaries should be clearly attributed to roles — that's the verb's whole point. **No tokens for tokens' sake** — every voice turn must add information.
 
+**Team learning capture:** Arbitration is always multi-role (it's the verb's definition). At the tail (Step 5 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each agent that stated a position (history summary references the topic and the resolution outcome), then the one-line behavior-feedback prompt. Arbitrations are dense per-role moments — behavior feedback at the end of an arbitration is some of the highest-signal feedback the team will get.
+
 ## Three modes
 
 - **`decide`** (cheapest) — framework summarizes positions concisely; conductor decides directly. No further agent dialogue.
@@ -160,6 +162,17 @@ Every arbitration produces an ADR at `hacky-hours/02-design/decisions/<YYYY-MM-D
 
 - Update `HANDOFFS.yml`: if there was a pending handoff that the disagreement blocked, mark it resolved.
 - Update `NARRATIVE.md`: add a sentence noting the decision was made.
+
+## Step 5 — Stash (team learning)
+
+Run per `${CLAUDE_SKILL_DIR}/references/capture-format.md`. Arbitrations are high-signal moments for behavior feedback — roles stated their reasoning in compressed form, the conductor saw whose mental model they trusted, the resolution often reveals where a role's defaults need adjustment.
+
+1. List the agents that actually stated a position during this arbitration (typically: the two or more roles named in the topic; in `watch` mode all roles that took a turn).
+2. Compose a one-sentence past-tense contribution summary per participant. Include the topic, the agent's position, and the outcome: e.g., *"Argued for stricter CSP on the payment surface; conductor decided in favor of Sam's looser proposal for V1, deferred Alex's stricter posture to V2."*
+3. Resolve the session ID per the algorithm in `capture-format.md`.
+4. **History append + metrics refresh (silent):** for each participant, append `- <date> · <project-slug> · arbitrate:<mode> · <summary>` to `~/.hacky-hours/teams/<active>/agents/<agent-id>/history.md`. Then refresh the `metrics:` block in each participating agent's `profile.md` per `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Derived metrics" + §"Level derivation". Commit both files together: `git -C ~/.hacky-hours/teams/<active>/ add agents/*/history.md agents/*/profile.md && git commit -m "history: arbitrate <mode> @ <project> @ <date> — <N> agent(s)"`.
+5. **Behavior feedback prompt:** ask the conductor *"Anything about how the roles argued this that should change how they work in future sessions? (E.g., 'Alex, lead with blast radius before threat model.' Free-form by agent, or `none`.)"* For each agent named, write `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` per the schema.
+6. **Footer:** print *"Stashed <N> behavior note(s) for <agents>. Appended arbitration history to <count> agent(s) (commit <sha>). Promote with `/hacky-hours team update` when ready."*
 
 ## Cost guidance
 

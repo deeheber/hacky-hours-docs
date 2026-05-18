@@ -70,15 +70,35 @@ Wait for explicit user confirmation. **Never submit on default.** Never submit w
 
 ## Step 4 — Submit (only on explicit yes)
 
+**Label-detect first.** Labels are upstream config and may not exist on the repo at any given time. Probe before adding `--label`:
+
+```bash
+# List labels that exist on the upstream repo (one per line)
+gh label list --repo empathetech/hacky-hours-docs --json name --jq '.[].name'
+```
+
+Build the `--label` argument from the *intersection* of the desired labels (`user-feedback`, `v<framework-major-version>`) and the labels that actually exist on the upstream repo. If neither exists, omit `--label` entirely — submitting with a label that doesn't exist would fail the whole `gh issue create` call.
+
+If any requested labels are missing, surface a one-line note in the issue body footer so upstream maintainers know:
+
+```
+> Note for empathetech: `/hacky-hours issue` (this verb) tried to apply labels [<requested>] per the skill spec. Missing on this repo: [<missing>]. Filing without them as a fallback — labels can be created upstream when convenient.
+```
+
+This note has already been the trigger for an upstream issue (issue #6's tail observation); the label-detect protects against regression of the bug where `gh issue create` would fail wholesale because of a label-not-found error.
+
+Then submit:
+
 ```bash
 gh issue create \
   --repo empathetech/hacky-hours-docs \
   --title "<title>" \
   --body "<body>" \
-  --label "user-feedback,v<framework-major-version>"
+  [--label "<existing-labels-comma-separated>"]   # only if any matched
 ```
 
-If `gh issue create` succeeds: print the issue URL + confirmation.
+If `gh issue create` succeeds: print the issue URL + confirmation. Mention which labels (if any) were applied and which were omitted because they don't exist upstream.
+
 If it fails: print the error, keep the draft locally, suggest filing manually at https://github.com/empathetech/hacky-hours-docs/issues.
 
 ## Step 5 — Update local feedback record (if applicable)

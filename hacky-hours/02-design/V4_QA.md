@@ -689,6 +689,524 @@ In the same `full`-mode output, can you tell which role is speaking from the *to
 
 ---
 
+## Test 11 — Slice 12 verification (team learning capture)
+
+Closes the v4 thesis loop. Verify the end-to-end persistence chain: multi-role verb → history append + behavior pending → team-update accept → committed agent change → next session sees the updated agent. Plus the audit Lane B saturation guard (issue #6 fix). Plus tools/issue.md label-detect.
+
+### 11.1 Pre-state: confirm sessions is empty and team has only initial commit
+
+```bash
+ls ~/.hacky-hours/sessions/ 2>/dev/null
+git -C ~/.hacky-hours/teams/default log --oneline
+```
+
+**Expected:** sessions/ empty (or contains only `.current-session` from a prior test). Team git log shows only the initial-team commit (or whatever existed before this test).
+
+### 11.2 Run a multi-role verb that fans out — capture history
+
+On the test project from earlier suites (or hacky-hours-docs itself if you're running QA dogfood-style):
+
+```
+/hacky-hours audit
+```
+
+After the audit's normal Step 4 summary, the new Step 5 (Stash) should run:
+
+- Auto-prints which agents participated (typically: Security, A11y, Ops, QA, Architect).
+- Auto-appends one line per participant to their `history.md`. Format: `- <YYYY-MM-DD> · <project-slug> · audit · <summary>`.
+- Auto-commits on the team repo with message `history: audit @ <project> @ <date> — <N> agent(s)`.
+- Prompts: *"Anything you said during this audit that should change how an agent works in future sessions?"*
+
+**Expected outputs to check:**
+
+```bash
+# History was appended
+cat ~/.hacky-hours/teams/default/agents/security/history.md | tail
+cat ~/.hacky-hours/teams/default/agents/architect/history.md | tail
+
+# Team repo committed
+git -C ~/.hacky-hours/teams/default log --oneline
+# Should show a new "history: audit @ ..." commit
+
+# Session ID was created
+cat ~/.hacky-hours/sessions/.current-session
+# Should print a YYYY-MM-DD-HHMM-xxxx string
+
+ls ~/.hacky-hours/sessions/
+# Should show .current-session + a <session-id>/ folder
+```
+
+✅ Pass criteria: history.md has new lines for each participating agent; team repo has a new commit; sessions/.current-session exists; the contribution summaries are concrete (not generic "Reviewed code") and reference what the role actually flagged.
+
+### 11.3 Behavior feedback prompt — answer with a real correction
+
+When the Stash phase asks for behavior feedback, respond with something like:
+
+```
+Security — be terser when flagging Tier 1 findings. Skip the threat-model framing for personal-use tools.
+Architect — none
+```
+
+**Expected outputs to check:**
+
+```bash
+ls ~/.hacky-hours/sessions/<session-id>/pending/
+# Should show security.md (NOT architect.md — "none" doesn't stash)
+
+cat ~/.hacky-hours/sessions/<session-id>/pending/security.md
+```
+
+**Expected file contents:**
+
+```yaml
+---
+captured_at: <ISO timestamp>
+session_id: <same as .current-session>
+project: <project-slug>
+verb: audit
+kind: behavior_feedback
+agent: security
+status: pending
+---
+
+## Context
+<one paragraph: what was happening during the audit>
+
+## Proposed change
+<the conductor's words, verbatim or near-verbatim — "be terser when flagging Tier 1 findings. Skip the threat-model framing for personal-use tools.">
+```
+
+The footer should print: *"Stashed 1 behavior note(s) for [security]. Appended history to 5 agent(s) (commit <sha>). Promote with `/hacky-hours team update` when ready."*
+
+✅ Pass criteria: pending file present for named agent only, schema matches `references/capture-format.md`, frontmatter complete, conductor's actual words preserved.
+
+### 11.4 Behavior feedback prompt — answer "none"
+
+Run another multi-role verb (e.g., `/hacky-hours arbitrate decide "should we add a new dep?"`). When asked for behavior feedback, answer `none`.
+
+**Expected:** no new pending files written; history still appends; footer prints *"Stashed 0 behavior note(s). Appended history to <N> agent(s) (commit <sha>)."*
+
+✅ Pass criteria: `none` is a valid silent answer; history still fires regardless.
+
+### 11.5 team update promotes the pending change
+
+```
+/hacky-hours team update
+```
+
+**Expected:** the verb reads the pending entry from 11.3, presents it for accept/edit/reject/defer. Accept it.
+
+```bash
+# Check it landed in feedback.md
+cat ~/.hacky-hours/teams/default/agents/security/feedback.md
+# Should contain the new behavior note
+
+# Check the team repo commit
+git -C ~/.hacky-hours/teams/default log --oneline
+# Should show a "Update 1 agent(s) — <date>" commit on top of the earlier history: commits
+
+# Pending file moved to resolved
+ls ~/.hacky-hours/sessions/<session-id>/resolved/
+# Should show security.md
+ls ~/.hacky-hours/sessions/<session-id>/pending/
+# Should be empty (or only contain entries from other agents)
+```
+
+✅ Pass criteria: behavior note appended to security's `feedback.md`, team repo committed, pending file moved to resolved.
+
+### 11.6 Next session uses the updated agent
+
+Open a new Claude Code session (or simulate by waiting >4h or by deleting `.current-session` — this resets session ID; the team repo update persists regardless). Run another audit:
+
+```
+/hacky-hours audit
+```
+
+**Expected:** Security's findings should reflect the new behavior note. If you told Security to "be terser at Tier 1," Tier 1 findings should look noticeably more compact than previous audits on the same project. The persistence chain is real if you can see the agent applying yesterday's correction today.
+
+✅ Pass criteria: visible behavior change in the agent's output that traces back to the behavior note from 11.3. The orchestra learned.
+
+### 11.7 Session ID staleness regenerates correctly
+
+```bash
+# Manually backdate the marker file to >4 hours ago
+touch -t $(date -v-5H +%Y%m%d%H%M) ~/.hacky-hours/sessions/.current-session
+
+# Run a multi-role verb
+/hacky-hours audit
+```
+
+**Expected:** during the verb's Stash phase, a *new* session ID is generated (different from the one written before the touch). Old session folder still exists with its resolved entries; new session folder is created with today's pending entries.
+
+✅ Pass criteria: stale marker triggers regeneration; old session state preserved.
+
+### 11.8 Audit Lane B saturation guard fires (issue #6 fix)
+
+On a project with at least 2 prior audits in `hacky-hours/audits/` whose actionable critiques have been addressed (or simulate with a script that pre-seeds 3 audit files), run:
+
+```
+/hacky-hours audit
+```
+
+**Expected:** Lane B's traffic-light score and first 5 question answers pass through unmodified. The "First fix" item gets either:
+- Passed through if the recommendation is genuinely novel and not already in the docs, OR
+- **Replaced with the saturation flag note** if the conductor verifies (via Lane C cross-ref or direct Read) that the recommendation is already present in the docs the stranger just read.
+
+In the saturated case, the Documentation dimension on the scorecard gets `· saturated (N)` appended, and a counter file `hacky-hours/audits/.lane-b-saturation` records the streak. The "At-a-glance" section frames saturation as a positive graduation indicator.
+
+✅ Pass criteria: no more false-negative "first fix" recommendations like "add an anchor callout to README opening" when the README already has one. Saturation is named as a graduation signal, not a stuck 🟡.
+
+### 11.9 tools/issue.md label-detect (issue #6 tail bug)
+
+```
+/hacky-hours issue
+# (interactive flow — compose a minimal issue, confirm submission)
+```
+
+**Expected:** before `gh issue create` runs, the verb calls `gh label list --repo empathetech/hacky-hours-docs` to discover existing labels. If `user-feedback` and `v4` don't exist upstream, the verb:
+- Omits `--label` entirely from the `gh issue create` call (so it doesn't fail wholesale).
+- Adds a one-line note to the issue body footer explaining which labels were requested but absent.
+- After successful submission, the confirmation line mentions which labels (if any) were applied vs. omitted.
+
+✅ Pass criteria: a missing-label upstream state does not block submission; the issue body footer surfaces the gap for maintainers to act on.
+
+### 11.10 Team site reflects accumulated history
+
+After running 11.2–11.6, regenerate the team site:
+
+```
+/hacky-hours team site build
+# Open the generated HTML
+open ~/.hacky-hours/teams/default/docs/index.html
+```
+
+**Expected (v4.0.0-dev):** the static-site generator reads `profile.md` (which doesn't reference `history.md` directly), so the visible site is unchanged structurally. **However**, manually inspecting any agent's `history.md` file via the site's "view source" link (or directly in the team repo) shows the accumulated entries.
+
+Surfacing history on the rendered site is a v4.1+ candidate (per V4_DESIGN.md §4.21 deferral list). Slice 12 ships the persistence; the site's history view is a follow-on.
+
+✅ Pass criteria: site still builds and renders; history is *in the data* even if not yet *in the rendered view*.
+
+### 11.11 Backfill dry-run from this repo's CHANGELOG
+
+The thesis-completion test: this repo (hacky-hours-docs) has 30+ CHANGELOG entries spanning v0.x → v4. Forward-capture caught none of them. Backfill should populate per-agent history retroactively.
+
+```
+cd /path/to/hacky-hours-docs
+/hacky-hours team backfill --dry-run
+```
+
+**Expected:**
+- Pre-flight surfaces: source (CHANGELOG.md preferred), entry count (30+), target team (default), agents in scope (12).
+- Dry-run skips per-agent interactivity. Prints proposed entries grouped by agent.
+- Each agent shows a sensible number of proposed entries:
+  - **Maya (Product):** ~12 entries (every milestone version)
+  - **Priya (Architect):** ~10 entries (ARCHITECTURE updates, ADRs, structural changes)
+  - **Alex (Security):** ~5 entries (SECURITY_PRIVACY updates, audit findings)
+  - **Lena (A11y):** ~3 entries (ACCESSIBILITY updates, v1.6.0 audit)
+  - **Diego (Licensing):** ~2 entries (LICENSING.md, CLA decision)
+  - **Emma (QA):** ~3 entries (TESTING.md, V4_QA.md, pre-release checklist)
+  - Others as the classification table allows.
+- Each line follows the format `- <date> · hacky-hours-docs · <verb> (backfilled, CHANGELOG#<anchor>) · <summary>`.
+- No team-repo writes occur (dry-run).
+
+✅ Pass criteria: classification produces sensible per-agent breakdowns; no agent is wildly miscounted; summaries reference what the CHANGELOG entry actually says (not invented detail); zero commits land.
+
+### 11.12 Backfill real run, per-agent batch review, commits land
+
+```
+/hacky-hours team backfill
+```
+
+**Expected flow:**
+- Same pre-flight + summary as 11.11, but proceeds interactively.
+- Per agent (in some sensible order — by entry count desc is reasonable), presents the batch with `a / s / e / r / d` options.
+- For agent 1 (Maya): answer `a` (accept all). Verify a commit lands on the team repo: `git -C ~/.hacky-hours/teams/default log --oneline | head` shows `history: backfill @ hacky-hours-docs — product (12 entries from changelog)` or similar.
+- For agent 2 (Priya): answer `s`, select a subset (e.g., `1, 3-5, 8`). Verify only those entries land in priya's history.md.
+- For agent 3 (Alex): answer `e`, edit one summary. Verify the edited form lands.
+- For agent 4 (Felix or Yuki): answer `r` (reject all). Verify no entries land for that agent and no commit is created.
+- For agent 5 (Sam): answer `d` (defer). Verify `~/.hacky-hours/sessions/<session-id>/backfill-pending/sam.md` exists.
+- After all 12 agents resolved: footer summary prints per-agent disposition + commits added count.
+
+```bash
+# Verify per-agent commits exist
+git -C ~/.hacky-hours/teams/default log --oneline | grep "history: backfill"
+# Should show separate commits per accepting agent
+
+# Verify a specific agent's history.md
+cat ~/.hacky-hours/teams/default/agents/product/history.md
+# Should have the 12 entries chronologically, all annotated `(backfilled, CHANGELOG#...)`
+
+# Verify backfilled-vs-forward-captured distinguishability
+grep "(backfilled," ~/.hacky-hours/teams/default/agents/product/history.md | wc -l
+# Should match the accepted count for that agent
+```
+
+**Re-invocation safety:** run `/hacky-hours team backfill` a second time on the same repo:
+
+**Expected:** entries already present (with their `(backfilled, ...)` annotations matched against proposed anchors) are skipped. Conductor sees: *"<count> entries already backfilled for <agent>; <count> new entries to consider."* If everything is already there: *"No new backfill candidates — already retroactively populated."*
+
+✅ Pass criteria: per-agent batches behave correctly under each disposition (accept/select/edit/reject/defer); per-agent commits land on team repo; annotations distinguish backfilled from future forward-captured entries; re-invocation is idempotent.
+
+---
+
+## Test 12 — Slice 13 verification (agent representation: metrics + team site + résumé + reflection)
+
+The thesis-visibility test. Slice 12 closed the persistence loop in the data; Slice 13 closes it in the visible layer. Verify the four coordinated pieces work together: metrics refresh, team-site rendering, résumé generation, and reflection. Assumes Slice 12 has been run and at least one team has history (run Test 11 first, or backfill this repo).
+
+### 12.1 Metrics block springs into existence after first multi-role verb
+
+Pre-state: a fresh agent's `profile.md` has no `metrics:` block. (Default team templates ship without one; the block lands on first refresh.)
+
+```bash
+# Inspect pre-state
+grep -A1 "^metrics:" ~/.hacky-hours/teams/default/agents/security/profile.md
+# Should print nothing (no metrics block yet) OR an existing one from prior tests
+```
+
+Run a multi-role verb that engages Security:
+
+```
+/hacky-hours audit
+```
+
+After the audit's Step 5 (Stash), inspect:
+
+```bash
+grep -A12 "^metrics:" ~/.hacky-hours/teams/default/agents/security/profile.md
+```
+
+**Expected:** the `metrics:` block now exists with at least `level`, `history_entries`, `projects`, `verbs_run`, `last_active`, `metrics_refreshed` populated. Values reflect the audit run (e.g., `history_entries: 1`, `verbs_run: 1`, `projects: [hacky-hours-docs]`, `last_active: <today>`, `level: 1`).
+
+```bash
+# Verify the commit bundles history.md + profile.md
+git -C ~/.hacky-hours/teams/default log -1 --stat
+# Should show both agents/security/history.md AND agents/security/profile.md in the same commit
+```
+
+✅ Pass criteria: metrics block is created/refreshed in same commit as history append; level + counts reflect actual activity.
+
+### 12.2 Level derivation handles base table + breadth bumps
+
+Pre-condition: backfill this repo so multiple agents have varying history counts and verb-type variety.
+
+```
+/hacky-hours team backfill
+# accept all batches
+```
+
+Inspect a few agents' levels:
+
+```bash
+for agent in product architect security accessibility data; do
+  echo "=== $agent ==="
+  grep -A2 "^metrics:" ~/.hacky-hours/teams/default/agents/$agent/profile.md | grep -E "level|history_entries"
+done
+```
+
+**Expected:** levels track the base table:
+- agents with 0 entries → level 0
+- 1–5 entries → level 1
+- 6–15 → level 2
+- 16–30 → level 3
+- 31–60 → level 4
+- 61+ → level 5
+
+Plus breadth bumps:
+- +1 if 3+ projects (probably won't fire on this repo; only 1 project)
+- +1 if 5+ verb types (likely fires for product and architect)
+
+Maya (product) and Priya (architect) likely hit level 3 from raw count with a +1 bump from verb-type variety → level 4. Verify the math matches the table.
+
+✅ Pass criteria: levels are honest signal — high count alone doesn't max out levels without breadth; agents with no work show level 0.
+
+### 12.3 Team site renders metrics badges on index cards
+
+```
+/hacky-hours team site build
+open ~/.hacky-hours/teams/default/docs/index.html
+```
+
+**Expected:** Index page shows agent cards. Each card with `history_entries > 0` displays a metrics badge below the body: `lvl <N> · <count> contribution(s) · <K> project(s)`. Agents with zero history get no badge (clean card). Level number is highlighted with the accent color.
+
+Inspect HTML directly:
+
+```bash
+grep -c "metrics-badge" ~/.hacky-hours/teams/default/docs/index.html
+# Should match the count of agents with non-zero history
+```
+
+✅ Pass criteria: badges render where appropriate; absent where appropriate; visually distinct from existing card content.
+
+### 12.4 Profile page renders Recent track record + Lessons applied
+
+Open any agent with history:
+
+```bash
+open ~/.hacky-hours/teams/default/docs/agents/architect.html
+```
+
+**Expected:**
+- Header has metadata line ending with "Level <N> · <count> contributions"
+- After the existing Bio (Background / How I work / What I produce), a new "Recent track record" section appears with a timeline of up to 10 entries (newest first). Each entry shows date · project · verb · summary.
+- After Track record, a "Lessons applied" section shows up to 5 durable feedback notes (omitted if `feedback.md` is empty or only contains the template placeholder).
+- Backfilled entries' `(backfilled, ...)` annotation is stripped from the rendered verb name (display-clean; data still has it).
+
+```bash
+grep -c "Recent track record" ~/.hacky-hours/teams/default/docs/agents/architect.html
+# Should be 1
+grep -c "history-entry" ~/.hacky-hours/teams/default/docs/agents/architect.html
+# Should match min(history_entries, 10) for that agent
+```
+
+✅ Pass criteria: timeline renders chronologically; entries are readable; lessons render only when present; CSS is mobile-responsive (resize to <600px and verify single-column layout).
+
+### 12.5 team resume generates fact-derived synthetic résumé
+
+```
+/hacky-hours team resume architect
+```
+
+**Expected:** writes `~/.hacky-hours/teams/default/agents/architect/resume.md`. Footer prints line count + level + contribution count.
+
+```bash
+cat ~/.hacky-hours/teams/default/agents/architect/resume.md
+```
+
+Verify structure:
+- Frontmatter: `agent`, `generated`, `generator: team-resume v4.0.0`, `style: standard`, `source.history_entries`, `source.feedback_entries`
+- `# <Name> <avatar> <Role>` header
+- `> <tagline>` quote
+- `**Level <N>** · <count> contributions · <K> projects · joined <date>`
+- `## Summary` (2-3 sentences, no padding)
+- `## Skills` (aggregated by verb-type, evidence counts cited)
+- `## Experience` grouped by project, chronological within project, newest-first
+- `## Recent learnings` (paraphrased from feedback; omitted if feedback empty)
+- `## Profile` (verbatim bio sections)
+- Footer line
+
+✅ Pass criteria: every skill claim has a count traceable to history.md; no invented experience; honest about thin work (if architect has only 3 entries, skills section is 1-2 lines, not padded to 8).
+
+### 12.6 team resume --all + thin-work honesty
+
+```
+/hacky-hours team resume --all
+```
+
+**Expected:** writes resume.md for every agent. Per-agent status lines print. Agents with zero history get a **minimal** résumé (header + Summary + Profile only — no Skills/Experience/Learnings padding). Agents with history get standard structure.
+
+```bash
+# Verify zero-history agent gets minimal output
+wc -l ~/.hacky-hours/teams/default/agents/data/resume.md   # likely minimal — data has no FE/BE work in this repo
+wc -l ~/.hacky-hours/teams/default/agents/product/resume.md # likely fuller — product touches every milestone
+```
+
+The first should be noticeably shorter than the second. Honest output reflects actual work.
+
+✅ Pass criteria: --all completes for all 12 agents; minimal vs. standard structure matches history depth; no résumé claims experience the agent doesn't have.
+
+### 12.7 Team site links to résumés and renders standalone pages
+
+```
+/hacky-hours team site build
+```
+
+**Expected:** for every agent with a `resume.md`, a `docs/agents/<id>-resume.html` is generated. Profile pages show a "📄 Read full résumé →" link below the specialties list.
+
+```bash
+open ~/.hacky-hours/teams/default/docs/agents/architect-resume.html
+```
+
+**Expected on the résumé page:**
+- "← Profile" back-link in the header (navigates back to the profile page, not the team index)
+- Rendered markdown of resume.md as a single-column page
+- Distinct styling (blockquote accents, larger h1)
+
+✅ Pass criteria: résumé pages render; back-link goes to profile; cross-link from profile to résumé is present and works.
+
+### 12.8 team reflect — silent Track record refresh + prose proposals + self-observations
+
+Pre-condition: agent has at least 5 history entries (run Test 12.2 backfill first).
+
+```
+/hacky-hours team reflect architect
+```
+
+**Expected interactive flow:**
+- The verb reads `history.md`, `feedback.md`, current `profile.md`
+- Phase 1: silently refreshes a `## Track record` section in profile.md Bio (auto-append/replace, no review). One paragraph per project, third-person past-tense.
+
+```bash
+# After running reflect — check Track record section is present
+grep -A20 "^## Track record" ~/.hacky-hours/teams/default/agents/architect/profile.md
+```
+
+- Phase 2: presents proposed prose updates (Background / How I work / What I produce) — only sections where history/feedback justifies revision. For each, writes a `kind: prose_update` pending entry. Verify:
+
+```bash
+ls ~/.hacky-hours/sessions/<session-id>/pending/
+# Should show one or more architect.md pending entries with kind: prose_update
+cat ~/.hacky-hours/sessions/<session-id>/pending/architect.md
+# Should have frontmatter: kind: prose_update, target_section: <background|how_i_work|what_i_produce>
+```
+
+- Phase 3: prints self-observations (strengths + gaps). Conductor names items to stash as behavior feedback. Verify those land as separate `kind: behavior_feedback` pending entries.
+
+```bash
+# Commit log on team repo
+git -C ~/.hacky-hours/teams/default log --oneline | head -3
+# Should show "reflect: architect @ <date> — track record + metrics refreshed" (1 commit, the silent refresh)
+```
+
+Promote a proposed prose update:
+
+```
+/hacky-hours team update
+# Accept one of the prose_update entries
+```
+
+**Expected:** the relevant section in `profile.md` Bio (Background / How I work / What I produce) is replaced with the proposed prose; team repo commits the change.
+
+✅ Pass criteria: Track record refreshes silently (no review interruption); prose updates land in pending review with correct frontmatter; self-observations print and can be opt-in stashed; team-update promotes prose updates cleanly.
+
+### 12.9 Hybrid editing — three review semantics behave distinctly
+
+Verify the three review-semantic paths from the ADR don't blur together:
+
+- **Silent (metrics, Track record):** runs `audit` again; metrics refresh + history append happen in one commit with no conductor prompt. Track record section refreshes only on `team reflect`, also silent.
+- **Conductor-reviewed (prose updates):** `team reflect` proposes prose updates; nothing lands until `team update` accepts each section explicitly.
+- **Conductor-initiated (self-observations):** printed by `team reflect`; no auto-write; nothing lands unless conductor names items to stash.
+
+Run all three in one session and verify each behaves correctly:
+
+```
+/hacky-hours audit                 # silent metrics + history
+/hacky-hours team reflect product  # silent track record + reviewed prose + printed self-obs
+/hacky-hours team update           # conductor reviews the pending prose updates
+```
+
+✅ Pass criteria: each path operates as designed; no accidental conflation (e.g., metrics don't end up in the pending review flow; prose updates don't auto-land).
+
+### 12.10 End-to-end thesis verification — this repo, fresh team site
+
+After running Tests 11 (Slice 12) + 12.1–12.9, open the team site one final time:
+
+```
+/hacky-hours team resume --all
+/hacky-hours team site build
+open ~/.hacky-hours/teams/default/docs/index.html
+```
+
+**Expected — the thesis becomes visible:**
+- Index cards show level badges for agents who've shaped this codebase. Maya, Priya, Alex, Lena, Diego, Emma, Jordan visibly differ from data, ai-ml, FE, BE (who have less or no history on a docs-only repo).
+- Click into any agent's profile → see Recent track record timeline of their actual contributions. Lessons applied if they have durable feedback. Résumé link.
+- Click the résumé link → see the full synthetic CV with summary, skills, experience by project, recent learnings, and profile.
+- Click "← Profile" from résumé → back to profile page.
+- Each agent reads as a *teammate with a track record*, not a static persona.
+
+✅ Pass criteria: the conductor opens the team site and recognizes the agents as having grown with the project. The v4 thesis — *"orchestra of stakeholder-role AI agents that learn and grow with context"* — is no longer a claim but a visible fact.
+
+---
+
 ## Cleanup (optional)
 
 If you want to revert after testing:

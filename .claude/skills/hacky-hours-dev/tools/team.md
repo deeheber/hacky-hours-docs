@@ -13,6 +13,9 @@ Parse the rest of `$ARGUMENTS` after `team`:
 - "new [--tier <tier>]"       → create a new team (interactive; defaults to "full" tier)
 - "init"                      → if `~/.hacky-hours/teams/default/` doesn't exist, create it from the template; otherwise no-op
 - "update"                    → Read `${CLAUDE_SKILL_DIR}/tools/team-update.md` and follow it (promote session customizations into the team repo)
+- "backfill [flags]"          → Read `${CLAUDE_SKILL_DIR}/tools/team-backfill.md` and follow it (retroactively populate agent `history.md` from the project's CHANGELOG / git log)
+- "resume <agent-id> [flags]" or "resume --all" → Read `${CLAUDE_SKILL_DIR}/tools/team-resume.md` and follow it (generate synthetic resumes from accumulated profile + history + feedback)
+- "reflect <agent-id> [flags]" or "reflect --all" → Read `${CLAUDE_SKILL_DIR}/tools/team-reflect.md` and follow it (agent self-reflection: refresh Track record + propose prose updates + surface self-observations)
 - "site" or "site <subcommand>" → Read `${CLAUDE_SKILL_DIR}/tools/team-site.md` and follow it (static site for browsing — serve / build / publish)
 - "chat" or "chat <mode>"     → run the **Chat Mode** handler below (set or report `team_chat` in `~/.hacky-hours/settings.yml`)
 - "help"                      → print the help message below, then stop
@@ -213,6 +216,9 @@ Subcommands:
   init                     Create the default team (idempotent)
   chat [off|minimal|full]  Show or set team chat mode (multi-agent dialogue visibility)
   update                   Promote pending session changes to team repo
+  backfill [flags]         Retroactively populate agent history.md from CHANGELOG/git log
+  resume <id> | --all      Generate synthetic resume(s) from profile + history + feedback
+  reflect <id> | --all     Agent self-reflection: refresh track record + propose prose updates
   site [serve|build|publish]  Static site for browsing
   help                     Show this message
 

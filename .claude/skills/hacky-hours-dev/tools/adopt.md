@@ -6,6 +6,8 @@ When this verb runs, the active team meets the codebase. Each role reads the rel
 
 **Team chat mode:** Adopt is the *meet the team* moment — chat mode is especially valuable here. Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
 
+**Team learning capture:** Adopt is the full-team-meets-codebase moment — every role with non-N/A involvement participates. At the tail (Step 8 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent (one entry: "Met <project> at Tier <N>; recommended <involvement-level>"), then the one-line behavior-feedback prompt. This is the foundational history entry for the project on this team — every subsequent verb's history line gets read against this baseline.
+
 ---
 
 ## Step 0 — Pre-flight
@@ -497,6 +499,17 @@ Print to conductor:
 > *  - Triage the P0s from the assessment*
 > *  - `/hacky-hours team` to browse the roster*
 > *  - `/hacky-hours team update` to promote any feedback you've given the agents during this session*"
+
+## Step 8 — Stash (team learning)
+
+Run per `${CLAUDE_SKILL_DIR}/references/capture-format.md`. Adoption is the foundational team-meets-project moment, so the history entries here are especially load-bearing — every subsequent verb's history line implicitly references this baseline.
+
+1. List the agents that actually contributed to the assessment (skip any with N/A involvement).
+2. Compose a one-sentence past-tense contribution summary per participant. Include the recommended involvement level: e.g., *"Met hacky-hours-docs at Tier 1; recommended High involvement; flagged 2 P0s on input validation in tools/issue.md and tools/team.md."* Concrete.
+3. Resolve the session ID per the algorithm in `capture-format.md`.
+4. **History append + metrics refresh (silent):** for each participant, append `- <date> · <project-slug> · adopt · <summary>` to `~/.hacky-hours/teams/<active>/agents/<agent-id>/history.md`. Then refresh the `metrics:` block in each participating agent's `profile.md` per `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Derived metrics" + §"Level derivation". Commit both files together: `git -C ~/.hacky-hours/teams/<active>/ add agents/*/history.md agents/*/profile.md && git commit -m "history: adopt @ <project> @ <date> — <N> agent(s)"`.
+5. **Behavior feedback prompt:** ask the conductor *"Anything you said during adoption that should change how an agent works in future sessions? Free-form by agent, or `none`. (Common at adopt-time: 'be terser on this codebase' — it sets the rhythm for everything that follows.)"* For each agent named, write `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` per the schema.
+6. **Footer:** print *"Stashed <N> behavior note(s) for <agents>. Appended adoption history to <count> agent(s) (commit <sha>). This is the project's foundational team-meets-project record — every subsequent verb's history line references it. Promote with `/hacky-hours team update` when ready."*
 
 ## Notes for the assistant running this
 

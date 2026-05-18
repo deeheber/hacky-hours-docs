@@ -115,6 +115,62 @@ Closes the v4 thesis gap pilot surfaced: orchestra was loaded as context but inv
 - **Cost surfacing explicitly deferred to v4.1+** — no per-verb calibration data, no published tier → token-envelope mapping, no skill-level access to `/usage`. Switching to `full` prints a one-line caveat without numbers; existing `session_budget_warn` (§4.3) fires on actual consumption.
 - Design source: V4_DESIGN.md §4.20.
 
+### Added (Slice 12 — team learning closer, audit Lane B saturation guard, issue label-detect)
+
+Closes the v4 thesis loop pilot dogfooding surfaced (after Slice 11 made the orchestra audible): the orchestra was loaded, spoke aloud, and forgot the conversation. Pre-Slice-12, no verb wrote to `~/.hacky-hours/sessions/<id>/pending/` or to per-agent `history.md`. The "agents learn and grow with context" headline was structural-only.
+
+- **`references/capture-format.md`** — canonical contract for team-learning persistence. Pending-entry schema (frontmatter + content), `history.md` line schema, session-ID resolution algorithm (marker file at `~/.hacky-hours/sessions/.current-session` with 4-hour staleness window), per-verb implementation responsibilities, edge cases. Every multi-role verb references it; format changes happen in one file.
+- **Phase N — Stash wired into every multi-role verb** — `steps/01-ideate.md`, `steps/02-design.md`, `steps/03-roadmap.md`, `steps/04-build.md`, `steps/05-iterate.md`, `reviews/audit.md` (Step 5), `tools/adopt.md` (Step 8, foundational team-meets-project history), `tools/arbitrate.md` (Step 5, high-signal behavior feedback). At verb tail: silent `history.md` append for each participating agent (one line per: date · project · verb · contribution), then a one-line behavior-feedback prompt to the conductor (always shown; `none` is a valid answer). Pending behavior notes accumulate at `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` for promotion via `/hacky-hours team update`. History commits land directly in the team repo at end-of-verb without going through review.
+- **`/hacky-hours team backfill` — retroactive history population** (closes the "what about existing project history" gap surfaced during Slice 12 design). Forward-capture handles work done after Slice 12 lands. Projects that adopted v4 mid-stride — including hacky-hours-docs itself — need retroactive population, or agents' track records start empty on day-one of v4.0.0 install (team site renders bios with no history even for projects the team has shaped extensively). One-shot conductor-invoked verb: reads bound project's CHANGELOG.md (preferred) or git log, classifies each entry by which discipline(s) it touched (file paths + keywords table), proposes per-agent batches of history lines, conductor reviews per-agent (accept all / select / edit / reject / defer), commits per agent batch. Backfilled entries annotated `(backfilled, <CHANGELOG-anchor-or-SHA>)` for distinguishability + verifiable provenance. Flags: `--source changelog|git|both`, `--since <YYYY-MM-DD>`, `--dry-run`, `--agent <agent-id>` (incremental). Spec: `tools/team-backfill.md`.
+- **`tools/team-update.md` updated** to drop the "captures automatically when..." vibes-spec and reference `references/capture-format.md` as source of truth. Clarifies behavior-feedback (review-required) vs. history-append (silent, fact-of-record) paths.
+- **Audit Lane B saturation guard (closes issue #6)** — `reviews/audit.md` adds a conductor-side post-Lane-B saturation check: cross-references the doc-stranger's "First fix" recommendation against prior audit reports + Lane C verification + current doc state. If the recommendation is already present in the docs the stranger just read, replaces the first-fix with a graduation-indicator note instead of recording a false-negative critique. Documentation dimension on the scorecard annotates `· saturated (N)` where N is the consecutive saturation count (durable in `audits/.lane-b-saturation`). Preserves Lane B subagent's purity (it still reads only docs, no prior context); the conductor is the test interpreter.
+- **`tools/issue.md` label-detect (closes issue #6 tail bug)** — probes upstream labels via `gh label list --repo empathetech/hacky-hours-docs` before `gh issue create`. Builds `--label` from the intersection of requested labels (`user-feedback`, `v<framework-major-version>`) and existing labels. Omits `--label` entirely if no intersection — submitting with a non-existent label would fail the whole call. Surfaces missing-labels gap in the issue body footer so upstream can address.
+- **`V4_DESIGN.md` §4.21** — full design rationale for capture step (mechanism choice, two-slot review semantics, session-ID heuristic, deferred items).
+- **ADR** at `02-design/decisions/2026-05-17-team-learning-capture.md` — captures the design decision including rejected alternatives (inline capture, end-of-session hook, conductor-initiated only, history-merged-into-feedback-review).
+- **V4_QA.md Test 11** — 10 sub-tests covering pre-state, history append, behavior feedback prompt, "none" answer path, team-update promotion, next-session-uses-updated-agent verification, session-ID staleness regeneration, Lane B saturation guard, issue.md label-detect, team site reflection.
+
+### Deferred to v4.1+ from Slice 12
+
+- **History compaction** when `history.md` exceeds ~500 lines / ~10k tokens. Slice 12 ships append; compaction needs design on trigger + review semantics.
+- **Implicit feedback capture** (override-N-times → stash implicitly). Real signal but classification fuzzy. Re-evaluate after explicit prompt has run a release cycle.
+- ~~**Team site rendering of `history.md`**~~ — *un-deferred; shipped in Slice 13 (below).*
+- **Per-verb stash-mode override** in `settings.yml`. Always-on is the v4.0.0 default; tune later if data says it's noisy.
+
+### Added (Slice 13 — Agent representation: team site history + auto-evolving profile + résumé + reflection)
+
+Closes the v4 thesis loop in the visible layer. Pre-Slice-13, Slice 12's persistence was real in data but invisible on the team site — bios stayed static even as agents accumulated work. Conductor surfaced this during Slice 12 ship: *"the point of the team site and having these team avatars are that they are learning and growing with context; I want to treat these AI agents like human team members."* Slice 13 makes the orchestra appear as teammates with track records, not static personas with attached logs.
+
+**Four coordinated pieces, all in v4.0.0:**
+
+- **Derived metrics block (`metrics:` in `profile.md` frontmatter)** — auto-managed schema in every agent's `profile.md`: `level` (0–5 with breadth bumps), `history_entries`, `projects`, `verbs_run`, `by_verb` counts, `feedback_count`, `last_active`, `metrics_refreshed`, `reflected_at`. Refreshed in the same git commit as history append at end of every multi-role verb's Stash phase (bundled — no separate commit). Display-only; conductors don't hand-edit (overwritten on next refresh). Schema spec: `references/capture-format.md` §§"Derived metrics" + "Level derivation".
+- **Team-site renders history + lessons + résumés + level badges** (un-defers the v4.1+ item from Slice 12). `templates/team-site/generate.py` extended (~150 lines added, still pure Python stdlib) to read `history.md`, `feedback.md`, the `metrics:` block, and `resume.md` per agent. Profile pages gain a "Recent track record" timeline (last 10 entries with date/project/verb/summary), a "Lessons applied" section (durable feedback notes), a résumé link (when present), and a level + contribution-count metadata line in the header. Index cards gain a level badge (`lvl 3 · 18 contributions · 1 project`). Agents with no history get no badge — keeps fresh team grids clean. Mobile-responsive CSS additions.
+- **`/hacky-hours team resume <agent-id> | --all`** — synthetic résumé generator. Writes `agents/<id>/resume.md` composited from `profile.md` + `system-prompt.md` + `history.md` + `feedback.md` + `preferences.yml`. Structure: header (name, role, level, contributions), summary (distilled), skills (aggregated by verb-type with evidence counts), experience (grouped by project, chronological), recent learnings (paraphrased from feedback), profile (verbatim bio). Three style presets — `minimal` / `standard` / `deep`. Fact-derived only — every claim traces to a source; no invented skill claims; honest about thin work (agents with zero history get a minimal résumé, not padded). Regenerated freely; conductor commits if they want it tracked. Spec: `tools/team-resume.md`.
+- **`/hacky-hours team reflect <agent-id> | --all`** — agent self-reflection. Opt-in, conductor-invoked. Agent walks own `history.md` + `feedback.md` + `profile.md` and produces three outputs:
+  - **Track record section** — silent auto-append/replace in `profile.md` Bio. One paragraph per project, third-person past-tense, cites by count. No conductor review (same semantics as forward-capture history append). Committed silently.
+  - **Prose updates** — proposed refinements to Background / How I work / What I produce sections. Each warranted revision writes a `kind: prose_update` pending entry to `~/.hacky-hours/sessions/<id>/pending/<agent-id>.md` with a `target_section` field, reviewed via existing `team update` accept/edit/reject/defer flow.
+  - **Self-observations** — strengths the agent sees in own work + gaps to close. Printed; conductor names items to stash as behavior feedback for next session.
+
+  Spec: `tools/team-reflect.md`. Cadence: opt-in only (not part of Stash phase). Hybrid editing model conductor-confirmed: silent (metrics, track record), conductor-reviewed (prose updates), conductor-initiated (self-observations).
+
+- **`tools/team-update.md`** now accepts `kind: prose_update` pending entries in addition to `behavior_feedback` and `prompt_edit` — same accept/edit/reject/defer flow per section.
+- **`tools/team.md` + `SKILL.md`** — routing + help text for `team resume` and `team reflect` subcommands; argument-hint updated.
+- **Every multi-role verb's Stash step 4** updated to bundle metrics refresh with history append in a single commit.
+- **`references/capture-format.md`** — new sections §§"Derived metrics", "Level derivation", "Resume composition", "Reflection semantics". Implementation-responsibilities step 5 added (metrics refresh) with bundled commit pattern.
+
+**Design + project artifacts:**
+
+- `V4_DESIGN.md` §4.22 — full design rationale
+- ADR `02-design/decisions/2026-05-17-agent-representation.md` — captures the four-piece decision, hybrid editing rationale, and rejected alternatives (single combined verb, conductor-set levels, separate metrics file, auto-rewrite without review)
+- V4_QA.md Test 12 — 10 sub-tests covering metrics refresh post-verb, resume generation per agent, reflection three-output flow, hybrid bio editing semantics, team-site rendering of history/lessons/badges/résumé links
+
+### Deferred to v4.1+ from Slice 13
+
+- History compaction (shared deferral with Slice 12)
+- Agent-to-agent skill recommendation
+- Résumé export to non-Markdown shapes (LinkedIn JSON / PDF)
+- Per-project skill maps + cross-project skill inference
+- Reflection auto-cadence triggers
+
 ### Backward compatibility
 
 - All v3 verbs (`step`, `review 1..3`, `learn 1..3`, `update 1..2`, `tools upgrade|mode|walkthrough`) continue to work in v4
@@ -122,6 +178,7 @@ Closes the v4 thesis gap pilot surfaced: orchestra was loaded as context but inv
 - Migration story for v3 → v4 will land in `tools/upgrade.md` updates as subsequent slices complete
 - `disable-model-invocation` removal is a behavioral change but not a breaking install — v3 projects that never relied on context-driven invocation are unaffected
 - **Slice 11 (team chat):** existing `~/.hacky-hours/settings.yml` files without `team_chat:` are treated as `team_chat: minimal` until the user sets it explicitly. No breaking change to first-time invocation.
+- **Slice 12 (team learning capture):** existing teams without prior `history.md` entries are unaffected — the auto-append just starts adding entries from this point forward. Existing `~/.hacky-hours/sessions/` (empty pre-Slice-12) is similarly unaffected; the `.current-session` marker is created on first capture. No data migration required.
 
 ---
 
