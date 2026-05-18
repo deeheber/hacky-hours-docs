@@ -7,6 +7,181 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.0.0] — 2026-05-17
+
+**v4.0.0 — orchestra of stakeholder-role AI agents.** Reframes hacky-hours as a *competence prosthesis* — an orchestra of stakeholder-role AI agents (product, design, architect, FE, BE, security, ops, QA, a11y, licensing, Data, AI/ML) so one person can build software at team-grade and graduate the work to a real team. Replaces v3's "documentation framework for LLM-assisted app development" framing.
+
+Thesis-complete shipment: Slice 11 (orchestra audible) + Slice 12 (orchestra remembers) + Slice 13 (orchestra visible). See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
+
+### Added (Slice 1 — v4 foundation)
+
+- **v4 identity in SKILL.md** — framework is now the "conductor's podium" for an orchestra of stakeholder-role agents; matches the v4 thesis
+- **Reversed model invocation** — `disable-model-invocation: true` removed. Framework can now be invited from context (natural-language prompts like "build me an app", "harden this codebase", "audit this"). Always opens with an invitation pattern — never auto-enters.
+- **v4 routing** — new verbs added to SKILL.md: `team`, `adopt`, `audit`, `arbitrate`, `feedback`, `issue`, `meta`. v3 verbs (`step`, `review`, `learn`, `update`, `tools`) remain supported for backward compatibility.
+- **v4 first-run flow** — `tools/v4-first-run.md` creates the global user-level skeleton at `~/.hacky-hours/` (version, settings.yml, teams/, feedback/, sessions/, versions/) on first invocation. Seeds the audience profile with one short question.
+- **`~/.hacky-hours/settings.yml` schema** — user-level preferences: session budgets, default model + per-role overrides, voice baseline, audience profile (technical background + per-role fluency), privacy toggles.
+- **Routing stubs** for v4 verbs not yet implemented in Slice 1 — each stub honestly reports its slice status and points to the v3 fallback where applicable.
+- **V4_DESIGN.md** — 503-line design document at `hacky-hours/02-design/V4_DESIGN.md` capturing the thesis, architectural foundations, all 19 locked design decisions, role roster, operations & state files, update flow, deferral list, kickoff order, and risks held consciously.
+
+### Changed
+
+- **SKILL.md description** — expanded into a rich, model-matchable description so context-driven invocation fires on relevant prompts (and stays silent on tactical one-offs)
+- **Help message** — updated to v4.0.0 with v4 verbs prominent and v3 verbs marked as legacy-but-supported
+
+### Added (Slice 2 — default team roster)
+
+- **Default team template** at `templates/team/default/` — full 12-agent roster with:
+  - Maya Tanaka (📊 Product) — user value, scope discipline, roadmap
+  - Felix Okafor (🎨 Design) — user journeys, IA, interaction
+  - Priya Chen (🏗️ Architect) — system design, ADRs, technology selection
+  - Marcus Rivera (🖥️ Frontend) — components, state, perf, progressive enhancement
+  - Sam Park (⚙️ Backend) — APIs, reliability, integration
+  - Alex Davies (🛡️ Security) — threat modeling, secrets, auth, validation
+  - Jordan Kim (🚀 Ops/SRE) — deployment, observability, runbooks, on-call
+  - Emma Wright (🔍 QA) — test strategy, edge cases, regression risk
+  - Lena Mwangi (♿ Accessibility) — WCAG, keyboard, screen reader, contrast
+  - Diego Romano (📜 Licensing) — license compatibility, compliance scope
+  - Yuki Nakamura (📈 Data) — schema, pipelines, retention, analytics
+  - Kai Patel (🤖 AI/ML) — model selection, evals, AI safety
+- **Each agent has 5 files**: profile.md (SSG-renderable frontmatter + bio), system-prompt.md (full role definition with audience adaptation), history.md (compactable resume), feedback.md (durable conductor feedback), preferences.yml (per-agent config)
+- **Team-level files**: README.md (team description), tier.yml (full-tier roster + multiplexing config), VERSION (4.0.0), LICENSE (private by default per item 18), .gitignore
+- **`/hacky-hours team` verb** — full implementation upgraded from Slice 1 stub:
+  - Default Team Bootstrap on first invocation (copies template, stamps dates, `git init` + initial commit)
+  - `team` no-arg: survey + roster view
+  - `team list` — list all teams
+  - `team show <agent-id>` — view agent profile (and `--prompt` for full system prompt)
+  - `team switch <name>` — bind current project to a different team
+  - `team new` — create a new team
+  - `team init` — idempotent default-team creation
+  - `team help` — full help
+- **Team architecture made tangible**: teams are user-owned, separate from any project, applied by binding via project `AGENTS.md`. Each team is its own git repo (local-only default; GitHub-friendly remote optional).
+
+### Added (Slice 4b — per-role first-impressions design docs in adopt)
+
+- Adopt's Step 6 now produces real design docs from each **High** or **Critical** involvement role, not a placeholder.
+- Each first-impressions doc is written in team-grade voice with frontmatter (`owner`, `last_reviewed`, `status: first-impressions`, `tier`, `covers`, `does_not_cover`, `related_docs`) so docs are standalone-readable and graduation-ready from day one.
+- Two-tier template (per v3.0.0) used for ARCHITECTURE, SECURITY_PRIVACY, ACCESSIBILITY: deep + summary.
+- Per-role doc generation respects denylist + tier calibration + voice mode.
+- Parallel via Agent tool where available; sequential fallback otherwise.
+- v3 → v4 migration case: existing v3 design docs are NOT overwritten — conductor is asked whether to augment, rewrite, or skip each.
+
+### Added (Slice 7 — improvement loop closer)
+
+- **`/hacky-hours feedback`** — capture session friction (tool / seam / role kinds) to `~/.hacky-hours/feedback/<date>-<kind>-<slug>.md`. Structured frontmatter, local-only, never auto-uploaded.
+- **`/hacky-hours issue`** — opt-in submission of a feedback bundle (or fresh-composed content) as a GitHub issue against `empathetech/hacky-hours-docs`. Per-submission permission gate (`yes` / `edit` / `save draft` / `cancel`). Uses `gh` CLI.
+- **`/hacky-hours meta`** — clusters accumulated feedback by kind/target/tags, proposes specific diffs against framework source files (verb files, role system prompts, schemas). Conductor reviews each cluster's proposed patch and chooses apply / submit-as-issue / submit-as-PR / skip / edit. Confidence-rated per cluster. Closes the dogfood improvement loop.
+
+### Added (Slice 8 — team update + arbitration modes)
+
+- **`/hacky-hours team update`** — promotes pending session changes (behavior feedback, prompt edits) into the team repo with per-change accept/edit/reject/defer review. Single git commit on the team repo per session-update; honest multi-session race-condition handling; never silently overwrites.
+- **`/hacky-hours arbitrate <mode> <topic>`** — three named arbitration patterns:
+  - `decide` — cheapest, framework summarizes positions, conductor decides directly
+  - `resolve` — conductor states concerns, framework asks each role to propose against them
+  - `watch` — agents converse with each other while conductor observes, ends on convergence or interrupt
+- Every arbitration produces an ADR at `hacky-hours/02-design/decisions/<date>-<topic>.md` regardless of mode. `watch` mode appends the full transcript.
+
+### Added (Slice 9 — static team site)
+
+- **`/hacky-hours team site [serve|build|publish]`** — pure Python 3 stdlib static site generator (no npm, no Astro, no PyYAML, no Jinja). Reads agent `profile.md` frontmatter + bodies, generates HTML roster grid + per-agent profile pages.
+- Three browse modes:
+  - `serve` — local server (`python3 -m http.server 8000`); user runs the command themselves (no background-spawn risk)
+  - `build` — generates `~/.hacky-hours/teams/<team>/docs/`; works via `file://` (relative URLs, no fetch dependencies)
+  - `publish` — guides through GitHub Pages setup with a clear privacy gate before exposing team data
+- Respects per-field `published` flag in profile.md frontmatter — `false` skips the agent entirely.
+- Optional auto-deploy GitHub Action template for users who push the team repo.
+- Mobile-friendly CSS; emoji avatars; clean readable typography.
+
+### Added (Slice 10 — export verb)
+
+- **`/hacky-hours export <target>`** — exports project docs for graduation into a team's knowledge base.
+- v4.0.0 ships:
+  - `markdown-bundle` — single concatenated `.md` with TOC, paste-ready for Notion / Confluence / Obsidian / GDocs. Smart heading-demotion, cross-doc link rewriting, two-tier doc handling.
+  - `html-bundle` — designed; v4.0.0 recommends running `markdown-bundle` then any SSG (MkDocs/Hugo/etc.). Native html-bundle in v4.1+.
+- Excludes operational state files (NARRATIVE.md, STATE.md, adoption-assessment) — exports are team-grade artifacts, not internal working state.
+- API-based exporters (notion, gdocs, confluence) designed-but-not-implemented; honest deferral notice.
+
+### Added (Slice 11 — team chat, tiered closed-captioned multi-agent dialogue)
+
+Closes the v4 thesis gap pilot surfaced: orchestra was loaded as context but invisible during flow.
+
+- **`/hacky-hours team chat <off | minimal | full>`** — toggle team visibility for multi-role verbs. Default `minimal`.
+  - `off` — single narrator, pre-v4 behavior
+  - `minimal` — speaker attribution at meaningful moments only (concern introduction, disagreement, hand-off)
+  - `full` — closed-captioned dialogue with real per-role fan-out, side chatter, voice fidelity
+- **`references/chat-format.md`** — canonical render contract: emoji glyphs (from V4_DESIGN.md §5), `**Name (Role) [HH:MM]**` header, per-mode rules, voice baselines table.
+- **The hard rule** — "no tokens for tokens' sake" enforced across all modes. Every turn must add information; filler agreement, empty acknowledgments, manufactured disagreement, and restated points forbidden. Documented in `references/chat-format.md`.
+- **`team_chat` setting** added to `~/.hacky-hours/settings.yml` (added by `v4-first-run.md` for new installs; existing users get a one-line append on first use).
+- **Verb guidance updated** to honor `team_chat` mode: steps 1–5, `reviews/audit`, `tools/adopt`, `tools/arbitrate`. Each verb reads the mode and `chat-format.md` at entry.
+- **Cost surfacing explicitly deferred to v4.1+** — no per-verb calibration data, no published tier → token-envelope mapping, no skill-level access to `/usage`. Switching to `full` prints a one-line caveat without numbers; existing `session_budget_warn` (§4.3) fires on actual consumption.
+- Design source: V4_DESIGN.md §4.20.
+
+### Added (Slice 12 — team learning closer, audit Lane B saturation guard, issue label-detect)
+
+Closes the v4 thesis loop pilot dogfooding surfaced (after Slice 11 made the orchestra audible): the orchestra was loaded, spoke aloud, and forgot the conversation. Pre-Slice-12, no verb wrote to `~/.hacky-hours/sessions/<id>/pending/` or to per-agent `history.md`. The "agents learn and grow with context" headline was structural-only.
+
+- **`references/capture-format.md`** — canonical contract for team-learning persistence. Pending-entry schema (frontmatter + content), `history.md` line schema, session-ID resolution algorithm (marker file at `~/.hacky-hours/sessions/.current-session` with 4-hour staleness window), per-verb implementation responsibilities, edge cases. Every multi-role verb references it; format changes happen in one file.
+- **Phase N — Stash wired into every multi-role verb** — `steps/01-ideate.md`, `steps/02-design.md`, `steps/03-roadmap.md`, `steps/04-build.md`, `steps/05-iterate.md`, `reviews/audit.md` (Step 5), `tools/adopt.md` (Step 8, foundational team-meets-project history), `tools/arbitrate.md` (Step 5, high-signal behavior feedback). At verb tail: silent `history.md` append for each participating agent (one line per: date · project · verb · contribution), then a one-line behavior-feedback prompt to the conductor (always shown; `none` is a valid answer). Pending behavior notes accumulate at `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` for promotion via `/hacky-hours team update`. History commits land directly in the team repo at end-of-verb without going through review.
+- **`/hacky-hours team backfill` — retroactive history population** (closes the "what about existing project history" gap surfaced during Slice 12 design). Forward-capture handles work done after Slice 12 lands. Projects that adopted v4 mid-stride — including hacky-hours-docs itself — need retroactive population, or agents' track records start empty on day-one of v4.0.0 install (team site renders bios with no history even for projects the team has shaped extensively). One-shot conductor-invoked verb: reads bound project's CHANGELOG.md (preferred) or git log, classifies each entry by which discipline(s) it touched (file paths + keywords table), proposes per-agent batches of history lines, conductor reviews per-agent (accept all / select / edit / reject / defer), commits per agent batch. Backfilled entries annotated `(backfilled, <CHANGELOG-anchor-or-SHA>)` for distinguishability + verifiable provenance. Flags: `--source changelog|git|both`, `--since <YYYY-MM-DD>`, `--dry-run`, `--agent <agent-id>` (incremental). Spec: `tools/team-backfill.md`.
+- **`tools/team-update.md` updated** to drop the "captures automatically when..." vibes-spec and reference `references/capture-format.md` as source of truth. Clarifies behavior-feedback (review-required) vs. history-append (silent, fact-of-record) paths.
+- **Audit Lane B saturation guard (closes issue #6)** — `reviews/audit.md` adds a conductor-side post-Lane-B saturation check: cross-references the doc-stranger's "First fix" recommendation against prior audit reports + Lane C verification + current doc state. If the recommendation is already present in the docs the stranger just read, replaces the first-fix with a graduation-indicator note instead of recording a false-negative critique. Documentation dimension on the scorecard annotates `· saturated (N)` where N is the consecutive saturation count (durable in `audits/.lane-b-saturation`). Preserves Lane B subagent's purity (it still reads only docs, no prior context); the conductor is the test interpreter.
+- **`tools/issue.md` label-detect (closes issue #6 tail bug)** — probes upstream labels via `gh label list --repo empathetech/hacky-hours-docs` before `gh issue create`. Builds `--label` from the intersection of requested labels (`user-feedback`, `v<framework-major-version>`) and existing labels. Omits `--label` entirely if no intersection — submitting with a non-existent label would fail the whole call. Surfaces missing-labels gap in the issue body footer so upstream can address.
+- **`V4_DESIGN.md` §4.21** — full design rationale for capture step (mechanism choice, two-slot review semantics, session-ID heuristic, deferred items).
+- **ADR** at `02-design/decisions/2026-05-17-team-learning-capture.md` — captures the design decision including rejected alternatives (inline capture, end-of-session hook, conductor-initiated only, history-merged-into-feedback-review).
+- **V4_QA.md Test 11** — 10 sub-tests covering pre-state, history append, behavior feedback prompt, "none" answer path, team-update promotion, next-session-uses-updated-agent verification, session-ID staleness regeneration, Lane B saturation guard, issue.md label-detect, team site reflection.
+
+### Deferred to v4.1+ from Slice 12
+
+- **History compaction** when `history.md` exceeds ~500 lines / ~10k tokens. Slice 12 ships append; compaction needs design on trigger + review semantics.
+- **Implicit feedback capture** (override-N-times → stash implicitly). Real signal but classification fuzzy. Re-evaluate after explicit prompt has run a release cycle.
+- ~~**Team site rendering of `history.md`**~~ — *un-deferred; shipped in Slice 13 (below).*
+- **Per-verb stash-mode override** in `settings.yml`. Always-on is the v4.0.0 default; tune later if data says it's noisy.
+
+### Added (Slice 13 — Agent representation: team site history + auto-evolving profile + résumé + reflection)
+
+Closes the v4 thesis loop in the visible layer. Pre-Slice-13, Slice 12's persistence was real in data but invisible on the team site — bios stayed static even as agents accumulated work. Conductor surfaced this during Slice 12 ship: *"the point of the team site and having these team avatars are that they are learning and growing with context; I want to treat these AI agents like human team members."* Slice 13 makes the orchestra appear as teammates with track records, not static personas with attached logs.
+
+**Four coordinated pieces, all in v4.0.0:**
+
+- **Derived metrics block (`metrics:` in `profile.md` frontmatter)** — auto-managed schema in every agent's `profile.md`: `level` (0–5 with breadth bumps), `history_entries`, `projects`, `verbs_run`, `by_verb` counts, `feedback_count`, `last_active`, `metrics_refreshed`, `reflected_at`. Refreshed in the same git commit as history append at end of every multi-role verb's Stash phase (bundled — no separate commit). Display-only; conductors don't hand-edit (overwritten on next refresh). Schema spec: `references/capture-format.md` §§"Derived metrics" + "Level derivation".
+- **Team-site renders history + lessons + résumés + level badges** (un-defers the v4.1+ item from Slice 12). `templates/team-site/generate.py` extended (~150 lines added, still pure Python stdlib) to read `history.md`, `feedback.md`, the `metrics:` block, and `resume.md` per agent. Profile pages gain a "Recent track record" timeline (last 10 entries with date/project/verb/summary), a "Lessons applied" section (durable feedback notes), a résumé link (when present), and a level + contribution-count metadata line in the header. Index cards gain a level badge (`lvl 3 · 18 contributions · 1 project`). Agents with no history get no badge — keeps fresh team grids clean. Mobile-responsive CSS additions.
+- **`/hacky-hours team resume <agent-id> | --all`** — synthetic résumé generator. Writes `agents/<id>/resume.md` composited from `profile.md` + `system-prompt.md` + `history.md` + `feedback.md` + `preferences.yml`. Structure: header (name, role, level, contributions), summary (distilled), skills (aggregated by verb-type with evidence counts), experience (grouped by project, chronological), recent learnings (paraphrased from feedback), profile (verbatim bio). Three style presets — `minimal` / `standard` / `deep`. Fact-derived only — every claim traces to a source; no invented skill claims; honest about thin work (agents with zero history get a minimal résumé, not padded). Regenerated freely; conductor commits if they want it tracked. Spec: `tools/team-resume.md`.
+- **`/hacky-hours team reflect <agent-id> | --all`** — agent self-reflection. Opt-in, conductor-invoked. Agent walks own `history.md` + `feedback.md` + `profile.md` and produces three outputs:
+  - **Track record section** — silent auto-append/replace in `profile.md` Bio. One paragraph per project, third-person past-tense, cites by count. No conductor review (same semantics as forward-capture history append). Committed silently.
+  - **Prose updates** — proposed refinements to Background / How I work / What I produce sections. Each warranted revision writes a `kind: prose_update` pending entry to `~/.hacky-hours/sessions/<id>/pending/<agent-id>.md` with a `target_section` field, reviewed via existing `team update` accept/edit/reject/defer flow.
+  - **Self-observations** — strengths the agent sees in own work + gaps to close. Printed; conductor names items to stash as behavior feedback for next session.
+
+  Spec: `tools/team-reflect.md`. Cadence: opt-in only (not part of Stash phase). Hybrid editing model conductor-confirmed: silent (metrics, track record), conductor-reviewed (prose updates), conductor-initiated (self-observations).
+
+- **`tools/team-update.md`** now accepts `kind: prose_update` pending entries in addition to `behavior_feedback` and `prompt_edit` — same accept/edit/reject/defer flow per section.
+- **`tools/team.md` + `SKILL.md`** — routing + help text for `team resume` and `team reflect` subcommands; argument-hint updated.
+- **Every multi-role verb's Stash step 4** updated to bundle metrics refresh with history append in a single commit.
+- **`references/capture-format.md`** — new sections §§"Derived metrics", "Level derivation", "Resume composition", "Reflection semantics". Implementation-responsibilities step 5 added (metrics refresh) with bundled commit pattern.
+
+**Design + project artifacts:**
+
+- `V4_DESIGN.md` §4.22 — full design rationale
+- ADR `02-design/decisions/2026-05-17-agent-representation.md` — captures the four-piece decision, hybrid editing rationale, and rejected alternatives (single combined verb, conductor-set levels, separate metrics file, auto-rewrite without review)
+- V4_QA.md Test 12 — 10 sub-tests covering metrics refresh post-verb, resume generation per agent, reflection three-output flow, hybrid bio editing semantics, team-site rendering of history/lessons/badges/résumé links
+
+### Deferred to v4.1+ from Slice 13
+
+- History compaction (shared deferral with Slice 12)
+- Agent-to-agent skill recommendation
+- Résumé export to non-Markdown shapes (LinkedIn JSON / PDF)
+- Per-project skill maps + cross-project skill inference
+- Reflection auto-cadence triggers
+
+### Backward compatibility
+
+- All v3 verbs (`step`, `review 1..3`, `learn 1..3`, `update 1..2`, `tools upgrade|mode|walkthrough`) continue to work in v4
+- Existing v3 projects function without modification
+- Migration story for v3 → v4 will land in `tools/upgrade.md` updates as subsequent slices complete
+- `disable-model-invocation` removal is a behavioral change but not a breaking install — v3 projects that never relied on context-driven invocation are unaffected
+- **Slice 11 (team chat):** existing `~/.hacky-hours/settings.yml` files without `team_chat:` are treated as `team_chat: minimal` until the user sets it explicitly. No breaking change to first-time invocation.
+- **Slice 12 (team learning capture):** existing teams without prior `history.md` entries are unaffected — the auto-append just starts adding entries from this point forward. Existing `~/.hacky-hours/sessions/` (empty pre-Slice-12) is similarly unaffected; the `.current-session` marker is created on first capture. No data migration required.
+
+---
+
 ## [3.0.0] — 2026-05-06
 
 **Breaking install path change.** The `hacky-hours` framework now ships as a Claude Code Skill (`SKILL.md` format) instead of a single slash command file. `/hacky-hours` continues to work exactly the same — only the install location changes, from `~/.claude/commands/hacky-hours.md` to `~/.claude/skills/hacky-hours/`. The installer handles the migration automatically (downloads new structure, removes old file).

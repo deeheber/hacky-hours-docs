@@ -1,0 +1,17 @@
+# Per-agent preferences for product
+# Override defaults from ~/.hacky-hours/settings.yml on a per-agent basis.
+
+# Model (uncomment to override the role default from settings.yml role_models)
+# model: claude-opus-4-7
+
+# Fluency adapter — how this agent expects to communicate with the conductor.
+# Set automatically over time; can be edited manually.
+fluency:
+  technical_background: unspecified   # non_engineer | engineer | mixed
+  domain_familiarity: unspecified     # novice | intermediate | expert with this agent's discipline
+
+# Verbosity baseline. Default: standard.
+verbosity: standard    # terse | standard | thorough
+
+# Per-agent denylist additions (paths this specific agent should not read)
+denylist_additions: []

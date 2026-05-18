@@ -6,6 +6,10 @@
 
 **Purpose:** Define how the product works in enough detail to build it.
 
+**Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
+
+**Team learning capture:** This verb is always multi-role (design fans out across Architect, Security, A11y, Data, Licensing, QA at minimum). At the tail, run **Phase N — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent, then the one-line behavior-feedback prompt. Track which agents actually contributed to each doc — that list drives both writes.
+
 Start by asking which documents this project actually needs:
 
 | Document | Use when... |
@@ -33,5 +37,16 @@ Start by asking which documents this project actually needs:
 If the user wants to skip the deep dive and just write the summary: push back. The summary alone is the failure mode the two-tier pattern was designed to prevent. The deep dive is where the thinking happens; the summary is just the view.
 
 **When a design decision changes during iteration:** write an Architecture Decision Record (ADR) in `02-design/decisions/` named by date and topic (e.g., `2026-03-20-switch-to-postgres.md`). Update the **deep dive** first — that's the source of truth. Then regenerate or update the affected lines of the summary. Add a note in the deep dive pointing to the ADR.
+
+---
+
+**Phase N — Stash (team learning).** Run per `${CLAUDE_SKILL_DIR}/references/capture-format.md`:
+
+1. List the agents that actually authored or co-authored design docs during this run (e.g., Architect on ARCHITECTURE, Security on SECURITY_PRIVACY, Data + Backend on DATA_MODEL, etc.).
+2. Compose a one-sentence past-tense contribution summary per participant (concrete: "Authored ARCHITECTURE-deep.md sections 1–3 covering the API gateway split" — not "Helped with design").
+3. Resolve the session ID per the algorithm in `capture-format.md`.
+4. **History append + metrics refresh (silent):** for each participant, append `- <date> · <project-slug> · design · <summary>` to `~/.hacky-hours/teams/<active>/agents/<agent-id>/history.md`. Then refresh the `metrics:` block in each participating agent's `profile.md` per `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Derived metrics" + §"Level derivation". Commit both files together: `git -C ~/.hacky-hours/teams/<active>/ add agents/*/history.md agents/*/profile.md && git commit -m "history: design @ <project> @ <date> — <N> agent(s)"`.
+5. **Behavior feedback prompt:** ask the conductor *"Anything you said during this run that should change how an agent works in future sessions? Free-form by agent, or `none`."* For each agent named, write `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` per the schema.
+6. **Footer:** print *"Stashed <N> behavior note(s) for <agents>. Appended history to <count> agent(s) (commit <sha>). Promote with `/hacky-hours team update` when ready."*
 
 **Done when:** Both `<DOC>-deep.md` and `<DOC>-summary.md` exist for every design doc the project needs, the deep dive contains the actual blueprint with implementation-ready detail, and the summary is a faithful one-screen condensation that cross-links into the deep dive. ✅
