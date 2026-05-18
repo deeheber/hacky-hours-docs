@@ -78,7 +78,7 @@ Beyond explicit `/hacky-hours feedback` calls, the framework should also capture
 - When a verb is abandoned mid-flow, log it as a tool-friction note
 - When the conductor expresses frustration in chat ("ugh", "this isn't working", "wait that's not right"), surface a "want to capture this as feedback?" prompt
 
-These implicit captures are surfaced to the conductor for confirmation before writing — never silently logged. v4.0.0-dev implements explicit `/hacky-hours feedback` only; implicit capture is a follow-on enhancement.
+These implicit captures are surfaced to the conductor for confirmation before writing — never silently logged. v4.0.0 implements explicit `/hacky-hours feedback` only; implicit capture is a follow-on enhancement.
 
 ## Privacy
 

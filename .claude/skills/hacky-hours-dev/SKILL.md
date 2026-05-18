@@ -117,7 +117,7 @@ v3 verbs (still supported in v4 for backward compatibility — see migration in 
 When the user runs `/hacky-hours help` or `tools help`, print exactly this:
 
 ```
-Hacky Hours framework assistant — v4.0.0-dev
+Hacky Hours framework assistant — v4.0.0
 
 Hacky Hours is a competence prosthesis for LLM-assisted software development.
 It engages an orchestra of stakeholder-role AI agents (product, design, security,

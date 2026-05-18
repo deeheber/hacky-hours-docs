@@ -133,7 +133,7 @@ If two Claude Code sessions are running simultaneously and both have pending cha
 
 - The first to call `/hacky-hours team update` and accept wins.
 - The second session's pending change will be reviewed against the now-updated agent state. The conductor will see what was already changed and can decide whether the second change still applies.
-- v4.0.0-dev surfaces this honestly: *"This change is against an earlier version of <agent>'s prompt — the prompt has changed since this was captured. Here's the current state and the proposed change. Still applies?"*
+- v4.0.0 surfaces this honestly: *"This change is against an earlier version of <agent>'s prompt — the prompt has changed since this was captured. Here's the current state and the proposed change. Still applies?"*
 
 ## Discard / Restart
 

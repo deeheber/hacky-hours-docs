@@ -47,7 +47,7 @@ Tell the user the URL is `http://localhost:8000`. Note: this command will block 
 - Surface this expectation: *"Server will run until you press Ctrl+C. Open http://localhost:8000 to browse."*
 - Not block the agent loop indefinitely — instead, print the command for the user to run themselves rather than the framework spawning it, OR spawn it in the background (background option is acceptable since the user can kill it later).
 
-For v4.0.0-dev: print the command for the user to run. Background-spawning a long-lived process is risky in the framework context.
+For v4.0.0: print the command for the user to run. Background-spawning a long-lived process is risky in the framework context.
 
 ## Step 3 — Publish subcommand
 
@@ -130,7 +130,7 @@ See V4_DESIGN.md §4.8 for the full static site design.
 
 ## Notes for the assistant
 
-- **Don't background-spawn the server** in v4.0.0-dev. Print the command instead so the user has direct control.
+- **Don't background-spawn the server** in v4.0.0. Print the command instead so the user has direct control.
 - **Generator output is overwritten** on each build. If the user customized HTML directly (vs. editing profiles), they should commit before rebuilding.
 - **Generated files are committable** — the `docs/` folder is part of the team repo and used by GitHub Pages. The site/.gitignore should NOT ignore docs/.
 - **When the team gets updated** (`/hacky-hours team update` lands new agent feedback / prompt changes), the static site doesn't auto-rebuild. Suggest: *"You promoted changes — want to rebuild the site? `/hacky-hours team site build`"*

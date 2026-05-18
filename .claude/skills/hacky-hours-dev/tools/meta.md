@@ -92,7 +92,7 @@ For each patch's resolution:
 
 - **apply:** modify the file at the install path (`~/.claude/skills/hacky-hours/<file>`). Note: this will be overwritten on next `/hacky-hours update` unless you also push the change upstream. Warn the user.
 - **submit as issue:** call `/hacky-hours issue` flow with the patch as the body.
-- **submit as PR:** complex — for v4.0.0-dev, print *"PR submission isn't automated yet. Apply the diff to your local fork manually and push. Patch content is above."*
+- **submit as PR:** complex — for v4.0.0, print *"PR submission isn't automated yet. Apply the diff to your local fork manually and push. Patch content is above."*
 - **skip:** mark the source feedback files with `meta_reviewed: skipped` in frontmatter.
 - **edit:** re-prompt for diff revisions, then re-ask.
 
@@ -119,4 +119,4 @@ This prevents the same items from being re-clustered next time.
 
 This is the dogfood-improvement-loop closer the design promised. Without it, agents and verbs are frozen at their initial implementations. With it, lived friction becomes framework edits, and the framework gets better the more it's used.
 
-For v4.0.0-dev: the loop is end-to-end functional but inherently as good as the patterns you accumulate. The first useful run probably needs 10+ feedback items to surface meaningful clusters. Until then, treat `/hacky-hours meta` as a "see what's accumulated" diagnostic rather than a patch-generator.
+For v4.0.0: the loop is end-to-end functional but inherently as good as the patterns you accumulate. The first useful run probably needs 10+ feedback items to surface meaningful clusters. Until then, treat `/hacky-hours meta` as a "see what's accumulated" diagnostic rather than a patch-generator.

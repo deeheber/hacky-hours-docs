@@ -7,11 +7,11 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased] — feat/v4.0.0
+## [4.0.0] — 2026-05-17
 
-**v4.0.0 in active development.** Reframes hacky-hours as a *competence prosthesis* — an orchestra of stakeholder-role AI agents (product, design, architect, FE, BE, security, ops, QA, a11y, licensing, Data, AI/ML) so one person can build software at team-grade and graduate the work to a real team. Replaces v3's "documentation framework for LLM-assisted app development" framing.
+**v4.0.0 — orchestra of stakeholder-role AI agents.** Reframes hacky-hours as a *competence prosthesis* — an orchestra of stakeholder-role AI agents (product, design, architect, FE, BE, security, ops, QA, a11y, licensing, Data, AI/ML) so one person can build software at team-grade and graduate the work to a real team. Replaces v3's "documentation framework for LLM-assisted app development" framing.
 
-See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
+Thesis-complete shipment: Slice 11 (orchestra audible) + Slice 12 (orchestra remembers) + Slice 13 (orchestra visible). See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
 
 ### Added (Slice 1 — v4 foundation)
 
@@ -26,7 +26,7 @@ See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
 ### Changed
 
 - **SKILL.md description** — expanded into a rich, model-matchable description so context-driven invocation fires on relevant prompts (and stays silent on tactical one-offs)
-- **Help message** — updated to v4.0.0-dev with v4 verbs prominent and v3 verbs marked as legacy-but-supported
+- **Help message** — updated to v4.0.0 with v4 verbs prominent and v3 verbs marked as legacy-but-supported
 
 ### Added (Slice 2 — default team roster)
 
@@ -44,7 +44,7 @@ See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
   - Yuki Nakamura (📈 Data) — schema, pipelines, retention, analytics
   - Kai Patel (🤖 AI/ML) — model selection, evals, AI safety
 - **Each agent has 5 files**: profile.md (SSG-renderable frontmatter + bio), system-prompt.md (full role definition with audience adaptation), history.md (compactable resume), feedback.md (durable conductor feedback), preferences.yml (per-agent config)
-- **Team-level files**: README.md (team description), tier.yml (full-tier roster + multiplexing config), VERSION (4.0.0-dev), LICENSE (private by default per item 18), .gitignore
+- **Team-level files**: README.md (team description), tier.yml (full-tier roster + multiplexing config), VERSION (4.0.0), LICENSE (private by default per item 18), .gitignore
 - **`/hacky-hours team` verb** — full implementation upgraded from Slice 1 stub:
   - Default Team Bootstrap on first invocation (copies template, stamps dates, `git init` + initial commit)
   - `team` no-arg: survey + roster view
@@ -94,9 +94,9 @@ See `hacky-hours/02-design/V4_DESIGN.md` for the full design.
 ### Added (Slice 10 — export verb)
 
 - **`/hacky-hours export <target>`** — exports project docs for graduation into a team's knowledge base.
-- v4.0.0-dev ships:
+- v4.0.0 ships:
   - `markdown-bundle` — single concatenated `.md` with TOC, paste-ready for Notion / Confluence / Obsidian / GDocs. Smart heading-demotion, cross-doc link rewriting, two-tier doc handling.
-  - `html-bundle` — designed; v4.0.0-dev recommends running `markdown-bundle` then any SSG (MkDocs/Hugo/etc.). Native html-bundle in v4.1+.
+  - `html-bundle` — designed; v4.0.0 recommends running `markdown-bundle` then any SSG (MkDocs/Hugo/etc.). Native html-bundle in v4.1+.
 - Excludes operational state files (NARRATIVE.md, STATE.md, adoption-assessment) — exports are team-grade artifacts, not internal working state.
 - API-based exporters (notion, gdocs, confluence) designed-but-not-implemented; honest deferral notice.
 

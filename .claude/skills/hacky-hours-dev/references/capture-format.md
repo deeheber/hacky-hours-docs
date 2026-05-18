@@ -92,7 +92,7 @@ Field order (separator: ` · `):
 - Newest entries at the top of the section.
 - One newline between entries (the markdown list does the rest).
 
-**Compaction:** when `history.md` exceeds ~500 lines or ~10k tokens (the limit specified in the template boilerplate), the framework summarizes older entries into a "Key facts and patterns" section at the top and archives raw entries to `history-archive/<YYYY-MM-DD>.md` in the team repo. v4.0.0-dev ships the append — compaction is a daemon-style task deferred to v4.1+. Until then, agents with long histories just have long files. Git history preserves the raw record either way.
+**Compaction:** when `history.md` exceeds ~500 lines or ~10k tokens (the limit specified in the template boilerplate), the framework summarizes older entries into a "Key facts and patterns" section at the top and archives raw entries to `history-archive/<YYYY-MM-DD>.md` in the team repo. v4.0.0 ships the append — compaction is a daemon-style task deferred to v4.1+. Until then, agents with long histories just have long files. Git history preserves the raw record either way.
 
 ---
 

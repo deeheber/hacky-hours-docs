@@ -69,9 +69,9 @@ In any Claude Code session, run:
 /hacky-hours help
 ```
 
-**Expected:** Top of output reads `Hacky Hours framework assistant — v4.0.0-dev`. Lists v4 verbs prominently: `team`, `adopt`, `audit`, `arbitrate`, `feedback`, `issue`, `meta`. Lists v3 verbs as "still supported".
+**Expected:** Top of output reads `Hacky Hours framework assistant — v4.0.0`. Lists v4 verbs prominently: `team`, `adopt`, `audit`, `arbitrate`, `feedback`, `issue`, `meta`. Lists v3 verbs as "still supported".
 
-✅ Pass criteria: v4.0.0-dev visible; new verbs visible; v3 verbs still listed.
+✅ Pass criteria: v4.0.0 visible; new verbs visible; v3 verbs still listed.
 
 ### 1.2 First-run flow creates global setup
 
@@ -82,7 +82,7 @@ If you backed up `~/.hacky-hours/` (step 0a), it should not exist now.
 ```
 
 **Expected:** First message should be the v4 first-run greeting:
-> *"Welcome to Hacky Hours v4.0.0-dev 🛠️🤗 — first time using v4 on this machine..."*
+> *"Welcome to Hacky Hours v4.0.0 🛠️🤗 — first time using v4 on this machine..."*
 
 It asks if you're ready, then asks one short audience-profile question (engineer / non-engineer / mixed).
 
@@ -97,7 +97,7 @@ Should show: `feedback/  sessions/  settings.yml  teams/  version  versions/`
 cat ~/.hacky-hours/version
 ```
 
-Should print `4.0.0-dev`.
+Should print `4.0.0`.
 
 ```bash
 cat ~/.hacky-hours/settings.yml | head -30
@@ -172,7 +172,7 @@ ls ~/.hacky-hours/teams/default/agents/
 cd ~/.hacky-hours/teams/default/ && git log --oneline
 ```
 
-Should show: `<sha> Initial team — created by Hacky Hours v4.0.0-dev`
+Should show: `<sha> Initial team — created by Hacky Hours v4.0.0`
 
 ### 2.2 Team roster view
 
@@ -475,7 +475,7 @@ Each should create its own note with appropriate `kind:` frontmatter.
 
 ### 7.2 Trigger a pending change (manual)
 
-Since session-pending capture wiring is preliminary in v4.0.0-dev, manually stage a pending change:
+Since session-pending capture wiring is preliminary in v4.0.0, manually stage a pending change:
 
 ```bash
 mkdir -p ~/.hacky-hours/sessions/test-session-001/pending/
@@ -880,7 +880,7 @@ After running 11.2–11.6, regenerate the team site:
 open ~/.hacky-hours/teams/default/docs/index.html
 ```
 
-**Expected (v4.0.0-dev):** the static-site generator reads `profile.md` (which doesn't reference `history.md` directly), so the visible site is unchanged structurally. **However**, manually inspecting any agent's `history.md` file via the site's "view source" link (or directly in the team repo) shows the accumulated entries.
+**Expected (v4.0.0):** the static-site generator reads `profile.md` (which doesn't reference `history.md` directly), so the visible site is unchanged structurally. **However**, manually inspecting any agent's `history.md` file via the site's "view source" link (or directly in the team repo) shows the accumulated entries.
 
 Surfacing history on the rendered site is a v4.1+ candidate (per V4_DESIGN.md §4.21 deferral list). Slice 12 ships the persistence; the site's history view is a follow-on.
 

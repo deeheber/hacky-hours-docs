@@ -49,7 +49,7 @@ Then:
    cd ~/.hacky-hours/teams/default/
    git init
    git add .
-   git commit -m "Initial team — created by Hacky Hours v4.0.0-dev"
+   git commit -m "Initial team — created by Hacky Hours v4.0.0"
    ```
 
    Do not push to a remote. The team is local-only by default. The user can `git remote add` later if they want cross-device sync.
@@ -139,7 +139,7 @@ Interactive flow to create a new team:
 3. Ask for intended use (free-text → becomes part of README.md philosophy)
 4. Create the directory at `~/.hacky-hours/teams/<name>/` by copying the default template
 5. Adjust `tier.yml` based on chosen tier (for solo/lean/startup, remove or merge agent folders accordingly — see `references/team-tiers.md`, deferred)
-6. For v4.0.0-dev, only "full" tier is fully implemented. For solo/lean/startup: print *"<tier> tier is in development. Defaulting to full tier for now — you can manually remove agents from `~/.hacky-hours/teams/<name>/agents/` and update `tier.yml`."*
+6. For v4.0.0, only "full" tier is fully implemented. For solo/lean/startup: print *"<tier> tier is in development. Defaulting to full tier for now — you can manually remove agents from `~/.hacky-hours/teams/<name>/agents/` and update `tier.yml`."*
 7. `git init` + initial commit in the new team repo
 
 ### `init`

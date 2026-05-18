@@ -4,12 +4,12 @@ The graduation property in action: your project's docs are designed to migrate i
 
 ## Targets
 
-v4.0.0-dev ships two targets:
+v4.0.0 ships two targets:
 
 - **`markdown-bundle`** — single concatenated `.md` file ready to paste into Notion, Confluence, Obsidian, GitHub Discussions, anywhere that accepts markdown
 - **`html-bundle`** — static HTML site (project-level equivalent of `/hacky-hours team site`)
 
-API-based exporters (`notion`, `gdocs`, `confluence`) are designed but not implemented in v4.0.0-dev. Track those in v4.1+.
+API-based exporters (`notion`, `gdocs`, `confluence`) are designed but not implemented in v4.0.0. Track those in v4.1+.
 
 ## Step 0 — Pre-flight
 
@@ -58,7 +58,7 @@ Concatenate all included docs into a single file at `hacky-hours/exports/<YYYY-M
 ```markdown
 # <Project name> — Documentation Bundle
 
-Generated <date> by Hacky Hours v4.0.0-dev.
+Generated <date> by Hacky Hours v4.0.0.
 
 This bundle contains the team-grade documentation for <project>. Paste into any
 markdown-aware tool (Notion, Confluence, Obsidian, GitHub Discussions) — it's
@@ -89,7 +89,7 @@ designed to render cleanly without modification.
 
 Smart concatenation:
 - **Demote heading levels by 1.** The bundle's TOC uses h2/h3 to break up sections; each included doc's existing headings become h2 or deeper.
-- **Resolve relative-path image references.** If any doc references `./images/diagram.png`, copy the image into `hacky-hours/exports/<date>-bundle-assets/` and rewrite the path. (For v4.0.0-dev: surface a warning if images can't be resolved; don't crash.)
+- **Resolve relative-path image references.** If any doc references `./images/diagram.png`, copy the image into `hacky-hours/exports/<date>-bundle-assets/` and rewrite the path. (For v4.0.0: surface a warning if images can't be resolved; don't crash.)
 - **Resolve cross-doc links.** A link like `[Security model](./SECURITY_PRIVACY.md)` becomes `[Security model](#security--privacy)` since they're now in the same document.
 - **Strip private frontmatter fields** like `owner: <internal id>` from each section's metadata footer — but keep useful ones (last_reviewed, status).
 
@@ -103,7 +103,7 @@ After generation: print
 
 Project-level static site. Uses the same generator pattern as `/hacky-hours team site` but for project docs.
 
-For v4.0.0-dev: tell the conductor:
+For v4.0.0: tell the conductor:
 
 > *"`html-bundle` is in development. The recommended path right now: run `/hacky-hours export markdown-bundle` to get a single .md file, then push it through any static site generator you prefer (MkDocs, Hugo, Astro, 11ty). Or use `/hacky-hours team site` for the team-browser equivalent.*
 >
@@ -125,7 +125,7 @@ If user wants to wait: just exit politely.
 
 Print honestly:
 
-> *"<Target> API integration is designed but not yet implemented in v4.0.0-dev. Use `markdown-bundle` and paste manually for now — Notion and Confluence both accept clean markdown paste. Native integrations are tracked for v4.1+."*
+> *"<Target> API integration is designed but not yet implemented in v4.0.0. Use `markdown-bundle` and paste manually for now — Notion and Confluence both accept clean markdown paste. Native integrations are tracked for v4.1+."*
 
 ## Step 3 — Update state
 

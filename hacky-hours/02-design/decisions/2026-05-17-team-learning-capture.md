@@ -40,7 +40,7 @@ The behavior-feedback prompt is always shown — even if the conductor expects t
 
 ## Rationale
 
-**Why end-of-verb instead of inline capture.** Inline capture asks the assistant to classify mid-conversation conductor remarks as "this is behavior feedback for an agent." Classification rules are inherently fuzzy — the failure mode is exactly the current state of v4.0.0-dev's persistence: "we said capture happens automatically" with no mechanism that fires. End-of-verb gives capture a discrete, named moment with a structured prompt the conductor explicitly answers.
+**Why end-of-verb instead of inline capture.** Inline capture asks the assistant to classify mid-conversation conductor remarks as "this is behavior feedback for an agent." Classification rules are inherently fuzzy — the failure mode is exactly the current state of v4.0.0's persistence: "we said capture happens automatically" with no mechanism that fires. End-of-verb gives capture a discrete, named moment with a structured prompt the conductor explicitly answers.
 
 **Why both slots fire at the same moment.** History append and behavior-feedback prompt are co-located because they share trigger conditions (verb completion + identified participants). Splitting them into separate phases doubles the interruption cost and the implementation surface.
 

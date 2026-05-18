@@ -140,7 +140,7 @@ Write to `hacky-hours/audits/<YYYY-MM-DD>.md`:
 ```markdown
 # Audit — <project name> — <date>
 
-**Tier:** <N>  ·  **Team:** <team-name>  ·  **Framework:** v4.0.0-dev
+**Tier:** <N>  ·  **Team:** <team-name>  ·  **Framework:** v4.0.0
 
 ---
 
