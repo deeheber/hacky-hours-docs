@@ -72,6 +72,7 @@ team_chat: minimal        # off | minimal | full
 # Audience modeling — informs how every role adapts its communication to you
 profile:
   technical_background: unspecified    # non_engineer | engineer | mixed | unspecified
+  plan: unspecified                    # pro | max5x | max20x | unspecified — affects defaults below
   role_fluency:
     # Set your fluency per discipline so each role calibrates appropriately.
     # Levels: novice | intermediate | expert
@@ -81,6 +82,33 @@ profile:
     # security: novice
     # frontend: intermediate
 
+# Feature flags — v4.1+; gated mechanisms ship disabled-by-default
+# See references/feature-flag-loader.md for the pattern + flag list
+# See ADR 2026-05-22-feature-flag-layer.md for the design
+features:
+  # Workflow (v4.1 Tier 1)
+  discovery_phase: false              # Discovery phase in Step 1 + lo-fi homepage gate
+  skeptic_mode: false                 # --skeptic flag on any role
+  status_updates: false               # agent-initiated escalation + status messages
+  presentations: false                # presentation artifact alongside deep docs
+
+  # Team learning (v4.1 Tier 1 + Tier 2)
+  cross_role_propagation: false       # team-update Step 3 propagate-to-peer
+  auto_promote_low_stakes: false      # team-update auto-bucket by `stakes` field
+  auto_debrief: false                 # end-of-verb agent-to-agent self-debrief
+
+  # Workroom (v4.1 Tier 2)
+  workroom_mode: false                # multi-turn agent dialogue → messages.jsonl
+
+  # Browser companion write-back (v4.1 Tier 3)
+  forms_writeback: false              # browser fillable-forms → pending-input.json
+  backlog_writeback: false            # browser kanban drag-to-reorder
+  session_monitor: false              # browser session-monitor surface
+
+# Workroom bounds (v4.1+; see ADR 2026-05-22-workroom-mechanic.md)
+workroom_max_turns: 24
+workroom_role_budget: 2000
+
 # Privacy
 share_feedback_with_empathetech: false   # opt-in only; /hacky-hours issue still works individually
 auto_update_check: false                  # never auto-update; explicit /hacky-hours update only
@@ -88,13 +116,33 @@ auto_update_check: false                  # never auto-update; explicit /hacky-h
 
 ## Step 5 — Audience profile (brief)
 
-Ask the user one short question to seed the audience model:
+Ask the user two short questions to seed the audience model.
+
+**Question 1 — Background:**
 
 > *"One quick question that helps every role talk to you the right way: are you primarily a software engineer, primarily a non-engineer (builder, founder, SME), or somewhere in the middle?"*
 
 Update `profile.technical_background` in settings.yml accordingly. If they say "non-engineer," set `voice_default: builder` (already the default). If "engineer," set `voice_default: engineer`. If "mixed," keep `builder` but note in the profile.
 
-This is the *only* setup question — do not ask about role fluency per discipline at first-run. Roles will learn fluency from lived signal over time, or the user can fill it in via `~/.hacky-hours/settings.yml` whenever they want.
+**Question 2 — Claude plan tier (v4.1+):**
+
+> *"And which Claude plan are you on? This shapes how aggressively the framework fans out across roles.*
+>  *  - **Pro** — leaner defaults, cost preflight on heavy verbs, smaller models for cheap roles*
+>  *  - **Max (5x or 20x)** — full fan-out, default model everywhere*
+>  *  - **Not sure / prefer not to say** — Pro-flavored defaults (safer fallback)"*
+
+Update `profile.plan` in settings.yml:
+
+- **`pro`** — also set `team_chat: minimal` (already the default in Step 4's template — keep it), and **add or update** the per-role overrides for low-output roles:
+  ```yaml
+  role_models:
+    licensing: claude-haiku-4-5
+    accessibility: claude-haiku-4-5
+  ```
+- **`max5x` / `max20x`** — leave defaults as-is.
+- **`unspecified`** — leave defaults as-is (template is already Pro-flavored).
+
+These two questions are the *only* setup prompts — do not ask about role fluency per discipline at first-run. Roles will learn fluency from lived signal over time, or the user can fill it in via `~/.hacky-hours/settings.yml` whenever they want.
 
 ## Step 6 — Tell the user what just happened and what's next
 
