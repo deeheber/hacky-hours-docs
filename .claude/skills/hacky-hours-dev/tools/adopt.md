@@ -19,6 +19,19 @@ When this verb runs, the active team meets the codebase. Each role reads the rel
    - **v3-shape `hacky-hours/` folder** (has `01-ideate/` etc. but no `NARRATIVE.md`): this is a v3 → v4 migration. Continue to Step 1 but note this — adoption will augment rather than replace.
    - **v4-shape `hacky-hours/` folder** (has `NARRATIVE.md`): re-adoption. Print *"This project already has v4 hacky-hours artifacts. Want to re-run adoption (will update artifacts but preserve your edits), or do you want a different verb (`audit` to re-evaluate, `ideate` to revisit product overview)?"*
 
+## Step 0.5 — Cost preflight (v4.1+)
+
+Read `${CLAUDE_SKILL_DIR}/references/cost-preflight.md` for the pattern. `adopt` is a heavy verb (typical 30K–80K tokens fanning out across roles + writing 5+ docs).
+
+Read `~/.hacky-hours/settings.yml` for `profile.plan`. Surface to the conductor:
+
+> *"`adopt` typically uses ~30K–80K tokens at default settings (~30–80% of a daily Pro limit, <2% of Max-5x).*
+> *  - **Proceed** — fan out across all roles, write full artifact set*
+> *  - **Downshift** — skip the optional involvement-assessment artifact; Haiku for cheap roles (licensing, a11y); narrate-only voice*
+> *  - **Cancel*"*
+
+Apply the conductor's choice for the remainder of this verb. **Always fire on `plan: pro` or `unspecified`. Skip on Max plans unless** `session_budget_warn` is already approached (the latter check depends on F2 instrumentation; documented but not enforced until F2 lands).
+
 ## Step 1 — Orientation
 
 Brief conversation, four questions, sensibly defaulted so non-engineers can run it in 90 seconds:

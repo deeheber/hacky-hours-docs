@@ -24,6 +24,21 @@ Contract source: `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Reflectio
    - `--track-record-only` — skip prose proposal and self-observation; just refresh the appended Track record section
 3. **Agent exists + has history:** for non-`--all`, verify the agent's folder exists and `history.md` has at least one structured entry. If history is empty: print *"Nothing to reflect on yet — `<agent-id>` has no history entries. Run multi-role verbs (audit, design, adopt, etc.) so the agent accumulates work, then reflect."* and exit.
 
+## Step 0.5 — Cost preflight (v4.1+) — only fires for `--all`
+
+Read `${CLAUDE_SKILL_DIR}/references/cost-preflight.md` for the pattern. Single-agent reflection is light; `--all` is heavy (typical 40K–120K tokens for a 12-agent team).
+
+Only fire preflight when `--all` is passed. For single-agent reflection, skip this step.
+
+Read `~/.hacky-hours/settings.yml` for `profile.plan`. Surface to the conductor:
+
+> *"`team reflect --all` typically uses ~40K–120K tokens for a 12-agent team (~40–120% of a daily Pro limit).*
+> *  - **Proceed** — reflect each agent in parallel; full prose-update generation per agent*
+> *  - **Downshift** — process agents one at a time (sequential); skip the prose-update generation step (offer to re-run later for individual agents)*
+> *  - **Cancel*"*
+
+Apply the conductor's choice for the remainder of this verb. **Always fire on `plan: pro` or `unspecified`. Skip on Max plans unless `session_budget_warn` is already approached.**
+
 ## Step 1 — Read the sources
 
 Read for the active agent:

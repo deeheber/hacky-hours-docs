@@ -22,6 +22,21 @@ Contract source: `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Backfill 
    - `--dry-run` — show the proposed history without writing or committing
    - `--agent <agent-id>` — restrict to one specific agent (useful for incremental backfill)
 
+## Step 0.5 — Cost preflight (v4.1+)
+
+Read `${CLAUDE_SKILL_DIR}/references/cost-preflight.md` for the pattern. `team backfill` is heavy when the project has substantial history (typical 60K–150K tokens for a mature project's CHANGELOG / git log + per-agent classification).
+
+Read `~/.hacky-hours/settings.yml` for `profile.plan`. After Step 1's plan summary is computed, surface to the conductor:
+
+> *"`team backfill` against this project's history is estimated to use ~N tokens (~X% of a daily Pro limit, ~Y% of Max-5x).*
+> *  - **Proceed** — full classification (file-path + keyword passes) + per-agent batches*
+> *  - **Downshift** — file-path classification only (skip the keyword pass); narrate-only when surfacing per-agent batches*
+> *  - **Cancel*"*
+
+Refine the N from the Step 1 plan summary (entries detected × per-entry classification cost). Until F2 lands, the estimate is observation-based (~150 tokens per CHANGELOG entry, ~50 per git-log entry).
+
+Apply the conductor's choice for the remainder of this verb. **Always fire on `plan: pro` or `unspecified`. Skip on Max plans unless estimate exceeds 50K input tokens.**
+
 ## Step 1 — Surface the plan and confirm scope
 
 Print a summary before doing any reads:

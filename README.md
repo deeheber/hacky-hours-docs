@@ -127,24 +127,60 @@ curl -fsSL https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/i
 irm https://raw.githubusercontent.com/empathetech/hacky-hours-docs/main/install.ps1 | iex
 ```
 
-After install, **restart Claude Code**, then type `/hacky-hours` in any session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`step`, `review`, `learn`, `update`, `tools`, `--root`, and more).
+After install, **restart Claude Code**, then type `/hacky-hours` in any session. See [`runbooks/install-as-command.md`](./runbooks/install-as-command.md) for full instructions, including the complete argument list (`step`, `review`, `learn`, `update`, `tools`, plus v4's `team`, `adopt`, `audit`, `arbitrate`, `feedback`, `issue`, `meta`, `export`, and `--root`).
 
-### What gets installed (v3.0.0+)
+**Current stable: v4.0.1.** v4.1 is in progress and lands on `main` behind feature flags (default-off until v4.1.0 release). See [`CHANGELOG.md`](./CHANGELOG.md) and [`hacky-hours/04-build/BACKLOG.md`](./hacky-hours/04-build/BACKLOG.md) for what's queued.
 
-`hacky-hours` ships as a [Claude Code Skill](https://code.claude.com/docs/en/skills) — a directory at `~/.claude/skills/hacky-hours/` with a small `SKILL.md` entrypoint and per-step / per-review supporting files that Claude loads only when you invoke them. This keeps the per-session prompt small and lets the framework grow without bloating context.
+### Plan-aware defaults (v4.1+)
+
+Hacky Hours v4 has historically been dogfooded on Claude Max. As of v4.1.x, the framework explicitly supports **Claude Pro** and adjusts defaults per plan tier:
+
+- **Pro** — leaner defaults: `team_chat: minimal`, Haiku for low-output roles (licensing, accessibility), **cost preflight** on heavy verbs (`adopt`, `audit`, `team reflect --all`, `team backfill`) before they fan out across roles.
+- **Max (5x / 20x)** — full fan-out with the default model. Preflight fires only when a verb's estimate exceeds ~50K input tokens.
+- **Unspecified** — Pro-flavored defaults (safer fallback).
+
+The cost preflight surfaces an estimate before fan-out and gives you three options: **Proceed**, **Downshift** (reduced fan-out, smaller models, narrate-only mode), or **Cancel**. You can change your plan tier any time in `~/.hacky-hours/settings.yml`:
+
+```yaml
+profile:
+  plan: pro    # pro | max5x | max20x | unspecified
+```
+
+First-run setup (`/hacky-hours team`, `/hacky-hours adopt`, or any first invocation) now asks for your plan as part of the brief audience-profile setup.
+
+### What gets installed (v4)
+
+`hacky-hours` ships as a [Claude Code Skill](https://code.claude.com/docs/en/skills) — a directory at `~/.claude/skills/hacky-hours/` with a small `SKILL.md` entrypoint and per-verb supporting files that Claude loads only when you invoke them. This keeps the per-session prompt small and lets the framework grow without bloating context.
 
 ```
 ~/.claude/skills/hacky-hours/
 ├── SKILL.md                # routing, global values, scaffold
-├── steps/                  # Step 1–5 guidance
-├── reviews/                # review 1–3 (audit / optimize / pivot)
+├── steps/                  # Step 1–5 guidance (v3 verbs, still supported)
+├── reviews/                # audit (v4) + legacy review 1–3
 ├── learn/                  # learn 1–3 (tour / onboard / quiz)
 ├── update/                 # update 1–2 (release / issues sync)
-├── tools/                  # tools (upgrade / mode / walkthrough)
-└── templates/design/       # two-tier design doc templates (summary + deep)
+├── tools/                  # v4: team / adopt / arbitrate / feedback / issue / meta / export / team-* / v4-first-run
+├── references/             # shared contracts: capture-format, chat-format, team-preflight, feature-flag-loader (v4.1+), cost-preflight (v4.1+)
+└── templates/
+    ├── design/             # two-tier design doc templates (summary + deep)
+    └── team/default/       # the starter 12-agent team, copied to ~/.hacky-hours/teams/default/ on first run
 ```
 
-**Two-tier design templates (v3.0.0):** Each design doc is built as a deep dive (`<DOC>-deep.md` — the actual blueprint, source of truth, what Step 4 builds from) plus a faithful one-screen summary (`<DOC>-summary.md` — for quick gut-checks and as a navigation onramp into specific deep-dive sections, especially helpful for non-technical readers). The deep dive is built first; the summary is generated from it as a condensation that never adds new information. If they disagree, the summary is regenerated. Currently prototyped on `ARCHITECTURE` only; other docs follow in v3.x once the pattern is validated in real sessions.
+User-level state (separate from the installed skill) lives at `~/.hacky-hours/`:
+
+```
+~/.hacky-hours/
+├── version                 # installed framework version
+├── settings.yml            # your preferences (model, voice, plan, features:)
+├── teams/                  # your persistent AI teams (own git repos)
+├── sessions/               # per-session transient state (messages, pending feedback)
+├── feedback/               # local feedback corpus
+└── versions/               # prior framework snapshots for rollback
+```
+
+**Two-tier design templates:** Each design doc is built as a deep dive (`<DOC>-deep.md` — the actual blueprint, source of truth, what Step 4 builds from) plus a faithful one-screen summary (`<DOC>-summary.md` — for quick gut-checks and as a navigation onramp into specific deep-dive sections, especially helpful for non-technical readers). The deep dive is built first; the summary is generated from it as a condensation that never adds new information. If they disagree, the summary is regenerated.
+
+**v4 orchestra of stakeholder-role agents:** v4 ships with a **persistent team** of 12 stakeholder-role AI agents (Product, Design, Architect, FE, BE, Security, Ops, QA, Accessibility, Licensing, Data, AI/ML). The team lives at `~/.hacky-hours/teams/default/` as its own git repo — portable across machines, bound per-project via `AGENTS.md`. Agents accumulate history and become smarter over time via `/hacky-hours team update`. See `hacky-hours/02-design/V4_DESIGN.md` for the full architecture.
 
 ### Upgrading
 
