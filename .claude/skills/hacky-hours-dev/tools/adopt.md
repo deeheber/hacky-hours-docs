@@ -8,6 +8,8 @@ When this verb runs, the active team meets the codebase. Each role reads the rel
 
 **Team learning capture:** Adopt is the full-team-meets-codebase moment — every role with non-N/A involvement participates. At the tail (Step 8 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent (one entry: "Met <project> at Tier <N>; recommended <involvement-level>"), then the one-line behavior-feedback prompt. This is the foundational history entry for the project on this team — every subsequent verb's history line gets read against this baseline.
 
+**Cost instrumentation (v4.1+):** Adopt is a heavy verb. Each phase + each role-turn + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 ---
 
 ## Step 0 — Pre-flight

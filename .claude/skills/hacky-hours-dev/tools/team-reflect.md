@@ -12,6 +12,8 @@ Reflection is **opt-in per agent.** It does not run automatically at end-of-verb
 
 Contract source: `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Reflection semantics".
 
+**Cost instrumentation (v4.1+):** `team reflect --all` is heavy (one full agent-read pass per agent). Each agent's reflection + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Single-agent reflect is light; logs verb-level only. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 ---
 
 ## Step 0 — Pre-flight

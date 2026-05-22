@@ -8,6 +8,8 @@ Supersedes v3's `review 1`. Runs three parallel lanes that evaluate the project 
 
 **Team learning capture:** Audit is always multi-role (Lane A engages Security, A11y, Ops, QA, Architect at minimum). At the tail (Step 5 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each agent that produced findings, then the one-line behavior-feedback prompt. Lane B (doc-stranger) and Lane C (cross-ref) are framework-internal and do not count as agent participation.
 
+**Cost instrumentation (v4.1+):** Audit is the heaviest verb in the framework. Each lane + each role-turn + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 The three lanes:
 
 - **(a) Role-driven codebase audit** — Security, A11y, Ops, QA, Architect read the actual code and flag issues
