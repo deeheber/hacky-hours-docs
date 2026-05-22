@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 v4.1 work lands on `main` behind feature flags (default-off). v4.1.0 release will flip stable defaults to `true`. v4.0.x patches (e.g., HF1, HF2) ship freely during the v4.1 cycle. Release strategy: trunk-based development with feature flags — see ADR `hacky-hours/02-design/decisions/2026-05-22-feature-flag-layer.md`.
 
+### Added — v4.1 Tier 0 (F2: token instrumentation hooks, 2026-05-22)
+
+- **`cost-log.jsonl` schema** documented in new `references/cost-instrumentation.md`. Per-session append-only JSONL log of token usage at three granularities (per-role-turn, per-phase, per-verb). Fields: `ts`, `session_id`, `verb`, `phase`, `role`, `input_tokens`, `output_tokens`, `cache_hits`, `model`, `wall_ms`, `verb_invocation_id`, `settings_snapshot`.
+- **"Cost instrumentation" preamble line** added to all 10 multi-role verb files (steps 01–05, audit, arbitrate, adopt, team-reflect, team-backfill). Skill files declare instrumentable points; the Claude Code harness writes the JSONL rows as platform-level instrumentation rolls out.
+- **Schema is forward-compatible** — works whether the harness implements partial or full instrumentation. `cost-log.jsonl` is local-only; never sent anywhere.
+
+Always-on infrastructure (no feature flag). Unblocks subsequent cost-aware features: real preflight estimates (currently observation-based via cost-preflight.md), graceful degradation under `session_budget_hard` pressure (currently documented but not enforced), and R1 (cost benchmarks publishing real per-verb numbers to `references/cost-model.yml`).
+
 ### Added — v4.1 Tier 0 + Tier 1/2 (F3 + T1.6 + T2.2: stakes-aware team update, 2026-05-22)
 
 Three coupled changes ship in one PR — they all rework the team-update flow:

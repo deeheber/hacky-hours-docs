@@ -10,6 +10,8 @@
 
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
 
+**Cost instrumentation (v4.1+):** Each phase + each role-turn + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 **Team learning capture:** Iteration is always multi-role (synthesis touches whoever owns the design docs that need amendment). At the tail, run **Phase 6 — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent, then the one-line behavior-feedback prompt. Track which agents actually weighed in during synthesis and amendment.
 
 **Phase 1: Capture**

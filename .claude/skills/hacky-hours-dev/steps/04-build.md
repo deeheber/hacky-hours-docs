@@ -10,6 +10,8 @@
 
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
 
+**Cost instrumentation (v4.1+):** Each phase + each role-turn + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 **Team learning capture:** Build is *sometimes* multi-role (each task typically engages 1–3 roles). At the tail of each task — not each session — run **Phase N — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md` for the roles that contributed to that task: silent `history.md` append per participating agent, then the behavior-feedback prompt. If only one role engaged, history still fires for that role; the prompt is still shown (conductor can answer `none`).
 
 Before starting any task:

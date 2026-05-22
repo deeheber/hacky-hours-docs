@@ -8,6 +8,8 @@ When roles disagree on a project, the conductor arbitrates. This verb gives the 
 
 **Team learning capture:** Arbitration is always multi-role (it's the verb's definition). At the tail (Step 5 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each agent that stated a position (history summary references the topic and the resolution outcome), then the one-line behavior-feedback prompt. Arbitrations are dense per-role moments — behavior feedback at the end of an arbitration is some of the highest-signal feedback the team will get.
 
+**Cost instrumentation (v4.1+):** Arbitration cost varies sharply by mode (`decide` cheapest; `resolve` and `watch` more expensive). Each role's position + each conductor turn + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 ## Three modes
 
 - **`decide`** (cheapest) — framework summarizes positions concisely; conductor decides directly. No further agent dialogue.

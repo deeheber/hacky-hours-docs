@@ -6,6 +6,8 @@ This is the **one-shot retroactive companion** to forward-capture (Stash phase i
 
 Contract source: `${CLAUDE_SKILL_DIR}/references/capture-format.md` §"Backfill semantics".
 
+**Cost instrumentation (v4.1+):** Backfill scales with project history size. The per-entry classification pass + per-agent batch propose + the verb itself are loggable units per `${CLAUDE_SKILL_DIR}/references/cost-instrumentation.md`. Schema is stable; harness populates token counts as instrumentation rolls out.
+
 ---
 
 ## Step 0 — Pre-flight
