@@ -14,6 +14,26 @@
 
 **Team learning capture:** This verb fans out to roles (mainly Product, with Licensing and Security weighing in on Constraints & Values). At the tail, run **Phase N — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent, then the one-line behavior-feedback prompt. Track which agents actually contributed.
 
+**Discovery phase (v4.1+, feature-flagged).** Before any synthesis writes, check `~/.hacky-hours/settings.yml` for `features.discovery_phase`. If `true`, run **Phase 1.0 — Discovery** per `${CLAUDE_SKILL_DIR}/references/discovery-questions.md` (three questions writing to `DISCOVERY.md` + a lo-fi homepage gate at `HOMEPAGE-SKETCH.md` before Step 2 can commit). If `false` or absent, skip Phase 1.0 and continue with v4.0.x behavior.
+
+## Phase 1.0 — Discovery (v4.1+, when `features.discovery_phase: true`)
+
+Before opening or extending `IDEATION.md`, run the three Discovery questions per `${CLAUDE_SKILL_DIR}/references/discovery-questions.md`. Outputs land in `ROOT_PATH/01-ideate/DISCOVERY.md`:
+
+1. **Current workflow** — what's the user doing today, before they reach this product?
+2. **5-second homepage** — what do they see and feel in the first 5 seconds?
+3. **Smallest first-session action** — what concrete action proves first-session value?
+
+After the three questions, the framework produces a **lo-fi homepage mockup** at `ROOT_PATH/01-ideate/HOMEPAGE-SKETCH.md` from Question 2's answer. Present to the founder:
+
+> *"Does this look like what you described?"*
+
+If rejected or significantly revised, return to Discovery (especially Question 2) and iterate. Architecture (Step 2) does not commit until the sketch is acknowledged.
+
+When `features.discovery_phase` is `false` or absent: skip Phase 1.0 entirely and continue to the existing IDEATION.md flow below (v4.0.x behavior preserved).
+
+## Phase 1.1 — IDEATION
+
 **IDEATION.md** is a free-writing space. No rules — just capture everything. Prompt the user with:
 - "Who is the first person you'd want to use this, and what would they do with it?"
 - "What problem have you personally experienced that this solves?"
