@@ -11,6 +11,20 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 v4.1 work lands on `main` behind feature flags (default-off). v4.1.0 release will flip stable defaults to `true`. v4.0.x patches (e.g., HF1, HF2) ship freely during the v4.1 cycle. Release strategy: trunk-based development with feature flags — see ADR `hacky-hours/02-design/decisions/2026-05-22-feature-flag-layer.md`.
 
+### Added — v4.1 Tier 1 (T1.1: Discovery phase in Step 1, 2026-05-22)
+
+The headline #11 fix. Adds a Discovery phase that interrogates the founder's brief before any synthesis writes.
+
+- **New `references/discovery-questions.md`** — three questions, each with rationale and watch-for guidance:
+  1. *"What is the user doing today, before they reach this product?"* → `DISCOVERY.md`
+  2. *"If a stranger lands on your homepage and you have 5 seconds before they leave: what do they see, and what do they feel?"* → prose + optional ASCII/Mermaid mockup
+  3. *"What's the smallest thing you'd want a user to do in their first session?"* → one-sentence description
+- **Phase 1.0 added to `steps/01-ideate.md`** — gated by `features.discovery_phase: true` (default `false` in v4.1.x). Runs before the existing IDEATION.md / PRODUCT_OVERVIEW.md flow. The existing IDEATION-and-synthesis flow becomes Phase 1.1.
+- **Lo-fi homepage gut-check gate** — after the three questions, the framework produces `01-ideate/HOMEPAGE-SKETCH.md` (ASCII / Markdown / Mermaid) from Question 2's answer. Owner reviews; if rejected, iterate. Architecture (Step 2) does not commit until the sketch is acknowledged.
+- When the flag is off, v4.0.x behavior is preserved exactly.
+
+This is the structural fix for the framing-miss pattern that produced both the pomodoro ("Mario" vs SMB2 USA Subcon) and reciprocator ("pathing tool" vs explorer) misses. Phase 1.0 makes "is the brief the right shape?" a structural moment, not a hope.
+
 ### Fixed — Hotfixes (HF1 + HF2, 2026-05-22)
 
 - **HF1: Pending-file clobber-suffix protocol** (`references/capture-format.md`). When a pending file already exists for the same (agent, session), the new write uses a timestamp-suffixed filename (`<agent-id>-<HHMMSS>.md`) instead of silently overwriting. `team update`'s collect step now treats both canonical and timestamp-suffixed variants as belonging to the same agent. Prevents the silent-overwrite case observed in the field.
