@@ -49,7 +49,7 @@ Then:
    cd ~/.hacky-hours/teams/default/
    git init
    git add .
-   git commit -m "Initial team — created by Hacky Hours v4.0.0"
+   git commit -m "Initial team — created by Hacky Hours v4.0.1"
    ```
 
    Do not push to a remote. The team is local-only by default. The user can `git remote add` later if they want cross-device sync.

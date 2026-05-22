@@ -208,7 +208,7 @@ If CLAUDE.md doesn't exist, create from the v4 schema (item 16 in V4_DESIGN.md):
 ## 2. Active Team
 **Team:** <active team name>
 **Source:** ~/.hacky-hours/teams/<team-name>
-**Framework version:** 4.0.0
+**Framework version:** 4.0.1
 
 ## 3. Voice & Style
 **Mode:** <builder | engineer from orientation>
@@ -243,7 +243,7 @@ This project uses the Hacky Hours framework with a team of stakeholder-role AI a
 ## Active Team
 **Team:** <team-name>
 **Source:** ~/.hacky-hours/teams/<team-name>/  (also resolvable via git URL — see team's README)
-**Framework version:** 4.0.0
+**Framework version:** 4.0.1
 
 ## Roster
 
@@ -307,7 +307,7 @@ adopted: <date>
 tier: <N>
 voice_mode: <builder | engineer>
 active_team: <team-name>
-framework_version: 4.0.0
+framework_version: 4.0.1
 
 last_action:
   verb: adopt

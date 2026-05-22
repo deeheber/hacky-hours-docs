@@ -58,7 +58,7 @@ Concatenate all included docs into a single file at `hacky-hours/exports/<YYYY-M
 ```markdown
 # <Project name> — Documentation Bundle
 
-Generated <date> by Hacky Hours v4.0.0.
+Generated <date> by Hacky Hours v4.0.1.
 
 This bundle contains the team-grade documentation for <project>. Paste into any
 markdown-aware tool (Notion, Confluence, Obsidian, GitHub Discussions) — it's

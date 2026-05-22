@@ -35,7 +35,7 @@ Generate `resume.md` with this structure (style: `standard`):
 ---
 agent: <agent-id>
 generated: <ISO timestamp>
-generator: team-resume v4.0.0
+generator: team-resume v4.0.1
 style: standard
 source:
   profile_modified: <YYYY-MM-DD>
@@ -188,4 +188,4 @@ No changes needed by the conductor — `team site build` after `team resume --al
 - **Honest over flattering.** A level-2 agent should not get a level-4-sounding summary. Match tone to actual seniority. Junior agents read as junior; senior agents read as senior. If the source data shows the agent has done thin work, the resume reflects that.
 - **Fact-derived skill claims only.** Don't infer "expert at Postgres" from one history entry mentioning a DATA_MODEL.md edit. Count + project breadth is the evidence; skill claims have to be backed.
 - **Resume is a snapshot, not history.** Regenerate freely. It's derived from sources, not the source itself.
-- **Don't overwrite a hand-edited `resume.md`.** If `resume.md` exists and contains a frontmatter `generator:` field that's *not* `team-resume v4.0.0`, ask the conductor: *"This resume looks hand-edited. Overwrite, or write to a sibling path (`resume-generated.md`)?"*
+- **Don't overwrite a hand-edited `resume.md`.** If `resume.md` exists and contains a frontmatter `generator:` field that's *not* `team-resume v4.0.1`, ask the conductor: *"This resume looks hand-edited. Overwrite, or write to a sibling path (`resume-generated.md`)?"*

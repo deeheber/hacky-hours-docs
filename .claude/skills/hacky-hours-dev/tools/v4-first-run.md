@@ -10,7 +10,7 @@ This runs **once per user**, not once per project. After completion, control ret
 
 Print:
 
-> *"Welcome to Hacky Hours v4.0.0 🛠️🤗 — first time using v4 on this machine.*
+> *"Welcome to Hacky Hours v4.0.1 🛠️🤗 — first time using v4 on this machine.*
 >
 > *Before we do anything project-specific, I'll create a small global setup under `~/.hacky-hours/`. That's where your **persistent team** of AI agents lives, along with your personal settings. It's yours — private by default, never shared, separate from any project repo.*
 >
@@ -28,7 +28,7 @@ Create the following directory structure under `$HOME/.hacky-hours/`:
 
 ```
 ~/.hacky-hours/
-├── version                 ← installed framework version (file contents: "4.0.0")
+├── version                 ← installed framework version (file contents: "4.0.1")
 ├── settings.yml            ← user preferences (see template below)
 ├── feedback/               ← local feedback corpus (empty for now)
 ├── sessions/               ← transient session state (empty)
@@ -36,7 +36,7 @@ Create the following directory structure under `$HOME/.hacky-hours/`:
 └── versions/               ← prior framework version snapshots for rollback (empty)
 ```
 
-Use `mkdir -p` for safety. Write `version` with the literal text `4.0.0` (no trailing newline beyond one).
+Use `mkdir -p` for safety. Write `version` with the literal text `4.0.1` (no trailing newline beyond one).
 
 ## Step 4 — Write settings.yml
 
