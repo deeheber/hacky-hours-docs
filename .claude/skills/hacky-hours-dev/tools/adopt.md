@@ -12,10 +12,9 @@ When this verb runs, the active team meets the codebase. Each role reads the rel
 
 ## Step 0 — Pre-flight
 
-1. **Global skeleton:** If `~/.hacky-hours/` doesn't exist → Read `tools/v4-first-run.md` first, then return here.
-2. **Default team:** If `~/.hacky-hours/teams/default/` doesn't exist → Read `tools/team.md` and run the Default Team Bootstrap, then return here.
-3. **In a project repo:** Confirm cwd has code (not an empty directory). Use `ls` + a quick file inventory. If empty: tell the user *"Adopt needs an existing codebase — there's nothing here yet. Want to start a new project with `/hacky-hours ideate` instead?"*
-4. **Detect existing hacky-hours/ folder:**
+1. **Team pre-flight:** Read `${CLAUDE_SKILL_DIR}/references/team-preflight.md` and run its checks. This ensures the global skeleton and default team exist before adopt fans out to roles.
+2. **In a project repo:** Confirm cwd has code (not an empty directory). Use `ls` + a quick file inventory. If empty: tell the user *"Adopt needs an existing codebase — there's nothing here yet. Want to start a new project with `/hacky-hours ideate` instead?"*
+3. **Detect existing hacky-hours/ folder:**
    - **No `hacky-hours/` folder:** fresh adoption. Continue to Step 1.
    - **v3-shape `hacky-hours/` folder** (has `01-ideate/` etc. but no `NARRATIVE.md`): this is a v3 → v4 migration. Continue to Step 1 but note this — adoption will augment rather than replace.
    - **v4-shape `hacky-hours/` folder** (has `NARRATIVE.md`): re-adoption. Print *"This project already has v4 hacky-hours artifacts. Want to re-run adoption (will update artifacts but preserve your edits), or do you want a different verb (`audit` to re-evaluate, `ideate` to revisit product overview)?"*

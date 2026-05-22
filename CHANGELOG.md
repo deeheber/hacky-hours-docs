@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **Multi-role verbs now bootstrap the default team on first use** (#7). Steps 1–5, `reviews/audit`, and `tools/arbitrate` previously assumed `~/.hacky-hours/teams/default/` existed and crashed when first-time v4 users (who'd just completed `tools/v4-first-run.md`) ran a step verb before `adopt` or `team`. The two-step pre-flight (skeleton + default team) is now centralized in `references/team-preflight.md` and included from every multi-role verb. `tools/adopt.md`'s inline guard is refactored to use the same reference, so there's one source of truth.
+
+---
+
 ## [4.0.0] — 2026-05-17
 
 **v4.0.0 — orchestra of stakeholder-role AI agents.** Reframes hacky-hours as a *competence prosthesis* — an orchestra of stakeholder-role AI agents (product, design, architect, FE, BE, security, ops, QA, a11y, licensing, Data, AI/ML) so one person can build software at team-grade and graduate the work to a real team. Replaces v3's "documentation framework for LLM-assisted app development" framing.

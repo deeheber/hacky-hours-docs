@@ -6,6 +6,8 @@
 
 **Purpose:** Get ideas out of the user's head and into structured form.
 
+**Pre-flight:** Before producing any output, Read `${CLAUDE_SKILL_DIR}/references/team-preflight.md` and run its checks. This verb assumes the global skeleton and the active team exist.
+
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
 
 **Team learning capture:** This verb fans out to roles (mainly Product, with Licensing and Security weighing in on Constraints & Values). At the tail, run **Phase N — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent, then the one-line behavior-feedback prompt. Track which agents actually contributed.

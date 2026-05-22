@@ -2,6 +2,8 @@
 
 Supersedes v3's `review 1`. Runs three parallel lanes that evaluate the project from different angles, then consolidates into a single scorecarded report.
 
+**Pre-flight:** Before producing any output, Read `${CLAUDE_SKILL_DIR}/references/team-preflight.md` and run its checks. This verb assumes the global skeleton and the active team exist.
+
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. Lane A's role findings are an ideal chat-mode surface — when mode is `minimal` or `full`, render the per-role headers and let voices be distinct. **No tokens for tokens' sake** — every voice turn must add information.
 
 **Team learning capture:** Audit is always multi-role (Lane A engages Security, A11y, Ops, QA, Architect at minimum). At the tail (Step 5 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each agent that produced findings, then the one-line behavior-feedback prompt. Lane B (doc-stranger) and Lane C (cross-ref) are framework-internal and do not count as agent participation.
