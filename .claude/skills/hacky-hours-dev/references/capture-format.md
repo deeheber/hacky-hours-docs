@@ -53,6 +53,8 @@ project: hacky-hours-docs        # basename of cwd
 verb: audit                       # the verb that fanned out
 kind: behavior_feedback           # behavior_feedback | prompt_edit
 agent: architect                  # role folder name
+stakes: high                      # low | high — drives team-update auto-promote behavior (v4.1+)
+propagated_from: ~                # optional: agent-id this entry was propagated from (v4.1+ cross-role)
 status: pending                   # pending | accepted | rejected | deferred
 ---
 
@@ -68,8 +70,40 @@ status: pending                   # pending | accepted | rejected | deferred
 **Frontmatter rules:**
 - `captured_at` — ISO 8601 with timezone.
 - `kind` — `behavior_feedback` for "do X differently next time"; `prompt_edit` only if the conductor explicitly edited an agent's `system-prompt.md` mid-session.
+- `stakes` (v4.1+) — `low` (craft / convention / tooling preference; auto-promotable when `features.auto_promote_low_stakes: true`) or `high` (framing / judgment / architectural default; queue for owner review). **Default `high`** when absent. See "Stakes rubric" section below.
+- `propagated_from` (v4.1+, optional) — when this pending entry was created via cross-role propagation in `team update` Step 3, the original agent-id whose accepted entry triggered the propagation. Surfaces in review so the conductor can see the chain.
 - `status` — always starts `pending`. `team update` writes the other values during accept/reject/defer.
 - One file per agent per verb invocation. If the conductor stashes feedback for the same agent twice in one verb, append to the same file with a `---` separator between entries.
+
+---
+
+## Stakes rubric (v4.1+)
+
+The `stakes` field determines whether `team update` auto-promotes an entry (low stakes, when `features.auto_promote_low_stakes` is enabled) or queues it for owner review (high stakes, always reviewed).
+
+**`stakes: low` — auto-promotable when the flag is on.** The entry describes *how* an agent works at a craft / convention / tooling level. Examples:
+
+- *"Use absolute paths in shell commands."*
+- *"Prefer `npm ci` over `npm install` in CI."*
+- *"Format git commit messages with a body explaining why."*
+- *"When the team has multiple agents review, render attribution per turn even at `team_chat: off`."*
+- *"Quote source URLs with `<SourceLink>` not raw `<a>`."*
+
+Pattern: doesn't change *what* the agent decides, prioritizes, or recommends — only *how* they execute.
+
+**`stakes: high` — always queues for owner review.** The entry describes *what* an agent decides, prioritizes, or holds as a principle. Examples:
+
+- *"When the user names a specific anchor, verify every addition belongs to that anchor."* (framing)
+- *"Don't conflate regulated-practice violation with standard informational disclaimer hygiene."* (judgment)
+- *"For products whose core data is small + public, default to client-side engine + JSON snapshot."* (architectural default)
+- *"Distinguish between owner-as-co-author and owner-as-reviewer roles."* (interaction model)
+- *"Land cheap infrastructure during scaffold, not as follow-up."* (cross-cutting principle)
+
+Pattern: shapes future client work; the owner needs to see it before it lands.
+
+**When in doubt: `high`.** Auto-promote is the optimization; queue-for-review is the correct default. False positives (low classified as high) cost an unnecessary review; false negatives (high classified as low) silently shape future client work in ways the owner didn't see. The asymmetry is real.
+
+**Who sets `stakes`:** the conductor at capture time. Either explicitly (via the Stash prompt's optional `[low]` / `[high]` annotation) or by default (`high`). The auto-debrief mechanism in T2.3 pre-classifies its own emissions as `low` because agents are commenting on their own craft — but the conductor can override on review.
 
 ---
 

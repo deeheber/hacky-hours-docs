@@ -11,6 +11,18 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 v4.1 work lands on `main` behind feature flags (default-off). v4.1.0 release will flip stable defaults to `true`. v4.0.x patches (e.g., HF1, HF2) ship freely during the v4.1 cycle. Release strategy: trunk-based development with feature flags — see ADR `hacky-hours/02-design/decisions/2026-05-22-feature-flag-layer.md`.
 
+### Added — v4.1 Tier 0 + Tier 1/2 (F3 + T1.6 + T2.2: stakes-aware team update, 2026-05-22)
+
+Three coupled changes ship in one PR — they all rework the team-update flow:
+
+- **F3 (Tier 0): `stakes:` field added to pending-file frontmatter** (`references/capture-format.md`). Values `low | high`; defaults to `high` when absent. New "Stakes rubric" section in `capture-format.md` distinguishes craft (auto-promotable) from framing (queue for review).
+- **T1.6 (Tier 1): Cross-role propagation in `team update`** (`tools/team-update.md` Step 3). When an accepted entry has `stakes: high` AND `features.cross_role_propagation: true`, the conductor is asked which peer agents should also adopt the principle. Selected peers get propagated pending entries (with `propagated_from:` annotation) that surface in the next `team update` cycle.
+- **T2.2 (Tier 2): Auto-promote / queue split in `team update`** (`tools/team-update.md` Step 1, 2, 4, 6). When `features.auto_promote_low_stakes: true`, low-stakes entries commit silently in Step 4 with a footer summary; high-stakes entries surface in the Step 2/3 review walk-through. When the flag is off, all entries flow through review (v4.0.x behavior).
+
+Both T1.6 and T2.2 are feature-flagged (`cross_role_propagation`, `auto_promote_low_stakes`); default-off in v4.1.x; flipped on in v4.1.0. F3's schema is additive — entries without `stakes` are treated as `high`.
+
+Confirmation footer (Step 6) now distinguishes auto-promoted / reviewed+accepted / propagated / deferred / rejected counts.
+
 ### Added — v4.1 Tier 1 (T1.5: plan-aware defaults wiring, 2026-05-22)
 
 - **Cost preflight on heavy verbs.** `adopt`, `audit`, `team reflect --all`, and `team backfill` now surface a token estimate before fanning out across roles, with **Proceed** / **Downshift** / **Cancel** options. Pattern documented in new `references/cost-preflight.md`.
