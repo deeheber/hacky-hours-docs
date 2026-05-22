@@ -454,9 +454,151 @@ Cadence: opt-in (not part of Stash phase). Spec: `tools/team-reflect.md`.
 
 ADR: `hacky-hours/02-design/decisions/2026-05-17-agent-representation.md`. Specs: `tools/team-resume.md`, `tools/team-reflect.md`. Contract additions: `references/capture-format.md` §§"Derived metrics", "Level derivation", "Resume composition", "Reflection semantics".
 
----
+### 4.23 Feature-flag layer (v4.1)
 
-## 5. The Role Roster (Core 12)
+V4.0.0 was dogfooded only on Claude Max. Pro-plan feasibility is unknown, conflicting with the framework's "this is for everyone" intent. v4.1 work compounds the problem — workroom mode, automated debrief, and the browser companion all add new fan-out. The fix is a feature-flag layer that lets users disable cost-heavy mechanisms granularly + plan-aware defaults so Pro / Max-5x / Max-20x users get sensible starting configurations.
+
+**Mechanism:** flat `features:` block in `~/.hacky-hours/settings.yml`. Each v4.1 mechanism is a named bool; all default `false` in v4.1.x patches; v4.1.0 release flips confirmed-stable defaults to `true`.
+
+**Plan-aware defaults:** new `profile.plan: pro | max5x | max20x | unspecified` schema. Pro defaults to leaner configurations (`team_chat: minimal`, Haiku for low-output roles, cost preflight on heavy verbs). Max defaults preserve v4.0.0 behavior.
+
+**Cost preflight + graceful degradation:** heavy verbs print an estimate before fanning out; framework auto-downshifts when `session_budget_hard` is approached.
+
+This unlocks **trunk-based development with feature flags** as the v4.1 release pattern. Every v4.1 piece lands on `main` disabled-by-default; v4.1.0 release flips the defaults. No long-lived feature branch with drift / conflict pain.
+
+ADR: `hacky-hours/02-design/decisions/2026-05-22-feature-flag-layer.md`. Source: GitHub issue #10.
+
+### 4.24 Workroom mechanic (v4.1)
+
+V4.0.0's interaction model routes everything through the owner; the team has no offstage space for productive disagreement. Two dogfooding misses (pomodoro: "Mario" vs SMB2 USA Subcon; reciprocator: planner vs explorer) traced to the absence of an agent-to-agent conversation surface.
+
+**Mechanism:** workroom-flagged verbs (Step 2, Step 5, audit) run a structured multi-turn agent-to-agent conversation. Each turn is one role; turns can be proposals, pushback, or convergence. Conversation ends when convergence is reached OR `workroom_max_turns` (default 24) is hit.
+
+**Persistence:** every turn is appended as a JSON object to `~/.hacky-hours/sessions/<session-id>/messages.jsonl`. JSONL because append-safe + cheap to tail + structured for browser-companion consumption. One source of truth, multiple render destinations.
+
+**Owner's view:** at end of workroom, the conductor produces a **digest** (the new presentation artifact, §4.25) with outcome, per-discipline summary, explicit disagreements, open questions, and linked artifacts. Owner reads the digest by default; transcript is preserved on disk and renderable via the chat surface (§4.29) when curious.
+
+**Owner interruption:** Cmd-C or `/hacky-hours redirect "<note>"` injects an owner note into the transcript and re-routes the team. Most common case: framing redirect (the pattern that this whole mechanism is designed to surface earlier).
+
+**Cost discipline:** gated behind `features.workroom_mode: false` by default; bounded by `workroom_max_turns` and `workroom_role_budget`; cost preflight fires.
+
+ADR: `hacky-hours/02-design/decisions/2026-05-22-workroom-mechanic.md`. Source: GitHub issue #11 piece 1.
+
+### 4.25 Three-artifact model: deep / presentations / status updates (v4.1)
+
+V4.0.0 produces one artifact tier (deep docs). These are appropriate for agents at build time but force the owner to read every section to know what's going on. Owner directive (2026-05-22): both layers must exist — deep for agents, presentations for owner review at checkpoints — with a third layer (status updates) for lightweight day-to-day messages.
+
+**Three layers:**
+
+| Artifact | Audience | Location | Lifetime |
+|---|---|---|---|
+| Deep docs (existing) | Agents at build time | `02-design/*-deep.md` | Project lifetime |
+| Presentations (new) | Owner at review checkpoints | `02-design/*-presentation.md` | Per-checkpoint, regenerated freely |
+| Status updates (new) | Owner day-to-day; team coordination | `sessions/<id>/messages.jsonl` with `role_event: "status"` | Session-scoped |
+
+**Presentation discipline:** one screen, no scrolling. Mandatory "Disagreements" section even when empty (state "no significant disagreements" — absence is signal). Deep doc wins on conflict; presentation regenerates.
+
+**Status update discipline:** out-of-band, agent-fired (not conductor-prompted), heuristic-driven ("would the owner appreciate this?"). Never load-bearing — informational only.
+
+ADR: `hacky-hours/02-design/decisions/2026-05-22-three-artifact-model.md`. Source: GitHub issue #11 piece 4.
+
+### 4.26 Automated agent-to-agent learning (v4.1)
+
+V4.0.0's `team update` requires the conductor to manually nominate every behavior change. Real teams learn continuously, agent-to-agent. v4.1 automates the low-stakes case while preserving owner oversight of the high-stakes case.
+
+**Mechanism:**
+
+1. **`stakes:` field in pending-file frontmatter** (`low | high`; default `high`). Documented rubric in `references/capture-format.md` distinguishes craft (auto-promotable) from framing (queue-for-review).
+2. **`team update` flow rework:** Step 1 buckets pending entries by stakes; Step 2 presents `high` only; auto-bucket commits silently with footer summary; Step 3 gains "propagate to peer" option that writes parallel pending files for peer agents.
+3. **End-of-verb auto-debrief** (`features.auto_debrief`): brief agent-to-agent reflection after Phase N — Stash, each "I would propose…" becomes a `stakes: low` pending entry pre-classified by the agent itself.
+
+**Safety:** auto-promote goes through `team update` (which has explicit harness permission per recent settings.json grant); auto-promote writes are batched into a single git commit; team-update footer enumerates what auto-landed.
+
+ADR: `hacky-hours/02-design/decisions/2026-05-22-automated-team-learning.md`. Source: GitHub issue #11 piece 3.
+
+### 4.27 Status-update artifact + agent-initiated escalation (v4.1)
+
+Sub-decision under §4.25, surfaced here because the agent-initiated-escalation behavior is structurally different from a regular status update.
+
+**Status update:** narrates a long-running role activity or phase transition. Fires when agent judges the owner would appreciate visibility. Surfaces in terminal (when `team_chat: minimal|full`) and in the Slack-style chat surface (§4.29).
+
+**Escalation:** distinct `role_event: "escalation"` message that asks the owner an explicit question or signals a blocker. Conductor surfaces escalations prominently (terminal: dedicated banner; chat surface: pinned-message style). Owner can ignore (verb continues), respond inline, or invoke `/hacky-hours redirect`.
+
+**Default heuristic:** escalate when (a) the team has tried 2+ approaches and neither converged, (b) the work depends on owner judgment that can't be inferred from the brief, (c) a security/licensing/cost concern crosses a threshold the framework can't autonomously decide. Each role's system prompt picks up this heuristic from `references/escalation-heuristic.md` (to be authored alongside T1.3).
+
+Source: GitHub issue #11 piece 2. Folded into §4.25 ADR.
+
+### 4.28 Browser companion (v4.1)
+
+V4.0.0 is terminal-only. The browser companion is a **local static workspace** generated from on-disk content, with no LLM round-trips, vendored deps, and zero per-use API spend.
+
+**Architecture:** pure Python stdlib generator (no npm, no Node). Three modes: `build`, `serve`, `serve --writeback`. Generated tree under `~/.hacky-hours/companion/<project-slug>/`.
+
+**Nine surfaces:** home, team browser (extends existing `team site`), project workspace, fillable forms, backlog kanban, audit timeline, diagram gallery, **Slack-style chat** (§4.29), session monitor.
+
+**Phased delivery (v4.1.0):**
+
+- Phase 1: scaffold + project workspace + diagram gallery + audit timeline (T3.0–T3.3)
+- Phase 2: pixel-art bootstrap + chat surface (T3.4, T3.5)
+- Phase 3: multi-workspace switcher + `projects.yml` (T3.6)
+- Phase 4: forms + backlog write-back (T3.7, T3.8)
+- Phase 5: session monitor (T3.9)
+
+**Handoff back to Claude:** clipboard handoff (MVP), `pending-input.json` (form submissions), marker-file polling (stretch).
+
+**Performance constraints:** initial load < 200ms, bundle target < 100KB, works offline, no CDN deps, keyboard nav + deep-linkable URLs everywhere, WCAG 2.1 AA baseline.
+
+ADR: `hacky-hours/02-design/decisions/2026-05-22-browser-companion.md`. Source: GitHub issue #8 (+ owner addition for §4.29).
+
+### 4.29 Slack-style team chat surface (sub-decision under §4.28)
+
+The 9th surface of the browser companion, added by owner during 2026-05-22 iterate Phase 1. Headline of v4.1.0.
+
+**Shape:**
+- **Workspace = project.** Multi-workspace switcher in the chrome (per `~/.hacky-hours/projects.yml`).
+- **Channel = session.** Each `~/.hacky-hours/sessions/<session-id>/` becomes a channel. Name derived from session metadata; description from session's first turn or `ITERATION.md` lead.
+- **Message = `messages.jsonl` row.** Avatar (24×24 pixel-art PNG) + header (`<emoji> <Name> · <Role>`) + Markdown body + timestamp + per-agent accent color. Threads emerge from `in_reply_to`.
+- **Read-only.** No write-back. Conversations don't expire — session folders are the source of truth.
+
+**Pixel-art avatars:** generated **once** at team-init time (or via `team avatars` opt-in verb) via one-shot LLM pass — installs as install cost, not per-use cost. Style is consistent across roster (one generator pass for all agents). Fallback: emoji + initials when generation isn't available.
+
+**Why load-bearing:** elegantly solves transcript-vs-digest (chat = transcript; presentation = digest), "show your work" (full audit trail), status-update artifact (channel messages), and the "team feels like consultants not coworkers" critique (per-agent identity makes the orchestra feel like a team).
+
+Folded into §4.28 ADR. Source: ITERATION.md §A3.1 (owner addition during iterate).
+
+### 4.30 Discovery phase in Step 1 (v4.1)
+
+Two dogfooding misses (pomodoro, reciprocator) showed v4.0.0's Step 1 *synthesizes* the founder's brief without *interrogating* whether the brief is the right product shape. v4.1 adds a Discovery phase **inside Step 1** (not a new step — minimizes new skill files and preserves the five-step mental model).
+
+**Three Discovery questions, before any PRODUCT_OVERVIEW.md write:**
+
+1. *"What is the user doing today, before they reach this product?"*
+2. *"If a stranger lands on your homepage, what do they see in the first 5 seconds, and what do they feel?"*
+3. *"What's the smallest thing you'd want a user to do in their first session?"*
+
+Outputs land in `01-ideate/DISCOVERY.md`. Feeds PRODUCT_OVERVIEW.md synthesis but stays around for reference.
+
+**Lo-fi homepage gut-check gate (between Step 1 and Step 2):** framework produces ASCII/Markdown/Mermaid homepage mockup at `01-ideate/HOMEPAGE-SKETCH.md`. Owner reviews before architecture commits. If rejected, return to Discovery.
+
+Gated by `features.discovery_phase: false` in v4.1.x; v4.0.x behavior preserved when disabled.
+
+ADR: `hacky-hours/02-design/decisions/2026-05-22-discovery-phase.md`. Source: GitHub issue #11 piece 5.
+
+### 4.31 Skeptic mode flag (v4.1)
+
+When Product proposes a framing, no role is structurally responsible for arguing against it. Agents converge politely. v4.1 introduces a **modal flag** (not a new role) any role can adopt: `--skeptic`.
+
+**Behavior:** when a role is invoked with `--skeptic`, that role argues against the proposed framing (even when its domain instinct would be to agree), surfaces the strongest objection from its discipline's lens, and names what the team would regret if wrong.
+
+**Multi-skeptic in workroom verbs:** after convergence, one role (conductor's pick or rotated) argues against the convergence. Load-bearing concerns reopen the workroom; otherwise the digest notes a skeptic pass was performed.
+
+**v4.2 escalation path:** if the modal flag is used heavily (10+ uses, 3+ projects, 50%+ load-bearing) by v4.2, escalate to a dedicated 13th role (🦂 The Skeptic). For v4.1.0, modal is sufficient.
+
+Gated by `features.skeptic_mode: false` in v4.1.x. Folded into §4.30 ADR.
+
+Source: GitHub issue #11 piece 6.
+
+---
 
 Ships in v4.0.0. Extensibility model for additional roles (e.g., DBA, Mobile, Performance Eng) deferred to v4.1+.
 
@@ -517,17 +659,59 @@ role_models:
 # Voice defaults (baseline; per-project VOICE.md overrides)
 voice_default: builder
 
-# About-the-user (informs audience adaptation)
+# About-the-user (informs audience adaptation; v4.1 adds plan)
 profile:
   technical_background: non_engineer
+  plan: pro                                 # v4.1: pro | max5x | max20x | unspecified
   role_fluency:
     security: novice
     product: expert
+
+# Feature flags (v4.1+; see §4.23)
+features:
+  discovery_phase: false
+  skeptic_mode: false
+  status_updates: false
+  presentations: false
+  auto_promote_low_stakes: false
+  cross_role_propagation: false
+  auto_debrief: false
+  workroom_mode: false
+  forms_writeback: false
+  backlog_writeback: false
+  session_monitor: false
+
+# Workroom bounds (v4.1+; see §4.24)
+workroom_max_turns: 24
+workroom_role_budget: 2000
 
 # Privacy
 share_feedback_with_empathetech: false
 auto_update_check: false
 ```
+
+### messages.jsonl (v4.1; `~/.hacky-hours/sessions/<session-id>/messages.jsonl`)
+Per-session append-only log of multi-agent dialogue + status updates + escalations. One JSON object per line. Schema:
+```json
+{"turn": 1, "ts": "ISO", "role": "product", "agent_id": "product",
+ "content": "...", "channel": "iterate", "in_reply_to": null,
+ "role_event": "turn"}              // turn | status | escalation | debrief | owner_note
+```
+The Slack-style chat surface (§4.29) is the canonical render destination. JSONL chosen for append-safety, cheap tailing, and programmatic consumption. See §4.24.
+
+### projects.yml (v4.1; `~/.hacky-hours/projects.yml`)
+Workspace index for the browser companion's multi-workspace switcher. Populated automatically when `/hacky-hours adopt` or `/hacky-hours ideate` runs in a new project directory. Schema:
+```yaml
+projects:
+  - slug: <project-slug>
+    path: <absolute-fs-path>
+    team: <team-name>
+    last_active: <ISO timestamp>
+```
+See §4.28.
+
+### companion/ (v4.1; `~/.hacky-hours/companion/<project-slug>/`)
+Generated static HTML output of the browser companion. Idempotent — safe to re-run `build` at any time. No state lives here that isn't derivable from the source content on disk. See §4.28.
 
 ---
 
@@ -562,15 +746,41 @@ auto_update_check: false
 
 ---
 
-## 8. What's Deferred to v4.1+
+## 8. What's Deferred (re-stratified post-v4.0.1)
 
-- Team marketplace / shared starter teams published by empathetech
-- Multi-team-per-project binding (escalate to bigger team for audits)
-- Notion / Confluence exporters (v4.0.0 ships Google Docs + static site only)
-- Cross-language / i18n
-- Multi-user collaboration on shared teams
-- Extension model for additional role types (DBA, Mobile, Performance Eng, etc.)
-- "Defer" option in promote flow (v4.0.0 only supports accept-or-discard)
+This section was originally a flat "deferred to v4.1+" list. Post-v4.0.1 (2026-05-22 iterate cycle), promoted items moved into v4.1 locked decisions (§4.23–§4.31). The remainder is re-stratified by target release.
+
+### Promoted to v4.1 (now §4.23–§4.31)
+
+- Feature-flag layer (§4.23)
+- Workroom mechanic (§4.24)
+- Three-artifact model — presentations + status updates (§4.25, §4.27)
+- Automated agent-to-agent learning (§4.26)
+- Browser companion + Slack-style chat surface (§4.28, §4.29)
+- Discovery phase + skeptic mode (§4.30, §4.31)
+
+### Deferred to v4.2+
+
+- **History compaction.** Boilerplate says compact at ~500 lines / ~10k tokens; mechanism (when, who triggers, conductor-reviewed vs automatic) needs more thought. v4.1 ships the append; long histories produce long files until compaction lands. Git preserves raw record.
+- **Skeptic as 13th role.** v4.1 ships as modal flag (§4.31). Escalate to dedicated role if signal warrants (10+ uses, 3+ projects, 50%+ load-bearing critiques).
+- **Implicit feedback capture** ("override agent N times → write pending implicitly"). Real signal but classification-fuzzy. Re-evaluate after explicit prompt has run for a release cycle.
+- **Per-verb stash-mode override** in settings.yml (`team_learning.stash_prompt: end_of_verb | end_of_session | off`). Defer until signal that always-on is too noisy.
+- **Agent-to-agent skill recommendation** ("Maya needs an architecture review; Priya is level 4 in audit. Engage her?")
+- **Reflection auto-cadence triggers** ("N verbs since last reflection — run one?")
+- **`verb-prelude.md` reference extraction** (DRY win; not load-bearing).
+
+### Deferred to v4.3+
+
+- **Team marketplace / shared starter teams** published by empathetech
+- **Multi-team-per-project binding** (escalate to bigger team for audits)
+- **Notion / Confluence exporters** (v4.0.0 ships Google Docs + static site only; v4.1 adds browser-companion static workspace)
+- **Cross-language / i18n**
+- **Multi-user collaboration on shared teams**
+- **Extension model for additional role types** (DBA, Mobile, Performance Eng, etc.)
+- **Résumé export to non-Markdown shapes** (LinkedIn JSON, PDF) — use `/hacky-hours export markdown-bundle` plus SSG for now
+- **Per-project skill maps + cross-project skill inference**
+- **Hosted browser companion** (currently local-only)
+- **Marker-file polling for browser → Claude write-back** (clipboard + `pending-input.json` ship in v4.1; marker-polling is the V1+ shape)
 
 ---
 
@@ -596,8 +806,12 @@ After these, the verb implementations and role-role coordination flow naturally.
 - **Team history can become noise.** Compaction is mandatory; without it, agent files bloat and lose their resume-like utility.
 - **The graduation property is testable, and you'll be tested on it.** The first team that picks up a hacky-hours project and rejects the docs is existential. The fresh-context Claude audit lane gives us a self-administered version of this test that doesn't require human reviewers.
 - **The "conductor arbitrates flexibly" pattern is powerful but advanced.** Default to the cheapest (`decide`) so first-time users aren't paralyzed.
-- **Cost of fan-out adoption** on a non-trivial codebase. Team-tier multiplexing addresses much of this; per-role model overrides in `settings.yml` cover the rest.
+- **Cost of fan-out adoption** on a non-trivial codebase. Team-tier multiplexing addresses much of this; per-role model overrides in `settings.yml` cover the rest. v4.1's feature-flag layer (§4.23) and plan-aware defaults make this an explicit user-tunable surface.
 - **Two update loops in tension** (local meta-tool patches vs upstream framework changes). Resolved structurally: promoted changes live in the team repo, not as customization patches against framework prompts.
+- **Cost of workroom mode** (v4.1, §4.24). Workroom mode multiplies fan-out cost. Mitigated by: feature flag default-off, bounded by `workroom_max_turns`, per-role budget caps, cost preflight. Risk: users enable it without understanding the cost; preflight is the safety net.
+- **Trust-as-default failure mode** (v4.1, §4.24/§4.25). When the team gets a framing wrong in a workroom, the presentation digest may not surface it clearly. Recovery path: owner can `/hacky-hours redirect` at any time; skeptic-mode (§4.31) gives the team an explicit anti-drift mechanism; the transcript on disk (`messages.jsonl`) is auditable post-hoc via the Slack-style chat surface.
+- **Pixel-art bootstrap as one-time cost** (v4.1, §4.29). Team-init generates 12 avatars via one-shot LLM pass. If generation fails (no network, no API), the chat surface falls back to emoji + initials; team is still functional. Risk surfaces only on first-run for non-trivial cohorts.
+- **Browser companion adds an attack surface even if local-only** (v4.1, §4.28). No CDN deps, no LLM calls, no remote endpoints; content limited to what's on disk. Risk surface is narrow: a compromised browser companion could only display content the user already has. Mitigated by vendored deps + license-checked dependency tree.
 
 ---
 
