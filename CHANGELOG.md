@@ -11,6 +11,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 v4.1 work lands on `main` behind feature flags (default-off). v4.1.0 release will flip stable defaults to `true`. v4.0.x patches (e.g., HF1, HF2) ship freely during the v4.1 cycle. Release strategy: trunk-based development with feature flags — see ADR `hacky-hours/02-design/decisions/2026-05-22-feature-flag-layer.md`.
 
+### Added — v4.1 Tier 1 (T1.5: plan-aware defaults wiring, 2026-05-22)
+
+- **Cost preflight on heavy verbs.** `adopt`, `audit`, `team reflect --all`, and `team backfill` now surface a token estimate before fanning out across roles, with **Proceed** / **Downshift** / **Cancel** options. Pattern documented in new `references/cost-preflight.md`.
+- **Plan-aware preflight rules.** Fires always on `plan: pro` or `unspecified`. Fires on Max plans only when the estimate exceeds 50K input tokens (with `audit` always crossing that threshold).
+- **Per-verb downshift profiles** documented inline in each heavy verb's skill file — `adopt` skips the involvement-assessment artifact + Haiku for cheap roles; `audit` runs Lane A only with top 3 roles; `team reflect --all` processes agents sequentially; `team backfill` uses file-path classification only.
+- **README updated** to describe v4 + v4.1 plan-aware defaults, the current install layout, and the persistent-team orchestra (the v4 thesis was missing from README).
+
+Note: graceful degradation under `session_budget_hard` pressure is documented but not enforced until F2 (token instrumentation) lands. Cost estimates are observation-based until R1 (benchmarks) publishes real numbers.
+
 ### Added — v4.1 Tier 0 (F1: feature-flag layer foundation, 2026-05-22)
 
 - **`features:` block in seeded `~/.hacky-hours/settings.yml`** (via `tools/v4-first-run.md` Step 4). 11 flags covering v4.1 Tier 1 / Tier 2 / Tier 3 mechanisms — all default `false`.
