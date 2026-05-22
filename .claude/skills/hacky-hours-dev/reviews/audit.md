@@ -24,6 +24,19 @@ Output: `hacky-hours/audits/<YYYY-MM-DD>.md` with a scorecard at the top (traffi
 2. **Active team:** read `AGENTS.md` for team binding; default if absent.
 3. **Settings & tier:** read `CLAUDE.md` for tier and voice; respect them in calibration.
 
+## Step 0.5 — Cost preflight (v4.1+)
+
+Read `${CLAUDE_SKILL_DIR}/references/cost-preflight.md` for the pattern. `audit` is the heaviest verb in the framework (typical 80K–200K tokens across three lanes; Lane A alone engages 5+ roles).
+
+Read `~/.hacky-hours/settings.yml` for `profile.plan`. Surface to the conductor:
+
+> *"`audit` typically uses ~80K–200K tokens (~80–200% of a daily Pro limit, ~2–4% of Max-5x).*
+> *  - **Proceed** — three lanes (A: role-driven, B: doc-stranger, C: cross-ref)*
+> *  - **Downshift** — Lane A only with top 3 roles (security, architect, qa); skip Lane B + C; narrate-only*
+> *  - **Cancel*"*
+
+Apply the conductor's choice for the remainder of this verb. **Always fire on `plan: pro` or `unspecified`. Always fire when estimate exceeds 50K input tokens — `audit` always exceeds that threshold, so this verb's preflight runs on all plan tiers.**
+
 ## Step 1 — Three-lane fan-out
 
 Run the three lanes in parallel where possible (Agent tool); sequentially otherwise.
