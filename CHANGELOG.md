@@ -7,6 +7,22 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — v4.1 cycle (in progress)
+
+v4.1 work lands on `main` behind feature flags (default-off). v4.1.0 release will flip stable defaults to `true`. v4.0.x patches (e.g., HF1, HF2) ship freely during the v4.1 cycle. Release strategy: trunk-based development with feature flags — see ADR `hacky-hours/02-design/decisions/2026-05-22-feature-flag-layer.md`.
+
+### Added — v4.1 Tier 0 (F1: feature-flag layer foundation, 2026-05-22)
+
+- **`features:` block in seeded `~/.hacky-hours/settings.yml`** (via `tools/v4-first-run.md` Step 4). 11 flags covering v4.1 Tier 1 / Tier 2 / Tier 3 mechanisms — all default `false`.
+- **`profile.plan` schema** added to settings.yml. Values: `pro | max5x | max20x | unspecified`. Seeded as `unspecified` by default; `tools/v4-first-run.md` Step 5 now asks the plan question and seeds plan-aware role-model overrides accordingly (Haiku for `licensing` + `accessibility` on Pro).
+- **`workroom_max_turns` and `workroom_role_budget`** settings added (defaults 24 and 2000). Consumed by T2.1 when it lands.
+- **`references/feature-flag-loader.md`** new — canonical pattern for verbs that gate behavior on a flag. Documents the fallback discipline ("absence ≡ false; v4.0.x fallback must keep working").
+- **Documents the flag list** in one place (the new reference's flag-table). Tier 1/2/3 PRs add their flags as they land; v4.1.0 release flips stable defaults to `true`.
+
+This PR doesn't wire any verb to use a flag yet. F1 establishes the infrastructure; T1.1–T3.9 each consume it.
+
+---
+
 ## [4.0.1] — 2026-05-22
 
 ### Fixed
