@@ -12,7 +12,7 @@ Previous milestone (v4.0.0) archived to `archive/BACKLOG-v4.0.0.md`.
 
 - [ ] **HF1 — Pending-file clobber-suffix protocol.** Update `references/capture-format.md` §"Per-verb implementation responsibilities" to require timestamp-suffixed filenames when a pending file already exists for the same agent + session. v4.0.2 patch. Source: ITERATION-2026-05-22 §C2.
 - [ ] **HF2 — `claude resume` skill-reload FAQ note.** One-paragraph addition to `tools/v4-first-run.md` documenting that `claude resume` re-reads skill files from disk. v4.0.2 patch. Source: ITERATION-2026-05-22 §C3.
-- [ ] **HF3 — Branch protection on `main`.** Ops task on `empathetech/hacky-hours-docs`: require PR review + green CI before merge to `main`. Not a code change. Source: ITERATION-2026-05-22 §B5.
+- [x] ~~**HF3 — Branch protection on `main`.**~~ Done 2026-05-22 — `main` now requires PR; admins included (no escape hatch); force-push + branch-deletion blocked; 0 required approving reviews (solo-maintainer); required-status-checks placeholder for when CI lands. Ops task, no release artifact. Source: ITERATION-2026-05-22 §B5.
 
 ---
 
