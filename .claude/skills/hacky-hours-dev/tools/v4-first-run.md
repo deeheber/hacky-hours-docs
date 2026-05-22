@@ -181,3 +181,33 @@ If this file is invoked again (e.g., the user manually triggered setup) and `~/.
 ```
 
 And offer to `/hacky-hours team` for managing teams or `/hacky-hours update` to update the framework.
+
+---
+
+## FAQ — installation, upgrade, and `claude resume`
+
+### Does `claude resume` pick up a newly installed version of the framework?
+
+**Yes.** When you exit a Claude Code session and restart with `claude resume`, the harness re-reads skill files from disk on session restore. If you ran `bash install.sh` between the original session and the resumed one, the resumed session loads the updated skill — you'll see the new help message, new verbs, etc. immediately.
+
+If `claude resume` *appeared* to leave you on an older version: check `~/.claude/skills/hacky-hours/SKILL.md` directly. The first line of the help message (printed by `/hacky-hours help`) shows the active version. If it shows the old version after resume, the install script may not have completed — re-run `bash install.sh` and verify the help-message version updates before doing more work.
+
+### Does running a verb in this session pick up an update I just installed?
+
+**No** (mid-session). The skill is read at session START. Once a session is running, the in-context copy is what's used; changes to disk don't take effect until the next session start.
+
+To activate an update mid-session: exit (Ctrl-D or close the terminal), then start a fresh session (or resume — see above). The fresh-start re-reads from disk.
+
+### How do I know which version is installed on disk?
+
+```bash
+cat ~/.claude/skills/hacky-hours/SKILL.md | head -1   # SKILL.md frontmatter line 1
+# Or check the version file written by v4-first-run:
+cat ~/.hacky-hours/version
+```
+
+The two should match for stable installs. They can diverge briefly during an update (skill is updated; user-side `~/.hacky-hours/version` is updated on next `team update` or `tools upgrade`).
+
+### Reinstalling — will it wipe my team / settings?
+
+**No.** `bash install.sh` only overwrites `~/.claude/skills/hacky-hours/` (the installed skill). It does NOT touch `~/.hacky-hours/` (your user state — teams, settings.yml, sessions, feedback). The strict separation is by design — see V4_DESIGN.md §7.

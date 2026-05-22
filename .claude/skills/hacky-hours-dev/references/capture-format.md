@@ -183,6 +183,7 @@ A verb that fans out to roles must:
 2. **Compose history summaries before the Stash prompt** — one sentence per participating agent, based on what that agent actually did. Not "Maya helped with audit" — concrete: "Confirmed PRODUCT_OVERVIEW.md still reflects the project's audience after the v4 pivot."
 3. **Resolve session ID** per the algorithm above before any pending file is written.
 4. **Append history first**, then prompt for behavior feedback, then write any pending files. This order matters — if the conductor cancels at the feedback prompt, the history is still recorded (which is correct — the verb did happen).
+4a. **Use timestamp-suffixed filenames when a pending file already exists for the same (agent, session)** — see "Pending-file clobber-suffix protocol" below. Prevents silent overwrite when a verb fires the Stash phase twice in one session, or when a Stash captures behavior feedback for the same agent that earlier had a different pending entry in the same session that hasn't been promoted yet.
 5. **Refresh derived metrics** in each participating agent's `profile.md` frontmatter immediately after history append (and before the commit in step 6). Parse the agent's `history.md` (plus `history-archive/*.md` if compaction has run) to recompute the full `metrics:` block per the schema above. Stamp `metrics_refreshed: <ISO timestamp>` and `last_active: <date>`. Bump `level` per the derivation table. This keeps team-site rendering, resume composition, and `team show <agent>` output in sync without a separate refresh verb. Sub-second per agent.
 6. **Commit history + metrics in a single commit** at end of verb:
    ```bash
@@ -192,6 +193,23 @@ A verb that fans out to roles must:
    ```
    No push. Team repo remains local-only by default. Bundling history + metrics in one commit keeps the team-repo log readable.
 7. **Honor `team_chat` mode** for the Stash phase rendering. In `off`, the narrator runs the prompt. In `minimal`, the prompt is attributed to the conductor's voice (no role headers — this is a framework moment, not a role moment). In `full`, optionally let one role (often Maya as Product, since she tracks team rhythm) introduce the stash block. Either way, the conductor's reply is captured verbatim.
+
+---
+
+## Pending-file clobber-suffix protocol
+
+**The problem:** the pending-file path `~/.hacky-hours/sessions/<session-id>/pending/<agent-id>.md` is keyed only on session + agent. If a verb fires the Stash phase twice in one session (rare but possible — e.g., two separate `audit` runs, or a multi-phase build with role re-engagement), the second write would silently overwrite the first if both target the same agent's pending file in the same session. This was observed in the field: behavior feedback for `security` was captured twice in one session against two different contexts (a regulated-practice distinction in one verb, then a scaffold-time-security principle in another); the second write clobbered the first. The first had already been promoted, so no data was lost, but the failure mode is real.
+
+**The protocol** (applies to every write to `~/.hacky-hours/sessions/<id>/pending/<agent-id>.md`):
+
+1. Before writing, check whether `pending/<agent-id>.md` already exists for the same session.
+2. If it does NOT exist: write to `pending/<agent-id>.md` (the canonical filename — backwards compatible).
+3. If it DOES exist: write to `pending/<agent-id>-<HHMMSS>.md` instead, where `HHMMSS` is the current local time. If a same-named timestamp file already exists (sub-second collision), increment to `pending/<agent-id>-<HHMMSS>-1.md`, `pending/<agent-id>-<HHMMSS>-2.md`, etc.
+4. Never `Write` (overwrite) an existing pending file. The only safe operations on an existing pending file are: leave it alone, or move it to `resolved/` after promotion via `team update`.
+
+**Read side** (`team update` Step 1 — Collect pending changes) — when grouping by agent, treat both the canonical name (`<agent-id>.md`) and any timestamp-suffixed variants (`<agent-id>-*.md`) as belonging to the same agent. Present them in chronological order in the review walk-through.
+
+**Why this is hotfix-shaped (HF1 in v4.0.x):** the silent-overwrite is rare but real, the fix is small (a write-path discipline + a read-path glob), and shipping it as a hotfix is more honest than waiting for a coordinated v4.1 release that this doesn't depend on.
 
 ---
 
