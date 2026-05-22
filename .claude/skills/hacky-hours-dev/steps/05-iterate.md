@@ -6,6 +6,8 @@
 
 **Purpose:** Capture bugs, ideas, and improvements after a release, amend the docs that need updating, and queue the work.
 
+**Pre-flight:** Before producing any output, Read `${CLAUDE_SKILL_DIR}/references/team-preflight.md` and run its checks. This verb assumes the global skeleton and the active team exist.
+
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
 
 **Team learning capture:** Iteration is always multi-role (synthesis touches whoever owns the design docs that need amendment). At the tail, run **Phase 6 — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each participating agent, then the one-line behavior-feedback prompt. Track which agents actually weighed in during synthesis and amendment.

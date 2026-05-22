@@ -6,6 +6,8 @@
 
 **Purpose:** Implement incrementally, with review at each step, aligned to design decisions.
 
+**Pre-flight:** Before producing any output, Read `${CLAUDE_SKILL_DIR}/references/team-preflight.md` and run its checks. This verb assumes the global skeleton and the active team exist.
+
 **Team chat mode:** Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. **No tokens for tokens' sake** — every voice turn must add information.
 
 **Team learning capture:** Build is *sometimes* multi-role (each task typically engages 1–3 roles). At the tail of each task — not each session — run **Phase N — Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md` for the roles that contributed to that task: silent `history.md` append per participating agent, then the behavior-feedback prompt. If only one role engaged, history still fires for that role; the prompt is still shown (conductor can answer `none`).

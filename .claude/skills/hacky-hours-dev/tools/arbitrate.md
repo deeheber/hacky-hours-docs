@@ -2,6 +2,8 @@
 
 When roles disagree on a project, the conductor arbitrates. This verb gives the conductor three named patterns to do that, calibrated to how much depth they want and how much budget they're willing to spend.
 
+**Pre-flight:** Before producing any output, Read `${CLAUDE_SKILL_DIR}/references/team-preflight.md` and run its checks. This verb assumes the global skeleton and the active team exist.
+
 **Team chat mode:** Arbitration is inherently multi-voice — chat mode is the natural rendering. Before producing any role-driven output, read `${CLAUDE_SKILL_DIR}/references/chat-format.md` and honor the current `team_chat` value from `~/.hacky-hours/settings.yml` (default `minimal`) throughout this verb. Even with `team_chat: off`, position summaries should be clearly attributed to roles — that's the verb's whole point. **No tokens for tokens' sake** — every voice turn must add information.
 
 **Team learning capture:** Arbitration is always multi-role (it's the verb's definition). At the tail (Step 5 below), run **Stash** per `${CLAUDE_SKILL_DIR}/references/capture-format.md`: silent `history.md` append for each agent that stated a position (history summary references the topic and the resolution outcome), then the one-line behavior-feedback prompt. Arbitrations are dense per-role moments — behavior feedback at the end of an arbitration is some of the highest-signal feedback the team will get.
