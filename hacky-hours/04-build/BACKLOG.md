@@ -2,125 +2,101 @@
 
 **Step 4 — Build** | hacky-hours-docs
 
----
+Queue of work. Items added during Step 3 / Step 5, removed when their PR merges. Completed work moves to [CHANGELOG.md](./CHANGELOG.md).
 
-## Next Milestone — v4.0.0
-
-### Slice 12 — Team learning closer (capture step + audit Lane B saturation guard + issue label-detect)
-
-**Type:** Implementation (v4.0.0 thesis closer)
-**Branch:** `feat/v4.0.0` (continuing on the same release branch)
-**Design:** `02-design/V4_DESIGN.md` §4.21
-**ADR:** `02-design/decisions/2026-05-17-team-learning-capture.md`
-**Origin:** Step 5 iteration on `feat/v4.0.0` (2026-05-17). ITERATION.md surfaced that the v4 persistence story was half-built — files exist, promoter exists, no verb writes to them. Also bundles issue #6 (audit Lane B saturation) since both items are the same failure shape ("framework memory mechanism that doesn't fire").
-
-Close the v4 thesis loop: agents actually learn and grow with context. Plus fix issue #6.
-
-**Scope:**
-
-*New canonical contract:*
-- `references/capture-format.md` — pending-entry schema, history-line schema, session-ID resolution algorithm, per-verb implementation responsibilities, edge cases
-
-*Phase N — Stash wired into every multi-role verb:*
-- `steps/01-ideate.md`, `steps/02-design.md`, `steps/03-roadmap.md`, `steps/04-build.md`, `steps/05-iterate.md` — preamble + tail Stash block
-- `reviews/audit.md` — preamble + Step 5 Stash block
-- `tools/adopt.md` — preamble + Step 8 Stash block (foundational team-meets-project history)
-- `tools/arbitrate.md` — preamble + Step 5 Stash block (high-signal behavior feedback moments)
-
-*Team-update.md reconciliation:*
-- `tools/team-update.md` — drop the "captures automatically when..." vibes-spec; reference `references/capture-format.md` as source of truth; clarify behavior-feedback vs. history-append paths
-
-*Retroactive companion: `/hacky-hours team backfill` (closes the "what about existing project history" gap):*
-- New verb `tools/team-backfill.md` — reads the bound project's CHANGELOG.md (or git log), classifies each entry by discipline (file paths + keywords → agent), proposes per-agent history batches, conductor reviews per-agent (accept all / select / edit / reject / defer), commits per agent batch
-- Backfilled entries annotated `(backfilled, <CHANGELOG-anchor-or-SHA>)` for distinguishability + provenance
-- `tools/team.md` routing — `team backfill` subcommand
-- `SKILL.md` — help message + argument-hint
-- `references/capture-format.md` — backfill semantics section (review-per-agent-batch vs. silent for forward-capture; per-agent commits vs. per-verb commits)
-
-*Issue #6 fix (Lane B saturation guard):*
-- `reviews/audit.md` — Lane B subagent prompt unchanged (preserves stranger purity); new post-Lane-B conductor-side saturation guard cross-checks the "First fix" recommendation against prior audit history + Lane C verification + current doc state; replaces saturated first-fix with a graduation-indicator note; `audits/.lane-b-saturation` durable counter file; scorecard annotation `· saturated (N)` on the Documentation dimension
-
-*Issue #6 tail bug fix:*
-- `tools/issue.md` — label-detect via `gh label list` before `gh issue create`; build `--label` from intersection of requested and existing labels; omit `--label` entirely if no intersection (prevents wholesale submission failure); surface missing-labels note in issue body footer
-
-*Design + docs:*
-- `02-design/V4_DESIGN.md` §4.21 — full design rationale
-- `02-design/decisions/2026-05-17-team-learning-capture.md` — ADR
-- `02-design/V4_QA.md` Test 11 — 10 sub-tests covering history append, behavior feedback prompt, "none" answer, team-update promotion, next-session-uses-update verification, session-ID staleness, Lane B saturation, issue.md label-detect, team site reflection
-
-*Misc:*
-- CHANGELOG entry under `[Unreleased] — feat/v4.0.0` as "Slice 12 — team learning closer"
-- BACKLOG housekeeping: remove Slice 11 (shipped in commit 8ca112c, already in CHANGELOG)
-
-**Done when:**
-- Running any multi-role verb appends a `history.md` line per participating agent and commits to the team repo, and the conductor sees a behavior-feedback prompt at end-of-verb.
-- A behavior note written by the prompt lands in `~/.hacky-hours/sessions/<id>/pending/<agent>.md` with the canonical schema. `/hacky-hours team update` reads it, promotes it on accept, and the next session's verb output reflects the change.
-- `/hacky-hours team backfill` on this very repo (hacky-hours-docs, with its full v3 + v4 CHANGELOG) produces per-agent batches that the conductor can accept; resulting history.md files reflect the project's lifetime; team site shows non-empty histories for the agents that actually shaped this codebase.
-- After 3 audits where prior asks have been addressed, Lane B's "First fix" gets replaced with a saturation graduation indicator rather than manufacturing a false-negative critique.
-- `/hacky-hours issue` succeeds against `empathetech/hacky-hours-docs` even when `user-feedback` and `v4` labels don't exist upstream — the verb omits `--label` and notes the gap in the issue body.
-- V4_QA.md Test 11 passes all 12 sub-tests on a fresh install (10 forward-capture + Lane B saturation + issue label-detect; plus 2 new backfill sub-tests).
+Previous milestone (v4.0.0) archived to `archive/BACKLOG-v4.0.0.md`.
 
 ---
 
-### Slice 13 — Agent representation (team site history + auto-evolving profile + résumé + reflection)
+## 🔥 Hotfix queue (v4.0.x patches, parallel to v4.1 work)
 
-**Type:** Implementation (v4.0.0 thesis surface)
-**Branch:** `feat/v4.0.0` (continues on the release branch)
-**Design:** `02-design/V4_DESIGN.md` §4.22
-**ADR:** `02-design/decisions/2026-05-17-agent-representation.md`
-**Origin:** Conductor confirmation during Slice 12 ship — *"the point of the team site and having these team avatars are that they are learning and growing with context; I want to treat these AI agents like human team members."* Slice 12 closed the persistence loop in data; Slice 13 closes it in the visible layer.
-
-Make the orchestra appear as teammates with track records. Four coordinated pieces, all in v4.0.0.
-
-**Scope:**
-
-*Derived metrics block:*
-- New `metrics:` frontmatter block in every agent's `profile.md` (auto-managed; conductors don't hand-edit)
-- Schema in `references/capture-format.md` §"Derived metrics" + §"Level derivation"
-- Refresh hook bundled into history-append step of every multi-role verb's Stash phase + `team backfill` per-agent batch + `team reflect`
-- Single git commit per refresh (bundled with history)
-
-*Team-site generator updates (un-defers v4.1+ deferral from Slice 12):*
-- `templates/team-site/generate.py` — reads `history.md`, `feedback.md`, metrics block, and `resume.md` per agent
-- Profile page additions: "Recent track record" timeline (last 10), "Lessons applied" section, résumé link (when present), level + contribution-count in header metadata
-- Index card additions: level badge + contribution count (hidden for level-0 agents)
-- New `render_resume_page` for standalone résumé HTML pages
-- CSS additions for new sections; mobile-responsive
-- All pure Python stdlib; no new dependencies
-
-*New verbs:*
-- `tools/team-resume.md` — synthetic résumé generator; three style presets (`minimal` / `standard` / `deep`); fact-derived only; outputs `agents/<id>/resume.md`
-- `tools/team-reflect.md` — opt-in conductor-invoked self-reflection; refreshes Track record section in profile (silent); proposes prose updates via `team update` pending flow (`kind: prose_update`); prints self-observations for conductor to optionally stash as behavior feedback
-
-*Routing + help:*
-- `tools/team.md` — routes `team resume` and `team reflect` subcommands; help message
-- `SKILL.md` — argument-hint + help message
-
-*Capture-format contract extensions:*
-- §"Derived metrics" (schema)
-- §"Level derivation" (table + breadth bumps)
-- §"Resume composition" (cross-reference to `team-resume.md`)
-- §"Reflection semantics" (cross-reference to `team-reflect.md`)
-- Step 5 of Implementation responsibilities (metrics refresh in same commit as history append)
-
-**Done when:**
-- After any multi-role verb run, the participating agents' `profile.md` files have an updated `metrics:` block bundled in the same commit as the history append. Levels and counts are accurate.
-- `/hacky-hours team resume <agent-id>` writes `resume.md` composited from sources. `--all` works. Honest about thin work (no padding for zero-history agents).
-- `/hacky-hours team reflect <agent-id>` refreshes Track record section silently, proposes prose updates as pending entries, and surfaces self-observations the conductor can opt to stash.
-- `/hacky-hours team site build` after the above produces HTML pages where: index cards show level badges; profile pages show Recent track record + Lessons applied + résumé link; résumé pages render at `agents/<id>-resume.html` with back-link to profile.
-- V4_QA.md Test 12 passes all 10 sub-tests on a fresh install (metrics refresh, resume generation, reflection flow, team site rendering, hybrid bio editing semantics).
-- After backfilling this very repo (`hacky-hours-docs`), running `team resume --all`, and rebuilding the team site: agents that have shaped this codebase render with real histories, real lessons, real résumés, and accurate level badges. The thesis becomes visible.
+- [ ] **HF1 — Pending-file clobber-suffix protocol.** Update `references/capture-format.md` §"Per-verb implementation responsibilities" to require timestamp-suffixed filenames when a pending file already exists for the same agent + session. v4.0.2 patch. Source: ITERATION-2026-05-22 §C2.
+- [ ] **HF2 — `claude resume` skill-reload FAQ note.** One-paragraph addition to `tools/v4-first-run.md` documenting that `claude resume` re-reads skill files from disk. v4.0.2 patch. Source: ITERATION-2026-05-22 §C3.
+- [x] ~~**HF3 — Branch protection on `main`.**~~ Done 2026-05-22 — `main` now requires PR; admins included (no escape hatch); force-push + branch-deletion blocked; 0 required approving reviews (solo-maintainer); required-status-checks placeholder for when CI lands. Ops task, no release artifact. Source: ITERATION-2026-05-22 §B5.
 
 ---
 
-## Backlog (unscheduled)
+## 🎯 Next Milestone — v4.1.0
 
-### BACKLOG hygiene pass (post-v4.0.0)
+Release pattern: **trunk-based development with feature flags**. Every v4.1 piece lands on `main` disabled-by-default. v4.1.0 release flips defaults to `true` for confirmed-stable features.
 
-Cross-check `02-design/V4_DESIGN.md` deferred-scope list against shipped slices and re-seed the unscheduled backlog with the actual v4.1+ candidates. After Slice 12, the known v4.1+ items include:
+Items within a tier are independent and can land in any order; tiers depend on the previous one.
 
-- **History compaction** — automated rollup of `history.md` past ~500 lines / ~10k tokens into a "Key facts and patterns" summary at top with raw entries archived to `history-archive/<date>.md`. Deferred from Slice 12 per ADR.
-- **Implicit feedback capture** — detect repeated conductor overrides of an agent's recommendation and stash a pending entry implicitly. Real signal but classification is fuzzy; re-evaluate after explicit prompt has run a release cycle.
-- **Team site history rendering** — surface `history.md` on agent profile pages. Needs design once we have enough accumulated entries to know what pattern works.
-- **Per-verb stash-mode override** in settings.yml (`team_learning.stash_prompt: end_of_verb | end_of_session | off`). Defer until we have signal that always-on prompt is too noisy.
-- **Extensibility for additional roles** beyond the core 12 (e.g., DBA, Mobile, Performance Eng).
+### Tier 0 — Foundation (must land first)
+
+- [ ] **F1 — `features:` block in `~/.hacky-hours/settings.yml`.** Flat schema (see ADR `2026-05-22-feature-flag-layer.md`). Loader machinery in SKILL.md preamble — verbs that branch on a flag read settings and fallback if absent. Default-off in v4.1.x. Adds `profile.plan: pro | max5x | max20x | unspecified` schema with v4-first-run prompt. ADR: feature-flag-layer.
+- [ ] **F2 — Token instrumentation hooks.** Per-verb / per-role / per-phase log entries to `~/.hacky-hours/sessions/<id>/cost-log.jsonl`. Schema in `references/cost-instrumentation.md` (new). Always-on; not feature-flagged. Sets up benchmarking for R1. ADR: feature-flag-layer §3.
+- [ ] **F3 — `stakes:` field in pending-file frontmatter.** Add `stakes: low | high` (default `high`) to `references/capture-format.md` schema. Add "Stakes rubric" section to the same file. ADR: automated-team-learning §1, §2.
+
+### Tier 1 — Cheap individual features (each behind a flag)
+
+- [ ] **T1.1 — Discovery phase in Step 1.** Add Phase 1.0 to `steps/01-ideate.md` (3 questions: user's current workflow / 5-second homepage gut-check / smallest first-session action). Outputs `01-ideate/DISCOVERY.md`. Add `references/discovery-questions.md`. Lo-fi homepage gate before Step 2 (`01-ideate/HOMEPAGE-SKETCH.md`). Gated by `features.discovery_phase`. ADR: discovery-phase.
+- [ ] **T1.2 — Skeptic-mode flag.** Implement `--skeptic` flag any role can adopt. Modal behavior; no new role. Gated by `features.skeptic_mode`. ADR: discovery-phase §4.
+- [ ] **T1.3 — Status-update artifact + agent-initiated escalation.** Add `role_event: "status"` and `role_event: "escalation"` schema to `references/capture-format.md` (or new `references/messages-schema.md`). Update each multi-role verb to permit status-update emissions. Add `references/escalation-heuristic.md` for the "when to fire" rubric. Gated by `features.status_updates`. ADR: three-artifact-model §3.
+- [ ] **T1.4 — Presentations artifact format spec.** Add `kind: presentation` schema to V4_DESIGN §6 / capture-format.md. Add presentation-generation guidance to Step 2 / Step 5 / audit. Render comes with browser companion (T3.1). Gated by `features.presentations`. ADR: three-artifact-model.
+- [ ] **T1.5 — Plan-aware defaults.** Wire `profile.plan` into `role_models` selection. Pro defaults Haiku for licensing + accessibility; preflight prompt fires on heavy verbs. Not flagged; always-on. ADR: feature-flag-layer §2, §3.
+- [ ] **T1.6 — Cross-role propagation in `team update`.** Step 3 of `tools/team-update.md` gains "propagate to peer" option. Adds `propagated_from:` field to pending-file frontmatter schema. Gated by `features.cross_role_propagation`. ADR: automated-team-learning §4.
+
+### Tier 2 — Workroom + automated learning (the structural #11 changes)
+
+- [ ] **T2.1 — Workroom verb shape.** Multi-turn agent dialogue persisted to `~/.hacky-hours/sessions/<id>/messages.jsonl`. Schema for `messages.jsonl` rows. Apply to Step 2 (design) first as the proving ground; then Step 5 (iterate), then audit Lane A. Add `workroom_max_turns` + `workroom_role_budget` settings. `/hacky-hours redirect "<note>"` slash command for owner interruption. Gated by `features.workroom_mode`. ADR: workroom-mechanic.
+- [ ] **T2.2 — Auto-promote / queue split in `team update`.** Step 1 buckets pending entries by `stakes`. Step 2 presents only `high`. Auto-bucket commits silently with footer summary. Step 6 footer distinguishes auto-promoted vs reviewed counts. Gated by `features.auto_promote_low_stakes`. Depends on F3. ADR: automated-team-learning §3.
+- [ ] **T2.3 — End-of-verb auto-debrief.** After Phase N — Stash, run a brief agent-to-agent self-debrief. Each "I would propose…" becomes a `stakes: low` pending entry pre-classified by the agent. Persists as `role_event: "debrief"` in `messages.jsonl`. Gated by `features.auto_debrief`. Depends on T2.1. ADR: automated-team-learning §5.
+
+### Tier 3 — Browser companion (#8)
+
+Can start in parallel with Tier 1; chat surface (T3.5) depends on T2.1 for messages.
+
+- [ ] **T3.0 — Python stdlib generator scaffolding.** Extend `tools/team-site.md` for project workspace output. Set up vendored deps (Mermaid MIT, optional HTMX BSD-2). No feature flag — opt-in via verb args. ADR: browser-companion §1.
+- [ ] **T3.1 — Read-only project workspace.** `~/.hacky-hours/companion/<slug>/project/` renders `01-ideate/` through `05-iterate/` as Markdown + inline Mermaid. Left-rail nav. "Edit in your editor" deep-links. ADR: browser-companion §2 surface 3.
+- [ ] **T3.2 — Diagram gallery surface.** All ERDs / architecture diagrams / user-journey flowcharts in one Mermaid render page. Click-to-expand. ADR: browser-companion §2 surface 7.
+- [ ] **T3.3 — Audit timeline surface.** Traffic-light scorecards rendered visually with trend-over-time. Drill-down to findings. Reads from `hacky-hours/audits/`. ADR: browser-companion §2 surface 6.
+- [ ] **T3.4 — Pixel-art avatar bootstrap.** One-shot LLM pass generates 24×24 PNG avatars for all team agents at `team init` time. New `tools/team-avatars.md` spec. Style per-role palette. Fallback: emoji + initials. No flag — one-time install cost. ADR: browser-companion §5.
+- [ ] **T3.5 — Slack-style chat surface.** `~/.hacky-hours/companion/<slug>/chat/` renders `messages.jsonl` as Slack-shaped UX. Channel = session. Workspace = project. Per-agent avatar + name/role header + accent color. Threads via `in_reply_to`. Read-only. No flag — opt-in via verb args. Depends on T2.1, T3.4. ADR: browser-companion §3 (the headline).
+- [ ] **T3.6 — Multi-workspace switcher + `projects.yml` index.** Auto-populate `~/.hacky-hours/projects.yml` when `adopt` / `ideate` runs in a new directory. Browser chrome left-sidebar lists workspaces. No flag. ADR: browser-companion §4.
+- [ ] **T3.7 — Schema-aware fillable forms.** Forms for PRODUCT_OVERVIEW 5Ws, Constraints & Values, ARCHITECTURE quickstart. Submission writes `pending-input.json`; framework reads at next session preamble. Cost-saving move per #10. Gated by `features.forms_writeback`. ADR: browser-companion §2 surface 4.
+- [ ] **T3.8 — Backlog kanban with write-back.** Kanban view (Next milestone / Backlog / Done-from-CHANGELOG). Drag-to-reorder writes back to `BACKLOG.md`. Gated by `features.backlog_writeback`. ADR: browser-companion §2 surface 5.
+- [ ] **T3.9 — Session monitor surface.** Tails `pending/` + recent `history.md` appends. Auto-refresh. Real-time team-activity view. Gated by `features.session_monitor`. Depends on T2.1. ADR: browser-companion §2 surface 9.
+
+### Tier 4 — v4.1.0 release prep
+
+- [ ] **R1 — Run cost benchmarks.** Across small / medium / large representative projects per TESTING.md "Cost benchmarking" section. Publish `02-design/COST_MODEL.md` with the green/yellow/red feasibility matrix. Author `references/cost-model.yml` for preflight estimates.
+- [ ] **R2 — V4_DESIGN.md re-stratification.** Update §8 deferral lists; ensure new locked decisions reflect what actually shipped. (Some Tier 3 phases may slip to v4.2.)
+- [ ] **R3 — Flip feature-flag defaults.** Update `settings.yml` template to default-true for confirmed-stable v4.1 features.
+- [ ] **R4 — Version bump v4.0.x → v4.1.0.** SKILL.md, VERSION, footer strings, etc. (follow the v4.0.1 pattern).
+- [ ] **R5 — Tag v4.1.0 + GitHub release.** Release notes summarize v4.1's six ADRs and the trunk-based feature-flag release pattern.
+
+---
+
+## 📋 Backlog (v4.2+, captured during this iterate cycle)
+
+- History compaction (carried from v4.0.0 deferral; needs trigger + review-cadence design)
+- Skeptic as 13th role (escalation from T1.2 modal if signal warrants)
+- `verb-prelude.md` reference extraction (DRY win on `references/team-preflight.md` + `chat-format.md` + `capture-format.md` includes)
+- Additional silent-overwrite-risk audit (iterate doc writes, ADR date-collision, audit scorecard writes)
+- Implicit feedback capture ("override agent N times → write pending implicitly")
+- Per-verb stash-mode override in settings.yml (`team_learning.stash_prompt: end_of_verb | end_of_session | off`)
+- Agent-to-agent skill recommendation
+- Reflection auto-cadence triggers
+- Notion / Confluence exporters (v4.3+)
+- Cross-language / i18n (v4.3+)
+- Multi-team-per-project binding (v4.3+)
+- Multi-user collaboration on shared teams (v4.3+)
+- Résumé export to non-Markdown shapes (LinkedIn JSON, PDF) (v4.3+)
+- Per-project skill maps + cross-project skill inference (v4.3+)
+- Hosted browser companion (v4.3+ — currently local-only)
+- Marker-file polling for browser → Claude write-back (currently clipboard + `pending-input.json`)
+
+---
+
+## Provenance
+
+This BACKLOG was refilled by `/hacky-hours iterate --root hacky-hours` on 2026-05-22 against the upstream framework after v4.0.1 shipped. Source: `hacky-hours/ITERATION.md` (will be archived as `archive/iteration-2026-05-22.md` when this cycle closes).
+
+Six ADRs in `02-design/decisions/` anchor the v4.1 design:
+- `2026-05-22-feature-flag-layer.md`
+- `2026-05-22-workroom-mechanic.md`
+- `2026-05-22-three-artifact-model.md`
+- `2026-05-22-automated-team-learning.md`
+- `2026-05-22-browser-companion.md`
+- `2026-05-22-discovery-phase.md`

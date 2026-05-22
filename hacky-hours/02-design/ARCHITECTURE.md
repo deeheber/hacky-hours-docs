@@ -220,6 +220,71 @@ The `/hacky-hours` slash command is a Claude Code convenience. The actual framew
 
 Users in non-Claude-Code environments interact with the framework through natural language ("help me with ideation", "what's in my backlog?") instead of slash commands. The CLAUDE.md instructions guide Claude's behavior the same way.
 
+## Browser Companion (v4.1+)
+
+V4.0.x is terminal-only. v4.1 ships a **local browser companion** as a workspace around the conversation — a pure Python stdlib generator that produces static HTML from on-disk content, with no LLM round-trips and zero per-use API spend.
+
+**Architecture:**
+
+```
+~/.hacky-hours/companion/
+├── index.html              # workspace switcher
+├── static/                 # vendored Mermaid, optional HTMX, fonts
+└── workspaces/<slug>/
+    ├── home.html           # 1. dashboard
+    ├── team/               # 2. team browser (extends `team site`)
+    ├── project/            # 3. project workspace (Markdown + Mermaid render)
+    ├── forms/              # 4. schema-aware forms (write-back)
+    ├── backlog.html        # 5. kanban (write-back)
+    ├── audits/             # 6. traffic-light timeline
+    ├── diagrams.html       # 7. diagram gallery
+    ├── chat/               # 8. Slack-style chat surface (the headline)
+    └── monitor.html        # 9. session monitor
+```
+
+**Three modes:** `build` (idempotent static generation), `serve` (`build` + `python3 -m http.server`), `serve --writeback` (adds POST endpoint for forms / backlog reordering).
+
+**Data sources** (one source of truth per surface, consumed by both terminal + browser):
+- Project artifacts (`01-ideate/` through `05-iterate/`) — Markdown on disk
+- Workroom transcripts — `~/.hacky-hours/sessions/<id>/messages.jsonl`
+- Team roster — `~/.hacky-hours/teams/<name>/agents/<id>/`
+- Workspace index — `~/.hacky-hours/projects.yml`
+
+**Write-back patterns:** clipboard handoff (MVP), `pending-input.json` (form submissions; framework reads at next session preamble), marker-file polling (stretch).
+
+**Slack-style chat surface** is the headline of v4.1.0 — workspaces = projects, channels = sessions, messages = workroom turns + status updates + escalations, per-agent pixel-art avatars generated once at team-init.
+
+**Performance constraints:** initial load < 200ms, bundle < 100KB, works offline, no CDN deps, keyboard nav + deep-linkable URLs, WCAG 2.1 AA baseline.
+
+Full spec: V4_DESIGN.md §4.28–§4.29. ADR: `02-design/decisions/2026-05-22-browser-companion.md`.
+
+## Feature-flag layer (v4.1+)
+
+v4.1 introduces a `features:` block in `~/.hacky-hours/settings.yml` that lets users enable or disable individual mechanisms (workroom mode, auto-debrief, status updates, presentations, etc.). All v4.1 features default `false` in v4.1.x patches; v4.1.0 release flips confirmed-stable defaults to `true`.
+
+This is the load-bearing pattern for the v4.1 release strategy: **trunk-based development with feature flags**, not a long-lived feature branch. Each v4.1 piece lands on `main` disabled-by-default. v4.1.0 release is "flip the defaults," not a big-bang merge.
+
+Plan-aware defaults (`profile.plan` in settings.yml) give Pro / Max-5x / Max-20x users sensible starting configurations. Pro defaults to leaner choices (`team_chat: minimal`, Haiku for low-output roles, cost preflight on heavy verbs).
+
+Full spec: V4_DESIGN.md §4.23. ADR: `02-design/decisions/2026-05-22-feature-flag-layer.md`.
+
+## Release Process (v4.1+ amendment)
+
+v4.0.x followed merge-based releases (long-lived `feat/v4.0.0` branch → merge to main → tag). v4.1 adopts **trunk-based with feature flags**:
+
+1. Each v4.1 piece (Tier 0 through Tier 4 — see ITERATION.md from 2026-05-22) lands on `main` as a small PR, disabled-by-default behind a feature flag.
+2. v4.0.x patches can ship freely during the v4.1 cycle.
+3. v4.1.0 release commit flips feature-flag defaults in the settings.yml template + bumps version strings. No big merge.
+
+Trade: more discipline per-PR (must respect the flag); no long-lived branch drift / conflict pain. The Pro-feasibility constraint from #10 makes the discipline worth it — every cost-heavy mechanism is opt-in.
+
 ## Design Decisions
 
-*Future decisions should be recorded in `02-design/decisions/`.*
+*Future decisions should be recorded in `02-design/decisions/`. As of v4.1 design (2026-05-22), the active ADRs added since v4.0.0 are:*
+
+- `2026-05-22-feature-flag-layer.md`
+- `2026-05-22-workroom-mechanic.md`
+- `2026-05-22-three-artifact-model.md`
+- `2026-05-22-automated-team-learning.md`
+- `2026-05-22-browser-companion.md`
+- `2026-05-22-discovery-phase.md`
